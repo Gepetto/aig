@@ -3,5 +3,4 @@ Stand alone computation of inverse kinematics for biped robots. These codes comp
 
 
 The repository was built following the guide of commits proposed in :
-
 https://gepgitlab.laas.fr/gsaurel/example-adder/-/commits/master
