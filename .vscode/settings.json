@@ -120,5 +120,6 @@
         "cfloat": "cpp",
         "climits": "cpp",
         "*.txx": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }
