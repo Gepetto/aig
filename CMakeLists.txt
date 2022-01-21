@@ -38,7 +38,7 @@ set(${PROJECT_NAME}_HEADERS
   )
 
 set(${PROJECT_NAME}_SOURCES
-  src/postures.cpp
+  src/postures.cpp src/checker.cpp
   )
 
 ADD_PROJECT_DEPENDENCY(pinocchio REQUIRED)
@@ -46,12 +46,14 @@ ADD_PROJECT_DEPENDENCY(example-robot-data REQUIRED)
 
 # If it is changed to "add_library" instead, it needs an extra option SHARED after the project_name
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS}) 
-add_executable(checker src/checker.cpp ${${PROJECT_NAME}_HEADERS}) 
+add_executable(checker ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS}) 
+#add_executable(postures src/postures.cpp ${${PROJECT_NAME}_HEADERS}) 
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
 target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio example-robot-data::example-robot-data)
 target_link_libraries(checker PUBLIC pinocchio::pinocchio example-robot-data::example-robot-data)
+#target_link_libraries(postures PUBLIC pinocchio::pinocchio example-robot-data::example-robot-data)
 
 if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
