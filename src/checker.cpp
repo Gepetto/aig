@@ -75,6 +75,135 @@ void check_SE3(){
     std::cout << "\n\n" << H.translation() << "\n\n" << std::endl;
 }
 
+void check_BipIKConstructor() {
+
+    IK_tools::BipIK H;
+    std::cout << "\n\n" << H.info.leftHipJoint << "\n\n" << std::endl;
+    std::cout << "\n\n" << H.info.comFromWaist << "\n\n" << std::endl;
+    
+    IK_tools::BipIK E(IK_tools::xyzVector(1, 1, 0));
+    std::cout << "\n\n" << E.info.leftHipJoint << "\n\n" << std::endl;
+    std::cout << "\n\n" << E.info.comFromWaist << "\n\n" << std::endl;
+
+    IK_tools::BipedSettings conf;
+    conf.leftHipJoint = conf::leftHipJointName;
+    conf.rightHipJoint = conf::rightHipJointName;
+    conf.rightKneeJoint = conf::rightKneeJointName;
+    conf.leftKneeJoint = conf::leftKneeJointName;
+    conf.leftAnkleJoint = conf::leftAnkleJointName;
+    conf.rightAnkleJoint = conf::rightAnkleJointName;
+    conf.leftFootFrame = conf::leftFootFrameName;
+    conf.rightFootFrame = conf::rightFootFrameName;
+    conf.comFromWaist = IK_tools::xyzVector(1, 1, 0);
+
+    IK_tools::BipIK G(conf);
+    std::cout << "\n\n" << G.info.model.name << "\n\n" << std::endl;
+    std::cout << "\n\n" << G.info.comFromWaist << "\n\n" << std::endl;
+    std::cout << "\n\n" << G.info.leftHipJoint << "\n\n" << std::endl;
+}
+
+void check_LegIGConstructor(){
+
+    IK_tools::LegIG L;
+    std::cout << "\n\n" << L.info.side << "\n\n" << std::endl;
+    
+    IK_tools::LegSettings conf;
+    conf.side = IK_tools::Side::LEFT;
+    conf.femurLength = 3.0;
+    conf.tibiaLenght = 1.32;
+    conf.hipFromWaist << 0, 1, 0;
+    conf.ankleFromFoot << 0, 0, 34;
+    
+    IK_tools::LegIG J(conf);
+    std::cout << "\n\n" << J.info.side << "\n\n" << std::endl;
+    std::cout << "\n\n" << J.info.hipFromWaist << "\n\n" << std::endl;
+
+    IK_tools::BipIK H;
+    IK_tools::LegIG U = H.leftLeg;
+    H.configurateLegs();
+    std::cout << "\n\n" << U.info.side << "\n\n" << std::endl;
+    std::cout << "\n\n" << U.info.hipFromWaist << "\n\n" << std::endl;
+    std::cout << "\n\n" << U.info.femurLength << "\n\n" << std::endl;
+}
+
+void checkSolveMethods(){
+
+    IK_tools::BipIK H;
+    H.configurateLegs();
+    Eigen::VectorXd q0 = H.info.model.referenceConfigurations["half_sitting"];
+    pin::Data data(H.info.model);
+    std::cout << "\n\n" << "q0 : " << q0 << "\n\n" << std::endl;
+
+    pin::forwardKinematics(H.info.model, data, q0);
+    pin::updateFramePlacements(H.info.model, data);
+    pin::FrameIndex LF_id = H.info.model.getFrameId(conf::leftFootFrameName),
+                    RF_id = H.info.model.getFrameId(conf::rightFootFrameName);
+
+    pin::SE3  leftFoot(data.oMf[LF_id]), 
+             rightFoot(data.oMf[RF_id]);
+    std::cout << "\n\n" << "LF.translation : " << leftFoot.translation() << "\n\n" << std::endl;
+    std::cout << "\n\n" << "RF.translation : " << rightFoot.translation() << "\n\n" << std::endl;
+    IK_tools::xyzVector com(q0.head(3) + H.info.comFromWaist);
+    
+    pin::SE3 base = H.computeBase(com, leftFoot, rightFoot);
+    std::cout << "\n\n" << "base.rotation : " << base.rotation() << "\n\n" << std::endl;
+    std::cout << "\n\n" << "base.translation : " << base.translation() << "\n\n" << std::endl;
+
+    std::cout << "\n\n" << "HipFromWaist : " << H.leftLeg.info.hipFromWaist << "\n\n" << std::endl;
+    std::cout << "\n\n" << "HipFromWaist : " << H.rightLeg.info.hipFromWaist << "\n\n" << std::endl;
+    std::cout << "\n\n" << "AnkleFromFoot : " << H.leftLeg.info.ankleFromFoot << "\n\n" << std::endl;
+    std::cout << "\n\n" << "AnkleFromFoot : " << H.rightLeg.info.ankleFromFoot << "\n\n" << std::endl;
+    std::cout << "\n\n" << "femur : " << H.leftLeg.info.femurLength << "\n\n" << std::endl;
+    std::cout << "\n\n" << "femur : " << H.rightLeg.info.femurLength << "\n\n" << std::endl;
+    std::cout << "\n\n" << "tibia : " << H.leftLeg.info.tibiaLenght << "\n\n" << std::endl;
+    std::cout << "\n\n" << "tibia : " << H.rightLeg.info.tibiaLenght << "\n\n" << std::endl;
+
+    IK_tools::legJoints L = H.leftLeg.solve(base, leftFoot);
+    IK_tools::legJoints R = H.rightLeg.solve(base, rightFoot);
+
+    std::cout << "\n\n" << "left leg joints : " << L << "\n\n" << std::endl;
+    std::cout << "\n\n" << "right leg joints : " << R << "\n\n" << std::endl;
+
+    Eigen::VectorXd posture;
+    H.solve(base, leftFoot, rightFoot, q0, posture);
+    std::cout << "\n\n" << "BipIK.solve : " << posture << "\n\n" << std::endl;
+
+}
+
+void check_solveDerivatives(){
+
+    IK_tools::BipIK H;
+    H.configurateLegs();
+    Eigen::VectorXd q0 = H.info.model.referenceConfigurations["half_sitting"];
+    pin::Data data(H.info.model);
+    std::cout << "\n\n" << "q0 : " << q0 << "\n\n" << std::endl;
+
+    pin::forwardKinematics(H.info.model, data, q0);
+    pin::updateFramePlacements(H.info.model, data);
+    pin::FrameIndex LF_id = H.info.model.getFrameId(conf::leftFootFrameName),
+                    RF_id = H.info.model.getFrameId(conf::rightFootFrameName);
+
+    pin::SE3 leftFoot(data.oMf[LF_id]), rightFoot(data.oMf[RF_id]);
+    IK_tools::xyzVector com1, com2, com3;
+    com1 = q0.head(3) + H.info.comFromWaist;
+    com2 = IK_tools::xyzVector(0, 0.01, -0.02) + com1;
+    com3 = IK_tools::xyzVector(0, 0.01, -0.02) + com2;
+    std::array<IK_tools::xyzVector, 3> coms = {com1, com2, com3};
+    std::array<pin::SE3, 3> LFs = {leftFoot, leftFoot, leftFoot};
+    std::array<pin::SE3, 3> RFs = {rightFoot, rightFoot, rightFoot};
+
+    Eigen::VectorXd posture, velocity, acceleration;
+
+    H.solve(coms, LFs, RFs, q0, posture, velocity, acceleration, 0.01);
+
+    std::cout << "\nPosture : \n" << posture << "\n\n" << std::endl;
+    std::cout << "\nVelocity : \n" << velocity << "\n\n" << std::endl;
+    std::cout << "\nAcceleration : \n" << acceleration << "\n\n" << std::endl;
+}
+
+
+// OLD CODE: /////////////////////////////
+
 void checkChasisConstructor(){
 
     IK_tools::BipedIK H;
@@ -173,7 +302,8 @@ void checkDerivativesComputation(){
     std::cout << "\n\n" << H.a << "\n\n" << std::endl;
 }
 
+
 int main(){
-    checkDerivativesComputation();
+    check_solveDerivatives();
 }
 

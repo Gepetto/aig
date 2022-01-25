@@ -7,33 +7,11 @@
 
 namespace pin = pinocchio;
 namespace IK_tools {
-
-    typedef Eigen::Matrix<double, 4, 4> HomMatrix;
     typedef Eigen::Matrix<double, 3, 3> RotMatrix;
     typedef Eigen::Matrix<double, 3, 1> xyzVector;
     typedef Eigen::Matrix<double, 6, 1> legJoints;
     enum Side {LEFT, RIGHT};
     
-    class BipedIK
-    {   
-    public:
-        xyzVector comFromWaist;
-        pin::Model model;
-        Eigen::VectorXd q0, q;
-        Eigen::VectorXd v, a;
-        BipedIK();
-        legJoints solveLeg(const pin::SE3 &com, 
-                            const pin::SE3 &foot, 
-                            const Side &side) const;
-        Eigen::VectorXd computePosture(const pin::SE3 &com, const pin::SE3 &leftFoot,
-                                        const pin::SE3 &rightFoot, Eigen::VectorXd q);
-        void setRootOrientation(pin::SE3 &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot);
-        void computeJointDerivatives(const Eigen::VectorXd &q1, 
-                                                const Eigen::VectorXd &q2, 
-                                                const Eigen::VectorXd &q3, const double dt);
-    };
-
-
     struct LegSettings
     {
     public:
@@ -103,29 +81,29 @@ namespace IK_tools {
                    const std::array<pin::SE3, 3> &leftFeet,
                    const std::array<pin::SE3, 3> &rightFeet,
                    const Eigen::VectorXd &q0, 
-                   const double &dt,
                          Eigen::VectorXd &posture, 
                          Eigen::VectorXd &velocity, 
-                         Eigen::VectorXd &acceleration);
+                         Eigen::VectorXd &acceleration,
+                   const double &dt);
         
         void solve(const std::array<xyzVector, 3> &coms, 
                    const std::array<RotMatrix, 3> &baseRotations,
                    const std::array<pin::SE3, 3> &leftFeet,
                    const std::array<pin::SE3, 3> &rightFeet,
                    const Eigen::VectorXd &q0, 
-                   const double &dt,
                          Eigen::VectorXd &posture, 
                          Eigen::VectorXd &velocity, 
-                         Eigen::VectorXd &acceleration);
+                         Eigen::VectorXd &acceleration,
+                   const double &dt);
 
         void solve(const std::array<pin::SE3, 3> &bases,
                    const std::array<pin::SE3, 3> &leftFeet,
                    const std::array<pin::SE3, 3> &rightFeet,
-                   const Eigen::VectorXd &q0, 
-                   const double &dt,
+                   const Eigen::VectorXd &q0,
                          Eigen::VectorXd &posture, 
                          Eigen::VectorXd &velocity,
-                         Eigen::VectorXd &acceleration); 
+                         Eigen::VectorXd &acceleration,
+                   const double &dt); 
 
         void configurateLegs();
         pin::SE3 computeBase(const xyzVector &com,
@@ -134,6 +112,32 @@ namespace IK_tools {
         pin::SE3 computeBase(const xyzVector &com, 
                          const RotMatrix &baseRotation);
     };
+
+//OLD CODE:////////////////////////////////////////////////////////////////////////
+
+   class BipedIK
+    {   
+    public:
+        xyzVector comFromWaist;
+        pin::Model model;
+        Eigen::VectorXd q0, q;
+        Eigen::VectorXd v, a;
+        BipedIK();
+        legJoints solveLeg(const pin::SE3 &com, 
+                            const pin::SE3 &foot, 
+                            const Side &side) const;
+        Eigen::VectorXd computePosture(const pin::SE3 &com, const pin::SE3 &leftFoot,
+                                        const pin::SE3 &rightFoot, Eigen::VectorXd q);
+        void setRootOrientation(pin::SE3 &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot);
+        void computeJointDerivatives(const Eigen::VectorXd &q1, 
+                                                const Eigen::VectorXd &q2, 
+                                                const Eigen::VectorXd &q3, const double dt);
+    };
+
+
+
+
+
 }
 
 
