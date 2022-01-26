@@ -21,7 +21,6 @@
 
 namespace IK_tools{
     
-    // START OF NEW STRUCTURE
     BipIK::BipIK(){
 
         pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), info.model);
@@ -181,6 +180,49 @@ namespace IK_tools{
 
         velocity = pin::difference(info.model, q1, q3)/(2*dt);
         acceleration = (velocity3-velocity1)/dt;
+    }
+
+    Eigen::Vector2d BipIK::computeCoP(pin::Data &data, const Eigen::VectorXd &posture, 
+                                      const Eigen::VectorXd &velocity, const Eigen::VectorXd &acceleration,
+                                      bool flatHorizontalGround){
+
+        Wrench tauMw = pin::rnea(info.model, data, posture, velocity, acceleration).head(6);
+        Eigen::Vector3d groundTorqueMo = tauMw.tail(3) + 
+                                         pin::skew(Eigen::Vector3d(posture.head(3)))*tauMw.head(3);
+        std::cout << "groundTorque: \n" << groundTorqueMo << std::endl;
+        Eigen::Vector3d pressureTorqueMo; 
+        if(flatHorizontalGround){
+            pressureTorqueMo = groundTorqueMo;
+        }else{
+            // TODO get the force distribution and remove the non pressure terms form the CoP computation.
+            // for now, we assume a flat and horizontal ground.
+        }
+        Eigen::Vector2d cop;
+        cop << -pressureTorqueMo(1)/tauMw(2), 
+                pressureTorqueMo(0)/tauMw(2);
+        return cop;
+    }
+ 
+    Eigen::Vector2d BipIK::computeCoP(pin::Data &data, const Eigen::VectorXd &posture, 
+                                      const Eigen::VectorXd &velocity, const Eigen::VectorXd &acceleration,
+                                      const Wrench &externalWrench, bool flatHorizontalGround){
+        // The external wrench is suposed to be expresed in the frame of the root link.
+
+        Wrench tauMw = pin::rnea(info.model, data, posture, velocity, acceleration).head(6);
+        Eigen::Vector3d groundTorqueMo = tauMw.tail(3) - externalWrench.tail(3) + 
+                                         pin::skew(Eigen::Vector3d(posture.head(3)))*(tauMw.head(3) - externalWrench.head(3));
+
+        Eigen::Vector3d pressureTorqueMo;
+        if(flatHorizontalGround){
+            pressureTorqueMo = groundTorqueMo;
+        }else{
+            // TODO get the force distribution and remove the non pressure terms form the CoP computation.
+            // for now, we assume a flat and horizontal ground.
+        }
+        Eigen::Vector2d cop;
+        cop << -pressureTorqueMo(1)/(tauMw(2) - externalWrench(2)),
+                pressureTorqueMo(0)/(tauMw(2) - externalWrench(2));
+        return cop;
     }
 
     LegIG::LegIG(){}

@@ -201,6 +201,93 @@ void check_solveDerivatives(){
     std::cout << "\nAcceleration : \n" << acceleration << "\n\n" << std::endl;
 }
 
+void check_CoPcomputation(){
+
+    IK_tools::BipIK H;
+    H.configurateLegs();
+    Eigen::VectorXd q0 = H.info.model.referenceConfigurations["half_sitting"];
+    q0(1) = 40; q0(0) = 70;
+    pin::Data data(H.info.model);
+
+    pin::forwardKinematics(H.info.model, data, q0);
+    pin::updateFramePlacements(H.info.model, data);
+    pin::FrameIndex LF_id = H.info.model.getFrameId(conf::leftFootFrameName),
+                    RF_id = H.info.model.getFrameId(conf::rightFootFrameName);
+
+    pin::SE3 leftFoot(data.oMf[LF_id]), rightFoot(data.oMf[RF_id]);
+    IK_tools::xyzVector com1, com2, com3;
+    com1 = q0.head(3) + H.info.comFromWaist;
+    com2 = IK_tools::xyzVector(0.0, 0.0, 0.0) + com1;
+    com3 = IK_tools::xyzVector(0.0, 0.0, 0.0) + com2;
+    std::array<IK_tools::xyzVector, 3> coms = {com1, com2, com3};
+    std::array<pin::SE3, 3> LFs = {leftFoot, leftFoot, leftFoot};
+    std::array<pin::SE3, 3> RFs = {rightFoot, rightFoot, rightFoot};
+
+    Eigen::VectorXd posture, velocity, acceleration;
+
+    H.solve(coms, LFs, RFs, q0, posture, velocity, acceleration, 0.01);
+    Eigen::Vector2d cop = H.computeCoP(data, posture, velocity, acceleration);
+    std::cout << "\nWaist: \n" << posture.head(3) << "\n\n" << std::endl;
+    std::cout << "\nCoM: \n" << com2 << "\n\n" << std::endl;
+    std::cout << "\nCoP: \n" << cop << "\n\n" << std::endl;
+    std::cout << "\nleftFoot : \n" << leftFoot.translation() << "\n\n" << std::endl;
+    std::cout << "\nrightFoot : \n" << rightFoot.translation() << "\n\n" << std::endl;
+}
+
+void check_CoPcomputationWithExtForces(){
+
+    IK_tools::BipIK H;
+    H.configurateLegs();
+    Eigen::VectorXd q0 = H.info.model.referenceConfigurations["half_sitting"];
+    q0(1) = 40; q0(0) = 70;
+    pin::Data data(H.info.model);
+
+    pin::forwardKinematics(H.info.model, data, q0);
+    pin::updateFramePlacements(H.info.model, data);
+    pin::FrameIndex LF_id = H.info.model.getFrameId(conf::leftFootFrameName),
+                    RF_id = H.info.model.getFrameId(conf::rightFootFrameName);
+
+    pin::SE3 leftFoot(data.oMf[LF_id]), rightFoot(data.oMf[RF_id]);
+    IK_tools::xyzVector com1, com2, com3;
+    com1 = q0.head(3) + H.info.comFromWaist;
+    com2 = IK_tools::xyzVector(0.0, 0.0, 0.0) + com1;
+    com3 = IK_tools::xyzVector(0.0, 0.0, 0.0) + com2;
+    std::array<IK_tools::xyzVector, 3> coms = {com1, com2, com3};
+    std::array<pin::SE3, 3> LFs = {leftFoot, leftFoot, leftFoot};
+    std::array<pin::SE3, 3> RFs = {rightFoot, rightFoot, rightFoot};
+
+    Eigen::VectorXd posture, velocity, acceleration;
+    H.solve(coms, LFs, RFs, q0, posture, velocity, acceleration, 0.01);
+
+    IK_tools::Wrench wrench0, wrench1, wrench2, wrench3;
+    wrench0 << 0,0,0,0,0,0;
+    wrench1 << 100,0,0,0,0,0;
+    wrench2 << 10,0,100,0,0,0;
+    wrench3 << 0,0,0,50,0,0;
+    Eigen::Vector2d cop1 = H.computeCoP(data, posture, velocity, acceleration);
+    Eigen::Vector2d cop2 = H.computeCoP(data, posture, velocity, acceleration, wrench0);
+    Eigen::Vector2d cop3 = H.computeCoP(data, posture, velocity, acceleration, wrench1);
+    Eigen::Vector2d cop4 = H.computeCoP(data, posture, velocity, acceleration, wrench2);
+    Eigen::Vector2d cop5 = H.computeCoP(data, posture, velocity, acceleration, wrench3);
+
+    std::cout << "\nWaist: \n" << posture.head(3) << "\n\n" << std::endl;
+    std::cout << "\nCoM: \n" << com2 << "\n\n" << std::endl;
+    std::cout << "\nCoP : \n" << cop1 << "\n\n" << std::endl;
+    std::cout << "\nCoP wit extForce = 0: \n" << cop2 << "\n\n" << std::endl;
+    std::cout << "\nCoP wit extForce_x = 100: \n" << cop3 << "\n\n" << std::endl;
+    std::cout << "\nCoP wit extForce_z = 100 and extForce_x = 10: \n" << cop4 << "\n\n" << std::endl;
+    std::cout << "\nCoP wit extTorque_x = 50: \n" << cop5 << "\n\n" << std::endl;
+    std::cout << "\nleftFoot : \n" << leftFoot.translation() << "\n\n" << std::endl;
+    std::cout << "\nrightFoot : \n" << rightFoot.translation() << "\n\n" << std::endl;
+}
+
+void check_skew(){
+    Eigen::Vector3d v;
+    v << 2, 3, 4;
+    
+    std::cout << "\nthe skew matrix : \n" << pin::skew(v) << "\n\n" << std::endl;
+}
+
 
 // OLD CODE: /////////////////////////////
 
@@ -304,6 +391,6 @@ void checkDerivativesComputation(){
 
 
 int main(){
-    check_solveDerivatives();
+    check_CoPcomputationWithExtForces();
 }
 

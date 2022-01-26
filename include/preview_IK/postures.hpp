@@ -10,6 +10,7 @@ namespace IK_tools {
     typedef Eigen::Matrix<double, 3, 3> RotMatrix;
     typedef Eigen::Matrix<double, 3, 1> xyzVector;
     typedef Eigen::Matrix<double, 6, 1> legJoints;
+    typedef Eigen::Matrix<double, 6, 1> Wrench;
     enum Side {LEFT, RIGHT};
     
     struct LegSettings
@@ -23,14 +24,13 @@ namespace IK_tools {
     {
     public:
         LegSettings info;
-
+    
         LegIG();
         LegIG(const LegSettings &configuration);
         legJoints solve(const pin::SE3 &base, const pin::SE3 &endEffector);
 
     };
     
-
     class ArmIG
     {
     public:
@@ -55,9 +55,22 @@ namespace IK_tools {
         ArmIG leftArm, rightArm;
 
         BipIK();
+
         BipIK(const xyzVector &setComFromWaist);
+
         BipIK(const BipedSettings &configuration);
+
         void checkCompatibility();//TODO
+
+        void configurateLegs();
+
+        pin::SE3 computeBase(const xyzVector &com,
+                         const pin::SE3 &leftFoot,
+                         const pin::SE3 &rightFoot);
+
+        pin::SE3 computeBase(const xyzVector &com, 
+                         const RotMatrix &baseRotation);
+
         void solve(const xyzVector &com,
                    const pin::SE3 &leftFoot,
                    const pin::SE3 &rightFoot,
@@ -105,12 +118,19 @@ namespace IK_tools {
                          Eigen::VectorXd &acceleration,
                    const double &dt); 
 
-        void configurateLegs();
-        pin::SE3 computeBase(const xyzVector &com,
-                         const pin::SE3 &leftFoot,
-                         const pin::SE3 &rightFoot);
-        pin::SE3 computeBase(const xyzVector &com, 
-                         const RotMatrix &baseRotation);
+        Eigen::Vector2d computeCoP(pin::Data &data, 
+                                   const Eigen::VectorXd &posture, 
+                                   const Eigen::VectorXd &velocity, 
+                                   const Eigen::VectorXd &acceleration,
+                                   bool flatHorizontalGround = true);
+
+        Eigen::Vector2d computeCoP(pin::Data &data, 
+                                   const Eigen::VectorXd &posture, 
+                                   const Eigen::VectorXd &velocity, 
+                                   const Eigen::VectorXd &acceleration,
+                                   const Wrench &externalWrench,
+                                   bool flatHorizontalGround = true);
+
     };
 
 //OLD CODE:////////////////////////////////////////////////////////////////////////
