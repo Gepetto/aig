@@ -80,10 +80,6 @@ void check_BipIKConstructor() {
     IK_tools::BipIK H;
     std::cout << "\n\n" << H.info.leftHipJoint << "\n\n" << std::endl;
     std::cout << "\n\n" << H.info.comFromWaist << "\n\n" << std::endl;
-    
-    IK_tools::BipIK E(IK_tools::xyzVector(1, 1, 0));
-    std::cout << "\n\n" << E.info.leftHipJoint << "\n\n" << std::endl;
-    std::cout << "\n\n" << E.info.comFromWaist << "\n\n" << std::endl;
 
     IK_tools::BipedSettings conf;
     conf.leftHipJoint = conf::leftHipJointName;

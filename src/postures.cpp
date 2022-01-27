@@ -23,7 +23,6 @@ namespace IK_tools{
     
     BipIK::BipIK(){
 
-        pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), info.model);
         info.leftHipJoint = conf::leftHipJointName;
         info.rightHipJoint = conf::rightHipJointName;
         info.leftKneeJoint = conf::leftKneeJointName;
@@ -32,6 +31,7 @@ namespace IK_tools{
         info.rightAnkleJoint = conf::rightAnkleJointName;
         info.leftFootFrame = conf::leftFootFrameName;
         info.rightFootFrame = conf::rightFootFrameName;
+        pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), info.model);
 
         pin::srdf::loadReferenceConfigurations(info.model, conf::srdf_path, false);
         Eigen::VectorXd q0 = info.model.referenceConfigurations["half_sitting"];
@@ -39,23 +39,13 @@ namespace IK_tools{
         xyzVector c = pin::centerOfMass(info.model, data, q0);
         info.comFromWaist = c - q0.head(3);
     }
-    BipIK::BipIK(const xyzVector &setComFromWaist){
 
-        info.leftHipJoint = conf::leftHipJointName;
-        info.rightHipJoint = conf::rightHipJointName;
-        info.leftKneeJoint = conf::leftKneeJointName;
-        info.rightKneeJoint = conf::rightKneeJointName;
-        info.leftAnkleJoint = conf::leftAnkleJointName;
-        info.rightAnkleJoint = conf::rightAnkleJointName;
-        info.leftFootFrame = conf::leftFootFrameName;
-        info.rightFootFrame = conf::rightFootFrameName;
-        info.comFromWaist = setComFromWaist;
-        pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), info.model);
-    }
     BipIK::BipIK(const BipedSettings &configuration){
+
         info = configuration;
         pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), info.model);
     }
+
     void BipIK::configurateLegs(){
         LegSettings leftConf, rightConf;
         pin::JointIndex leftHipID  = info.model.getJointId(info.leftHipJoint), 
@@ -81,49 +71,25 @@ namespace IK_tools{
         rightConf.ankleFromFoot = -info.model.frames[rightSoleID].placement.translation();
         rightLeg.info = rightConf;
     }
-    pin::SE3 BipIK::computeBase(const xyzVector &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot){
-        pin::SE3 base;
-        double leftYawl, rightYawl, baseYawl;
-        leftYawl = pin::log3(leftFoot.rotation())(2);
-        rightYawl = pin::log3(rightFoot.rotation())(2);
 
-        baseYawl = (leftYawl + rightYawl)/2;
-
-        base.rotation(Eigen::AngleAxisd(baseYawl, xyzVector(0, 0, 1)).toRotationMatrix());
-        base.translation(com - base.rotation() * info.comFromWaist);
-        return base;
-    }
     pin::SE3 BipIK::computeBase(const xyzVector &com, const RotMatrix &baseRotation){
+        
         pin::SE3 base;
-
         base.rotation(baseRotation);
         base.translation(com - base.rotation() * info.comFromWaist);
         return base;
     }
 
-    void BipIK::solve(const xyzVector &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot,
-                      const Eigen::VectorXd &q0, Eigen::VectorXd &posture){
+    pin::SE3 BipIK::computeBase(const xyzVector &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot){
+
+        double leftYawl, rightYawl;
+        leftYawl = pin::log3(leftFoot.rotation())(2);
+        rightYawl = pin::log3(rightFoot.rotation())(2);
         
-        posture = q0;
-        pin::SE3 base = computeBase(com, leftFoot, rightFoot);
-        posture.head(3) = base.translation();
-        Eigen::Quaterniond quat(base.rotation());
-        posture.segment(3, 4) << quat.x(), quat.y(), quat.z(), quat.w();
-        posture.segment(7, 6) = leftLeg.solve(base, leftFoot);
-        posture.segment(13, 6) = rightLeg.solve(base, rightFoot);
-        //TODO remove hard coded numbers 7, 6, 13, 6.
+        return computeBase(com, Eigen::AngleAxisd((leftYawl + rightYawl)/2, 
+                                                  xyzVector(0, 0, 1)).toRotationMatrix());
     }
-    void BipIK::solve(const xyzVector &com, const RotMatrix &baseRotation, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot,
-                      const Eigen::VectorXd &q0, Eigen::VectorXd &posture){
-        
-        posture = q0;
-        pin::SE3 base = computeBase(com, baseRotation);
-        Eigen::Quaterniond quat(base.rotation());
-        posture.segment(3, 4) << quat.x(), quat.y(), quat.z(), quat.w();
-        posture.segment(7, 6) = leftLeg.solve(base, leftFoot);
-        posture.segment(13, 6) = rightLeg.solve(base, rightFoot);
-        //TODO remove hard coded numbers 7, 6, 13, 6.
-    }
+    
     void BipIK::solve(const pin::SE3 &base, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot,
                const Eigen::VectorXd &q0, Eigen::VectorXd &posture){
         
@@ -135,6 +101,43 @@ namespace IK_tools{
         posture.segment(13, 6) = rightLeg.solve(base, rightFoot);
         //TODO the numbers 7, 6, 13, 6 could be not hard coded.
     }
+
+    void BipIK::solve(const xyzVector &com, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot,
+                      const Eigen::VectorXd &q0, Eigen::VectorXd &posture){
+        
+        pin::SE3 base = computeBase(com, leftFoot, rightFoot);
+        solve(base, leftFoot, rightFoot, q0, posture);
+    }
+
+    void BipIK::solve(const xyzVector &com, const RotMatrix &baseRotation, const pin::SE3 &leftFoot, const pin::SE3 &rightFoot,
+                      const Eigen::VectorXd &q0, Eigen::VectorXd &posture){
+        
+        pin::SE3 base = computeBase(com, baseRotation);
+        solve(base, leftFoot, rightFoot, q0, posture);
+    }
+
+    void BipIK::derivatives(const Eigen::VectorXd &q1, const Eigen::VectorXd &q3, Eigen::VectorXd &posture, 
+                            Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt){
+
+        Eigen::VectorXd velocity1(pin::difference(info.model, q1, posture)/dt);
+        Eigen::VectorXd velocity3(pin::difference(info.model, posture, q3)/dt);
+
+        velocity = pin::difference(info.model, q1, q3)/(2*dt);
+        acceleration = (velocity3-velocity1)/dt;
+    }
+
+    void BipIK::solve(const std::array<pin::SE3, 3> &bases, const std::array<pin::SE3, 3> &leftFeet, 
+                      const std::array<pin::SE3, 3> &rightFeet, const Eigen::VectorXd &q0, Eigen::VectorXd &posture, 
+                      Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt){
+        
+        Eigen::VectorXd q1, q3;
+        solve(bases[0], leftFeet[0], rightFeet[0], q0, q1);
+        solve(bases[1], leftFeet[1], rightFeet[1], q0, posture);
+        solve(bases[2], leftFeet[2], rightFeet[2], q0, q3);
+
+        derivatives(q1, q3, posture, velocity, acceleration, dt);
+    }
+    
     void BipIK::solve(const std::array<xyzVector, 3> &coms, const std::array<pin::SE3, 3> &leftFeet,
                       const std::array<pin::SE3, 3> &rightFeet, const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
                       Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt){
@@ -144,12 +147,9 @@ namespace IK_tools{
         solve(coms[1], leftFeet[1], rightFeet[1], q0, posture);
         solve(coms[2], leftFeet[2], rightFeet[2], q0, q3);
 
-        Eigen::VectorXd velocity1(pin::difference(info.model, q1, posture)/dt);
-        Eigen::VectorXd velocity3(pin::difference(info.model, posture, q3)/dt);
-
-        velocity = pin::difference(info.model, q1, q3)/(2*dt);
-        acceleration = (velocity3-velocity1)/dt;
+        derivatives(q1, q3, posture, velocity, acceleration, dt);
     }
+
     void BipIK::solve(const std::array<xyzVector, 3> &coms, const std::array<RotMatrix, 3> &baseRotations,
                       const std::array<pin::SE3, 3> &leftFeet, const std::array<pin::SE3, 3> &rightFeet, 
                       const Eigen::VectorXd &q0, Eigen::VectorXd &posture, Eigen::VectorXd &velocity, 
@@ -160,49 +160,9 @@ namespace IK_tools{
         solve(coms[1], baseRotations[1], leftFeet[1], rightFeet[1], q0, posture);
         solve(coms[2], baseRotations[2], leftFeet[2], rightFeet[2], q0, q3);
 
-        Eigen::VectorXd velocity1(pin::difference(info.model, q1, posture)/dt);
-        Eigen::VectorXd velocity3(pin::difference(info.model, posture, q3)/dt);
-
-        velocity = pin::difference(info.model, q1, q3)/(2*dt);
-        acceleration = (velocity3-velocity1)/dt;
-    }
-    void BipIK::solve(const std::array<pin::SE3, 3> &bases, const std::array<pin::SE3, 3> &leftFeet, 
-                      const std::array<pin::SE3, 3> &rightFeet, const Eigen::VectorXd &q0, Eigen::VectorXd &posture, 
-                      Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt){
-        
-        Eigen::VectorXd q1, q3;
-        solve(bases[0], leftFeet[0], rightFeet[0], q0, q1);
-        solve(bases[1], leftFeet[1], rightFeet[1], q0, posture);
-        solve(bases[2], leftFeet[2], rightFeet[2], q0, q3);
-
-        Eigen::VectorXd velocity1(pin::difference(info.model, q1, posture)/dt);
-        Eigen::VectorXd velocity3(pin::difference(info.model, posture, q3)/dt);
-
-        velocity = pin::difference(info.model, q1, q3)/(2*dt);
-        acceleration = (velocity3-velocity1)/dt;
+        derivatives(q1, q3, posture, velocity, acceleration, dt);
     }
 
-    Eigen::Vector2d BipIK::computeCoP(pin::Data &data, const Eigen::VectorXd &posture, 
-                                      const Eigen::VectorXd &velocity, const Eigen::VectorXd &acceleration,
-                                      bool flatHorizontalGround){
-
-        Wrench tauMw = pin::rnea(info.model, data, posture, velocity, acceleration).head(6);
-        Eigen::Vector3d groundTorqueMo = tauMw.tail(3) + 
-                                         pin::skew(Eigen::Vector3d(posture.head(3)))*tauMw.head(3);
-        std::cout << "groundTorque: \n" << groundTorqueMo << std::endl;
-        Eigen::Vector3d pressureTorqueMo; 
-        if(flatHorizontalGround){
-            pressureTorqueMo = groundTorqueMo;
-        }else{
-            // TODO get the force distribution and remove the non pressure terms form the CoP computation.
-            // for now, we assume a flat and horizontal ground.
-        }
-        Eigen::Vector2d cop;
-        cop << -pressureTorqueMo(1)/tauMw(2), 
-                pressureTorqueMo(0)/tauMw(2);
-        return cop;
-    }
- 
     Eigen::Vector2d BipIK::computeCoP(pin::Data &data, const Eigen::VectorXd &posture, 
                                       const Eigen::VectorXd &velocity, const Eigen::VectorXd &acceleration,
                                       const Wrench &externalWrench, bool flatHorizontalGround){
@@ -219,12 +179,19 @@ namespace IK_tools{
             // TODO get the force distribution and remove the non pressure terms form the CoP computation.
             // for now, we assume a flat and horizontal ground.
         }
-        Eigen::Vector2d cop;
-        cop << -pressureTorqueMo(1)/(tauMw(2) - externalWrench(2)),
-                pressureTorqueMo(0)/(tauMw(2) - externalWrench(2));
-        return cop;
+        
+        return Eigen::Vector2d(-pressureTorqueMo(1)/(tauMw(2) - externalWrench(2)),
+                                pressureTorqueMo(0)/(tauMw(2) - externalWrench(2)));
     }
 
+    Eigen::Vector2d BipIK::computeCoP(pin::Data &data, const Eigen::VectorXd &posture, 
+                                      const Eigen::VectorXd &velocity, const Eigen::VectorXd &acceleration,
+                                      bool flatHorizontalGround){
+        
+        Wrench externalWrench = Wrench::Zero();
+        return computeCoP(data, posture, velocity, acceleration, externalWrench, flatHorizontalGround);
+    }
+ 
     LegIG::LegIG(){}
     LegIG::LegIG(const LegSettings &configuration){
         info = configuration;
@@ -270,6 +237,8 @@ namespace IK_tools{
 
     ArmIG::ArmIG() {}
     
+
+
     //OLD CODE: //////////////////////////////////////////////////////////////////////////////
 
     BipedIK::BipedIK(){

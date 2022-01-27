@@ -27,15 +27,16 @@ namespace IK_tools {
     
         LegIG();
         LegIG(const LegSettings &configuration);
-        legJoints solve(const pin::SE3 &base, const pin::SE3 &endEffector);
-
+        legJoints solve(const pin::SE3 &base, 
+                        const pin::SE3 &endEffector);
     };
     
     class ArmIG
     {
     public:
         ArmIG();
-        Eigen::VectorXd solve(const pin::SE3 &base, const pin::SE3 &endEffector);
+        Eigen::VectorXd solve(const pin::SE3 &base, 
+                              const pin::SE3 &endEffector);
     };
 
     struct BipedSettings
@@ -49,14 +50,20 @@ namespace IK_tools {
     };
     class BipIK
     {
+    private:
+    void derivatives(const Eigen::VectorXd &q1, 
+                     const Eigen::VectorXd &q3, 
+                           Eigen::VectorXd &posture, 
+                           Eigen::VectorXd &velocity, 
+                           Eigen::VectorXd &acceleration, 
+                     const double &dt);
+
     public:
         BipedSettings info;
         LegIG leftLeg, rightLeg;
         ArmIG leftArm, rightArm;
 
         BipIK();
-
-        BipIK(const xyzVector &setComFromWaist);
 
         BipIK(const BipedSettings &configuration);
 
@@ -65,30 +72,30 @@ namespace IK_tools {
         void configurateLegs();
 
         pin::SE3 computeBase(const xyzVector &com,
-                         const pin::SE3 &leftFoot,
-                         const pin::SE3 &rightFoot);
+                             const pin::SE3 &leftFoot,
+                             const pin::SE3 &rightFoot);
 
         pin::SE3 computeBase(const xyzVector &com, 
-                         const RotMatrix &baseRotation);
+                             const RotMatrix &baseRotation);
 
         void solve(const xyzVector &com,
                    const pin::SE3 &leftFoot,
                    const pin::SE3 &rightFoot,
                    const Eigen::VectorXd &q0,
-                   Eigen::VectorXd &posture);
+                         Eigen::VectorXd &posture);
 
         void solve(const xyzVector &com, 
                    const RotMatrix &baseRotation, 
                    const pin::SE3 &leftFoot, 
                    const pin::SE3 &rightFoot,
                    const Eigen::VectorXd &q0, 
-                   Eigen::VectorXd &posture);
+                         Eigen::VectorXd &posture);
 
         void solve(const pin::SE3 &base,
                    const pin::SE3 &leftFoot,
                    const pin::SE3 &rightFoot,
                    const Eigen::VectorXd &q0,
-                   Eigen::VectorXd &posture);
+                         Eigen::VectorXd &posture);
 
         void solve(const std::array<xyzVector, 3> &coms, 
                    const std::array<pin::SE3, 3> &leftFeet,
@@ -118,13 +125,13 @@ namespace IK_tools {
                          Eigen::VectorXd &acceleration,
                    const double &dt); 
 
-        Eigen::Vector2d computeCoP(pin::Data &data, 
+        Eigen::Vector2d computeCoP(      pin::Data &data, 
                                    const Eigen::VectorXd &posture, 
                                    const Eigen::VectorXd &velocity, 
                                    const Eigen::VectorXd &acceleration,
                                    bool flatHorizontalGround = true);
 
-        Eigen::Vector2d computeCoP(pin::Data &data, 
+        Eigen::Vector2d computeCoP(      pin::Data &data, 
                                    const Eigen::VectorXd &posture, 
                                    const Eigen::VectorXd &velocity, 
                                    const Eigen::VectorXd &acceleration,
