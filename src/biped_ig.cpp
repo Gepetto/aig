@@ -4,11 +4,12 @@
  * @brief
  */
 
-#include "pinocchio/parsers/urdf.hpp"
-#include "pinocchio/parsers/srdf.hpp"
+#include "preview_ik/biped_ig.hpp"
+
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/rnea.hpp"
-#include "preview_ik/biped_ig.hpp"
+#include "pinocchio/parsers/srdf.hpp"
+#include "pinocchio/parsers/urdf.hpp"
 
 namespace preview_ik {
 

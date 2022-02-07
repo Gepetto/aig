@@ -12,8 +12,8 @@
 
 #include <Eigen/Dense>
 
-#include "pinocchio/multibody/model.hpp"
 #include "pinocchio/multibody/data.hpp"
+#include "pinocchio/multibody/model.hpp"
 #include "pinocchio/spatial/se3.hpp"
 #include "preview_ik/arm_ig.hpp"
 #include "preview_ik/leg_ig.hpp"
@@ -55,7 +55,7 @@ class BipedIG {
  private:
   void derivatives(const Eigen::VectorXd &q1, const Eigen::VectorXd &q3, Eigen::VectorXd &posture,
                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt);
-  
+
   pinocchio::SE3 computeBase(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
                              const pinocchio::SE3 &rightFoot);
 
@@ -101,7 +101,7 @@ class BipedIG {
                              const Eigen::VectorXd &acceleration, bool flatHorizontalGround = true);
 
   Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration, const Eigen::Matrix<double, 6,1> &externalWrench,
+                             const Eigen::VectorXd &acceleration, const Eigen::Matrix<double, 6, 1> &externalWrench,
                              bool flatHorizontalGround = true);
 };
 }  // namespace preview_ik
