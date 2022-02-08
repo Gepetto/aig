@@ -18,98 +18,6 @@
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
-// CHECKING FUNCTIONS
-void load_talos_model() {
-  pin::Model model;
-  pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), model);
-  std::cout << "\n\n" << model.name << "\n\n" << std::endl;
-}
-
-void get_referenceConfig() {
-  pin::Model model;
-  pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), model);
-  pin::srdf::loadReferenceConfigurations(model, conf::srdf_path, false);
-  Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
-  std::cout << "\n\n q.size() : " << q.size() << "\n\n" << std::endl;
-  std::cout << "\n\n model.nq : " << model.nq << "\n\n" << std::endl;
-}
-
-void compute_jointPlacement() {
-  pin::Model model;
-  pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), model);
-  pin::srdf::loadReferenceConfigurations(model, conf::srdf_path, false);
-  Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
-
-  std::cout << "\n\n" << model.jointPlacements[2].translation() << "\n\n" << std::endl;
-}
-
-void check_CoM() {
-  pin::Model model;
-  pin::urdf::buildModel(conf::urdf_path, pin::JointModelFreeFlyer(), model);
-  pin::srdf::loadReferenceConfigurations(model, conf::srdf_path, false);
-  Eigen::VectorXd q0 = model.referenceConfigurations["half_sitting"];
-  pin::Data data(model);
-  Eigen::Vector3d c = pin::centerOfMass(model, data, q0);
-
-  std::cout << "\n\n" << c << "\n\n" << std::endl;
-}
-
-void check_eigen_norms() {
-  Eigen::Vector3d x(3, 4, 0);
-  std::cout << "\n\n" << x.norm() << "\n\n" << std::endl;
-}
-
-void check_SE3() {
-  pin::SE3 H;
-  H.setIdentity();
-  std::cout << "\n\n" << H.rotation() << "\n\n" << std::endl;
-  std::cout << "\n\n" << H.translation() << "\n\n" << std::endl;
-}
-
-void check_BipIKConstructor() {
-  IK_tools::BipIK H;
-  std::cout << "\n\n" << H.info.leftHipJoint << "\n\n" << std::endl;
-  std::cout << "\n\n" << H.info.comFromWaist << "\n\n" << std::endl;
-
-  IK_tools::BipedSettings conf;
-  conf.leftHipJoint = conf::leftHipJointName;
-  conf.rightHipJoint = conf::rightHipJointName;
-  conf.rightKneeJoint = conf::rightKneeJointName;
-  conf.leftKneeJoint = conf::leftKneeJointName;
-  conf.leftAnkleJoint = conf::leftAnkleJointName;
-  conf.rightAnkleJoint = conf::rightAnkleJointName;
-  conf.leftFootFrame = conf::leftFootFrameName;
-  conf.rightFootFrame = conf::rightFootFrameName;
-  conf.comFromWaist = IK_tools::xyzVector(1, 1, 0);
-
-  IK_tools::BipIK G(conf);
-  std::cout << "\n\n" << G.info.model.name << "\n\n" << std::endl;
-  std::cout << "\n\n" << G.info.comFromWaist << "\n\n" << std::endl;
-  std::cout << "\n\n" << G.info.leftHipJoint << "\n\n" << std::endl;
-}
-
-void check_LegIGConstructor() {
-  IK_tools::LegIG L;
-  std::cout << "\n\n" << L.info.side << "\n\n" << std::endl;
-
-  IK_tools::LegSettings conf;
-  conf.side = IK_tools::Side::LEFT;
-  conf.femurLength = 3.0;
-  conf.tibiaLenght = 1.32;
-  conf.hipFromWaist << 0, 1, 0;
-  conf.ankleFromFoot << 0, 0, 34;
-
-  IK_tools::LegIG J(conf);
-  std::cout << "\n\n" << J.info.side << "\n\n" << std::endl;
-  std::cout << "\n\n" << J.info.hipFromWaist << "\n\n" << std::endl;
-
-  IK_tools::BipIK H;
-  IK_tools::LegIG U = H.leftLeg;
-  H.configurateLegs();
-  std::cout << "\n\n" << U.info.side << "\n\n" << std::endl;
-  std::cout << "\n\n" << U.info.hipFromWaist << "\n\n" << std::endl;
-  std::cout << "\n\n" << U.info.femurLength << "\n\n" << std::endl;
-}
 
 void checkSolveMethods() {
   IK_tools::BipIK H;
@@ -296,12 +204,7 @@ void check_CoPcomputationWithExtForces() {
   std::cout << "\nrightFoot : \n" << rightFoot.translation() << "\n\n" << std::endl;
 }
 
-void check_skew() {
-  Eigen::Vector3d v;
-  v << 2, 3, 4;
 
-  std::cout << "\nthe skew matrix : \n" << pin::skew(v) << "\n\n" << std::endl;
-}
 
 // OLD CODE: /////////////////////////////
 

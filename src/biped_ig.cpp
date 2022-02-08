@@ -24,9 +24,9 @@ BipedIG::BipedIG() {
   // right_arm_
 }
 
-BipedIG::BipedIG(const BipedSettings &settings) { initialize(settings); }
+BipedIG::BipedIG(const BipedIGSettings &settings) { initialize(settings); }
 
-void BipedIG::initialize(const BipedSettings &settings) {
+void BipedIG::initialize(const BipedIGSettings &settings) {
   // Copy the settings internally.
   settings_ = settings;
 
@@ -44,7 +44,7 @@ void BipedIG::initialize(const BipedSettings &settings) {
 }
 
 void BipedIG::configurateLegs() {
-  LegSettings left_leg_settings, right_leg_settings;
+  LegIGSettings left_leg_settings, right_leg_settings;
   pinocchio::JointIndex left_hip_id = model_.getJointId(settings_.left_hip_joint_name);
   pinocchio::JointIndex left_knee_id = model_.getJointId(settings_.left_knee_joint_name);
   pinocchio::JointIndex left_ankle_id = model_.getJointId(settings_.left_ankle_joint_name);
@@ -54,14 +54,14 @@ void BipedIG::configurateLegs() {
 
   pinocchio::FrameIndex leftSoleID = model_.getFrameId(settings_.left_foot_frame_name),
                         rightSoleID = model_.getFrameId(settings_.right_foot_frame_name);
-  left_leg_settings.side = LegSettings::Side::LEFT;
+  left_leg_settings.side = LegIGSettings::Side::LEFT;
   left_leg_settings.hip_from_waist = model_.jointPlacements[left_hip_id].translation();
   left_leg_settings.femur_length = model_.jointPlacements[left_knee_id].translation().norm();
   left_leg_settings.tibia_length = model_.jointPlacements[left_ankle_id].translation().norm();
   left_leg_settings.ankle_from_foot = -model_.frames[leftSoleID].placement.translation();
   left_leg_.initialize(left_leg_settings);
 
-  right_leg_settings.side = LegSettings::Side::RIGHT;
+  right_leg_settings.side = LegIGSettings::Side::RIGHT;
   right_leg_settings.hip_from_waist = model_.jointPlacements[right_hip_id].translation();
   right_leg_settings.femur_length = model_.jointPlacements[right_knee_id].translation().norm();
   right_leg_settings.tibia_length = model_.jointPlacements[right_ankle_id].translation().norm();

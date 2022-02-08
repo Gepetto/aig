@@ -20,9 +20,9 @@
 
 namespace preview_ik {
 /**
- * @brief @todo Describe BipedSettings
+ * @brief @todo Describe BipedIGSettings
  */
-struct BipedSettings {
+struct BipedIGSettings {
  public:
   std::string left_hip_joint_name = "";
   std::string left_knee_joint_name = "";
@@ -34,6 +34,36 @@ struct BipedSettings {
   std::string right_foot_frame_name = "";
   std::string urdf_path = "";
   std::string srdf_path = "";
+
+  friend std::ostream &operator<<(std::ostream &out, const BipedIGSettings &obj) {
+    out << "BipedIGSettings:\n";
+    out << "    left_hip_joint_name: " << obj.left_hip_joint_name << "\n";
+    out << "    left_knee_joint_name: " << obj.left_knee_joint_name << "\n";
+    out << "    left_ankle_joint_name: " << obj.left_ankle_joint_name << "\n";
+    out << "    left_foot_frame_name: " << obj.left_foot_frame_name << "\n";
+    out << "    right_hip_joint_name: " << obj.right_hip_joint_name << "\n";
+    out << "    right_knee_joint_name: " << obj.right_knee_joint_name << "\n";
+    out << "    right_ankle_joint_name: " << obj.right_ankle_joint_name << "\n";
+    out << "    right_foot_frame_name: " << obj.right_foot_frame_name << "\n";
+    out << "    urdf_path: " << obj.urdf_path << "\n";
+    out << "    srdf_path: " << obj.srdf_path << std::endl;
+    return out;
+  }
+
+  friend bool operator==(const BipedIGSettings &lhs, const BipedIGSettings &rhs) {
+    bool test = true;
+    test &= lhs.left_hip_joint_name == rhs.left_hip_joint_name;
+    test &= lhs.left_knee_joint_name == rhs.left_knee_joint_name;
+    test &= lhs.left_ankle_joint_name == rhs.left_ankle_joint_name;
+    test &= lhs.left_foot_frame_name == rhs.left_foot_frame_name;
+    test &= lhs.right_hip_joint_name == rhs.right_hip_joint_name;
+    test &= lhs.right_knee_joint_name == rhs.right_knee_joint_name;
+    test &= lhs.right_ankle_joint_name == rhs.right_ankle_joint_name;
+    test &= lhs.right_foot_frame_name == rhs.right_foot_frame_name;
+    test &= lhs.urdf_path == rhs.urdf_path;
+    test &= lhs.srdf_path == rhs.srdf_path;
+    return test;
+  }
 };
 
 /**
@@ -45,7 +75,7 @@ class BipedIG {
  private:
   pinocchio::Model model_;
   pinocchio::Data data_;
-  BipedSettings settings_;
+  BipedIGSettings settings_;
   LegIG left_leg_, right_leg_;
   ArmIG left_arm_, right_arm_;
   Eigen::VectorXd q0_;
@@ -65,11 +95,13 @@ class BipedIG {
  public:
   BipedIG();
 
-  BipedIG(const BipedSettings &settings);
+  BipedIG(const BipedIGSettings &settings);
 
-  void initialize(const BipedSettings &settings);
+  void initialize(const BipedIGSettings &settings);
 
-  const BipedSettings &get_settings();
+  const BipedIGSettings &get_settings() { return settings_; };
+  const LegIGSettings &get_left_leg_settings() { return left_leg_.get_settings(); };
+  const LegIGSettings &get_right_leg_settings() { return right_leg_.get_settings(); };
 
   void checkCompatibility();  // TODO
 

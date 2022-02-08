@@ -10,7 +10,9 @@ namespace preview_ik {
 
 LegIG::LegIG() {}
 
-LegIG::LegIG(const LegSettings &settings) { settings_ = settings; }
+LegIG::LegIG(const LegIGSettings &settings) { initialize(settings); }
+
+void LegIG::initialize(const LegIGSettings &settings) { settings_ = settings; }
 
 LegJoints LegIG::solve(const pinocchio::SE3 &base, const pinocchio::SE3 &endEffector) {
   Eigen::Vector3d hip = base.translation() + base.rotation() * settings_.hip_from_waist;

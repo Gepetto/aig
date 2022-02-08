@@ -65,11 +65,10 @@ if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 endif()
 
-# Add some checking
-# add_executable(checker src/checker.cpp)
-# target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-# target_link_libraries(checker PUBLIC ${PROJECT_NAME}
-#                                      example-robot-data::example-robot-data)
+# Add some checking add_executable(checker src/checker.cpp)
+# target_include_directories(${PROJECT_NAME} PUBLIC
+# $<INSTALL_INTERFACE:include>) target_link_libraries(checker PUBLIC
+# ${PROJECT_NAME} example-robot-data::example-robot-data)
 
 # add_executable(postures src/postures.cpp ${${PROJECT_NAME}_HEADERS})
 # target_link_libraries(postures PUBLIC pinocchio::pinocchio
@@ -77,13 +76,19 @@ endif()
 
 if(BUILD_TESTING)
   # Unit-Tests dependencies
-  set(${PROJECT_NAME}_CPP_TESTS)
+  set(${PROJECT_NAME}_CPP_TESTS
+      test_dependencies_usage #
+      test_leg_ig #
+      test_arm_ig #
+      test_biped_ig #
+  )
 
-  foreach(NAME ${${PROJECT_NAME}_CPP_TESTS})
-    add_unit_test(boost_add boost_add.cpp)
-    target_link_libraries(boost_add ${PROJECT_NAME}
+  foreach(unittest_name ${${PROJECT_NAME}_CPP_TESTS})
+    add_unit_test(${unittest_name} tests/${unittest_name}.cpp)
+    target_link_libraries(${unittest_name} ${PROJECT_NAME}
                           ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-    add_test_cflags(${UNITTEST_NAME} "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN")
+    target_compile_definitions(${unittest_name}
+                               PUBLIC "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN")
   endforeach()
 endif()
 
