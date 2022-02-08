@@ -1,5 +1,5 @@
-#include <boost/test/unit_test.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
@@ -30,11 +30,7 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_init_constructor) {
   BOOST_CHECK_EQUAL(leg_ig.get_settings(), settings);
 }
 
-enum Mode{
-  ZERO,
-  HALF_SITTING,
-  RANDOM
-};
+enum Mode { ZERO, HALF_SITTING, RANDOM };
 
 void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
                          pinocchio::SE3& rf, preview_ik::LegJoints& ll_q,

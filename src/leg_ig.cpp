@@ -14,14 +14,18 @@ LegIG::LegIG(const LegIGSettings &settings) { initialize(settings); }
 
 void LegIG::initialize(const LegIGSettings &settings) { settings_ = settings; }
 
-LegJoints LegIG::solve(const pinocchio::SE3 &base, const pinocchio::SE3 &endEffector) {
-  Eigen::Vector3d hip = base.translation() + base.rotation() * settings_.hip_from_waist;
-  Eigen::Vector3d ankle = endEffector.translation() + endEffector.rotation() * settings_.ankle_from_foot;
+LegJoints LegIG::solve(const pinocchio::SE3 &base,
+                       const pinocchio::SE3 &endEffector) {
+  Eigen::Vector3d hip =
+      base.translation() + base.rotation() * settings_.hip_from_waist;
+  Eigen::Vector3d ankle = endEffector.translation() +
+                          endEffector.rotation() * settings_.ankle_from_foot;
   Eigen::Vector3d hipFromAnkle = hip - ankle;
   double distance_hip_ankle = hipFromAnkle.norm();
 
   double q2, q3, q4, q5, q6, q7;
-  double cos_q5 = (pow(distance_hip_ankle, 2) - pow(settings_.femur_length, 2) - pow(settings_.tibia_length, 2)) /
+  double cos_q5 = (pow(distance_hip_ankle, 2) - pow(settings_.femur_length, 2) -
+                   pow(settings_.tibia_length, 2)) /
                   (2.0 * settings_.femur_length * settings_.tibia_length);
   if (cos_q5 >= 1)
     q5 = 0;
@@ -44,7 +48,8 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base, const pinocchio::SE3 &endEffe
 
   Eigen::Matrix3d Rint, Rext, R;
   Rext = base.rotation().transpose() * endEffector.rotation();
-  Rint = Eigen::AngleAxisd(-q7, Eigen::Vector3d(1, 0, 0)) * Eigen::AngleAxisd(-q5 - q6, Eigen::Vector3d(0, 1, 0));
+  Rint = Eigen::AngleAxisd(-q7, Eigen::Vector3d(1, 0, 0)) *
+         Eigen::AngleAxisd(-q5 - q6, Eigen::Vector3d(0, 1, 0));
   R = Rext * Rint;
   q2 = atan2(-R(0, 1), R(1, 1));
   q3 = atan2(R(2, 1), -R(0, 1) * sin(q2) + R(1, 1) * cos(q2));

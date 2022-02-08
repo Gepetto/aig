@@ -17,7 +17,8 @@ ArmIG::ArmIG() {
 #endif
 }
 
-Eigen::VectorXd ArmIG::solve(const pinocchio::SE3& /*base*/, const pinocchio::SE3& /*endEffector*/) {
+Eigen::VectorXd ArmIG::solve(const pinocchio::SE3& /*base*/,
+                             const pinocchio::SE3& /*endEffector*/) {
 #ifndef NDEBUG  // debug mode
   std::cout << "DEBUG: ArmIG::solve(): Not implemented" << std::endl;
 #endif

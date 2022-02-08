@@ -40,7 +40,8 @@ struct LegIGSettings {
         << "    femur_length: " << obj.femur_length << "\n"
         << "    tibia_length: " << obj.tibia_length << "\n"
         << "    hip_from_waist: " << obj.hip_from_waist.transpose() << "\n"
-        << "    ankle_from_foot: " << obj.ankle_from_foot.transpose() << std::endl;
+        << "    ankle_from_foot: " << obj.ankle_from_foot.transpose()
+        << std::endl;
     return out;
   }
 
@@ -67,7 +68,8 @@ class LegIG {
   LegIG(const LegIGSettings &settings);
   const LegIGSettings &get_settings() { return settings_; }
   void initialize(const LegIGSettings &settings);
-  LegJoints solve(const pinocchio::SE3 &base, const pinocchio::SE3 &endEffector);
+  LegJoints solve(const pinocchio::SE3 &base,
+                  const pinocchio::SE3 &endEffector);
 };
 }  // namespace preview_ik
 

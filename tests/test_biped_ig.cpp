@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
-#include "preview_ik/unittests/pyrene_settings.hpp"
 #include "preview_ik/biped_ig.hpp"
+#include "preview_ik/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
@@ -20,7 +20,8 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor) {
   settings.left_foot_frame_name = preview_ik::unittests::left_foot_frame_name;
   settings.right_hip_joint_name = preview_ik::unittests::right_hip_joint_name;
   settings.right_knee_joint_name = preview_ik::unittests::right_knee_joint_name;
-  settings.right_ankle_joint_name = preview_ik::unittests::right_ankle_joint_name;
+  settings.right_ankle_joint_name =
+      preview_ik::unittests::right_ankle_joint_name;
   settings.right_foot_frame_name = preview_ik::unittests::right_foot_frame_name;
   settings.urdf_path = preview_ik::unittests::urdf_path;
   settings.srdf_path = preview_ik::unittests::srdf_path;
@@ -38,7 +39,8 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_init_through_biped_ig) {
   settings.left_foot_frame_name = preview_ik::unittests::left_foot_frame_name;
   settings.right_hip_joint_name = preview_ik::unittests::right_hip_joint_name;
   settings.right_knee_joint_name = preview_ik::unittests::right_knee_joint_name;
-  settings.right_ankle_joint_name = preview_ik::unittests::right_ankle_joint_name;
+  settings.right_ankle_joint_name =
+      preview_ik::unittests::right_ankle_joint_name;
   settings.right_foot_frame_name = preview_ik::unittests::right_foot_frame_name;
   settings.urdf_path = preview_ik::unittests::urdf_path;
   settings.srdf_path = preview_ik::unittests::srdf_path;

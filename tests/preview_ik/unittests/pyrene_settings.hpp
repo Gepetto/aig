@@ -18,7 +18,8 @@
 namespace preview_ik {
 namespace unittests {
 const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR;
-const std::string urdf_path = path_to_robots + "/talos_data/robots/talos_reduced_corrected.urdf";
+const std::string urdf_path =
+    path_to_robots + "/talos_data/robots/talos_reduced_corrected.urdf";
 const std::string srdf_path = path_to_robots + "/talos_data/srdf/talos.srdf";
 
 const std::string left_hip_joint_name = "leg_left_1_joint";

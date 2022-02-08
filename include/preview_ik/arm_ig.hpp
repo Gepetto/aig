@@ -21,7 +21,8 @@ namespace preview_ik {
 class ArmIG {
  public:
   ArmIG();
-  Eigen::VectorXd solve(const pinocchio::SE3 &base, const pinocchio::SE3 &endEffector);
+  Eigen::VectorXd solve(const pinocchio::SE3 &base,
+                        const pinocchio::SE3 &endEffector);
 };
 }  // namespace preview_ik
 

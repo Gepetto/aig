@@ -35,7 +35,8 @@ struct BipedIGSettings {
   std::string urdf_path = "";
   std::string srdf_path = "";
 
-  friend std::ostream &operator<<(std::ostream &out, const BipedIGSettings &obj) {
+  friend std::ostream &operator<<(std::ostream &out,
+                                  const BipedIGSettings &obj) {
     out << "BipedIGSettings:\n";
     out << "    left_hip_joint_name: " << obj.left_hip_joint_name << "\n";
     out << "    left_knee_joint_name: " << obj.left_knee_joint_name << "\n";
@@ -50,7 +51,8 @@ struct BipedIGSettings {
     return out;
   }
 
-  friend bool operator==(const BipedIGSettings &lhs, const BipedIGSettings &rhs) {
+  friend bool operator==(const BipedIGSettings &lhs,
+                         const BipedIGSettings &rhs) {
     bool test = true;
     test &= lhs.left_hip_joint_name == rhs.left_hip_joint_name;
     test &= lhs.left_knee_joint_name == rhs.left_knee_joint_name;
@@ -83,13 +85,16 @@ class BipedIG {
 
   // Private methods.
  private:
-  void derivatives(const Eigen::VectorXd &q1, const Eigen::VectorXd &q3, Eigen::VectorXd &posture,
-                   Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt);
+  void derivatives(const Eigen::VectorXd &q1, const Eigen::VectorXd &q3,
+                   Eigen::VectorXd &posture, Eigen::VectorXd &velocity,
+                   Eigen::VectorXd &acceleration, const double &dt);
 
-  pinocchio::SE3 computeBase(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+  pinocchio::SE3 computeBase(const Eigen::Vector3d &com,
+                             const pinocchio::SE3 &leftFoot,
                              const pinocchio::SE3 &rightFoot);
 
-  pinocchio::SE3 computeBase(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation);
+  pinocchio::SE3 computeBase(const Eigen::Vector3d &com,
+                             const Eigen::Matrix3d &baseRotation);
 
   // Public methods.
  public:
@@ -100,40 +105,60 @@ class BipedIG {
   void initialize(const BipedIGSettings &settings);
 
   const BipedIGSettings &get_settings() { return settings_; };
-  const LegIGSettings &get_left_leg_settings() { return left_leg_.get_settings(); };
-  const LegIGSettings &get_right_leg_settings() { return right_leg_.get_settings(); };
+  const LegIGSettings &get_left_leg_settings() {
+    return left_leg_.get_settings();
+  };
+  const LegIGSettings &get_right_leg_settings() {
+    return right_leg_.get_settings();
+  };
 
   void checkCompatibility();  // TODO
 
   void configurateLegs();
 
-  void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
+  void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture);
+
+  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
+             const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
              const Eigen::VectorXd &q0, Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation, const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0, Eigen::VectorXd &posture);
+  void solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture);
 
-  void solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture);
+  void solve(const std::array<Eigen::Vector3d, 3> &coms,
+             const std::array<pinocchio::SE3, 3> &leftFeet,
+             const std::array<pinocchio::SE3, 3> &rightFeet,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt);
 
-  void solve(const std::array<Eigen::Vector3d, 3> &coms, const std::array<pinocchio::SE3, 3> &leftFeet,
-             const std::array<pinocchio::SE3, 3> &rightFeet, const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt);
+  void solve(const std::array<Eigen::Vector3d, 3> &coms,
+             const std::array<Eigen::Matrix3d, 3> &baseRotations,
+             const std::array<pinocchio::SE3, 3> &leftFeet,
+             const std::array<pinocchio::SE3, 3> &rightFeet,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt);
 
-  void solve(const std::array<Eigen::Vector3d, 3> &coms, const std::array<Eigen::Matrix3d, 3> &baseRotations,
-             const std::array<pinocchio::SE3, 3> &leftFeet, const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture, Eigen::VectorXd &velocity,
-             Eigen::VectorXd &acceleration, const double &dt);
+  void solve(const std::array<pinocchio::SE3, 3> &bases,
+             const std::array<pinocchio::SE3, 3> &leftFeet,
+             const std::array<pinocchio::SE3, 3> &rightFeet,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt);
 
-  void solve(const std::array<pinocchio::SE3, 3> &bases, const std::array<pinocchio::SE3, 3> &leftFeet,
-             const std::array<pinocchio::SE3, 3> &rightFeet, const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration, const double &dt);
+  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+                             const Eigen::VectorXd &velocity,
+                             const Eigen::VectorXd &acceleration,
+                             bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration, bool flatHorizontalGround = true);
-
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration, const Eigen::Matrix<double, 6, 1> &externalWrench,
+  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+                             const Eigen::VectorXd &velocity,
+                             const Eigen::VectorXd &acceleration,
+                             const Eigen::Matrix<double, 6, 1> &externalWrench,
                              bool flatHorizontalGround = true);
 };
 }  // namespace preview_ik
