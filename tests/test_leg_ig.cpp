@@ -30,7 +30,8 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_init_constructor) {
   BOOST_CHECK_EQUAL(leg_ig.get_settings(), settings);
 }
 
-void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf, pinocchio::SE3& rf, Eigen::VectorXd& q, const bool& random) {
+void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf, pinocchio::SE3& rf, Eigen::VectorXd& q,
+                         preview_ik::LegJoints& ll_q, preview_ik::LegJoints& rl_q, const bool& random) {
   // Get the model and data
   pinocchio::Model model;
   pinocchio::urdf::buildModel(preview_ik::unittests::urdf_path, pinocchio::JointModelFreeFlyer(), model);
@@ -50,11 +51,18 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf, pinocchio::SE
   pinocchio::FrameIndex lf_id = model.getFrameId(preview_ik::unittests::left_foot_frame_name);
   pinocchio::FrameIndex rf_id = model.getFrameId(preview_ik::unittests::right_foot_frame_name);
 
+  // Get the legs joints configuration for the test
+  int lleg_idx_qs = model.idx_qs[model.getJointId(preview_ik::unittests::left_hip_joint_name)];
+  int rleg_idx_qs = model.idx_qs[model.getJointId(preview_ik::unittests::right_hip_joint_name)];
+
+  // outputs
   lf = data.oMf[lf_id];
   rf = data.oMf[rf_id];
   Eigen::Quaterniond quat = Eigen::Quaterniond(q[6], q[3], q[4], q[5]);
   quat.normalize();
   base = pinocchio::SE3(quat.toRotationMatrix(), q.head<3>());
+  ll_q = q.segment<6>(lleg_idx_qs);
+  rl_q = q.segment<6>(rleg_idx_qs);
 }
 
 BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_half_sitting) {
@@ -69,15 +77,17 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_half_sitting) {
 
   // perform a forward kinematics on a configuration
   Eigen::VectorXd q;
-  pinocchio::SE3 base, lf, rf; 
-  generate_references(base, lf, rf, q, false);
+  pinocchio::SE3 base, lf, rf;
+  generate_references(base, lf, rf, ll_q, rl_q, false);
 
   // Compute inverse geometry.
   preview_ik::LegJoints leg_joints = leg_ig.solve(base, lf);
-  
-  
+
+  // get what to compare
+  Eigen::VectorXd test_leg_joints = q.segment<6>(lleg_idx_qs);
+
   // Tests
-  BOOST_CHECK_EQUAL(leg_ig.get_settings(), settings);
+  BOOST_CHECK_EQUAL(leg_joints, test_leg_joints);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
