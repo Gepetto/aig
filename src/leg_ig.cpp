@@ -8,56 +8,83 @@
 
 namespace preview_ik {
 
-LegIG::LegIG() {}
+LegIG::LegIG() { reset_internals(); }
 
 LegIG::LegIG(const LegIGSettings &settings) { initialize(settings); }
 
-void LegIG::initialize(const LegIGSettings &settings) { settings_ = settings; }
+void LegIG::initialize(const LegIGSettings &settings) {
+  settings_ = settings;
+  reset_internals();
+}
+
+void LegIG::reset_internals() {
+  // Small quantity to prevent numerical issues.
+  epsilon_ = 1.0e-6;
+  hip_ = ankle_ = hip_from_ankle_ = Eigen::Vector3d::Zero();
+  c5_ = 0.0;
+  q2_ = q3_ = q4_ = q5_ = q6_ = q7_ = 0.0;
+  opp_sign_hip_from_waist_y_ = sign_hip_from_ankle_z = 0.0;
+  a_ = b_ = c_ = 0.0;
+  Rint_ = Rext_ = R_ = Eigen::Matrix3d::Zero();
+  output_ = LegJoints::Zero();
+
+}
 
 LegJoints LegIG::solve(const pinocchio::SE3 &base,
                        const pinocchio::SE3 &endEffector) {
-  Eigen::Vector3d hip =
-      base.translation() + base.rotation() * settings_.hip_from_waist;
-  Eigen::Vector3d ankle = endEffector.translation() +
-                          endEffector.rotation() * settings_.ankle_from_foot;
-  Eigen::Vector3d hipFromAnkle = hip - ankle;
-  double distance_hip_ankle = hipFromAnkle.norm();
+  reset_internals();
 
-  double q2, q3, q4, q5, q6, q7;
-  double cos_q5 = (pow(distance_hip_ankle, 2) - pow(settings_.femur_length, 2) -
-                   pow(settings_.tibia_length, 2)) /
-                  (2.0 * settings_.femur_length * settings_.tibia_length);
-  if (cos_q5 >= 1)
-    q5 = 0;
-  else if (cos_q5 <= -1)
-    q5 = M_PI;
-  else
-    q5 = acos(cos_q5);
+  // First we compute the position of the hip with respect to the ankle.
+  hip_ = base.translation() + base.rotation() * settings_.hip_from_waist;
+  ankle_ = endEffector.translation() +
+           endEffector.rotation() * settings_.ankle_from_foot;
+  hip_from_ankle_ = endEffector.rotation().transpose() * (hip_ - ankle_);
 
-  q7 = atan2(hipFromAnkle(1), hipFromAnkle(2));
-  if (q7 > M_PI_2)
-    q7 -= M_PI;
-  else if (q7 < -M_PI_2)
-    q7 += M_PI;
+  // if hip_from_waist(1)<0.0 then out=1.0 else out=-1.0
+  opp_sign_hip_from_waist_y_ = settings_.hip_from_waist(1) < 0.0 ? 1.0 : -1.0;
 
-  int zDirectionLeg;
-  hipFromAnkle(2) > 0 ? zDirectionLeg = 1 : zDirectionLeg = -1;
+  // Compute the cos(q5)
+  const Eigen::Vector3d &knee_from_hip = settings_.knee_from_hip;
+  const Eigen::Vector3d &ankle_from_knee = settings_.ankle_from_knee;
+  a_ = abs(knee_from_hip(2));    // Femur Height.
+  b_ = abs(ankle_from_knee(2));  // Tibia Height.
+  c_ = sqrt(hip_from_ankle_(0) * hip_from_ankle_(0) +
+            hip_from_ankle_(2) * hip_from_ankle_(2));
+  c5_ = 0.5 * (c_ * c_ - a_ * a_ - b_ * b_) / (a_ * b_);
+  // Compute q5 (the knee).
+  if (c5_ > 1.0 - epsilon_) {
+    q5_ = 0.0;
+  }
+  if (c5_ < -1.0 + epsilon_) {
+    q5_ = M_PI;
+  }
+  if (c5_ >= -1.0 + epsilon_ && c5_ <= 1.0 - epsilon_) {
+    q5_ = acos(c5_);
+  }
 
-  q6 = -atan2(hipFromAnkle(0), zDirectionLeg * hipFromAnkle.tail<2>().norm()) -
-       asin((settings_.femur_length / distance_hip_ankle) * sin(M_PI - q5));
+  // Compute the orientation of the ankle.
+  sign_hip_from_ankle_z = hip_from_ankle_(2) > 0 ? 1.0 : -1.0;
+  q6_ = -atan2(hip_from_ankle_(0),
+               sign_hip_from_ankle_z * hip_from_ankle_.tail<2>().norm()) -
+        asin(a_ * sin(M_PI - q5_) / c_);
 
-  Eigen::Matrix3d Rint, Rext, R;
-  Rext = base.rotation().transpose() * endEffector.rotation();
-  Rint = Eigen::AngleAxisd(-q7, Eigen::Vector3d(1, 0, 0)) *
-         Eigen::AngleAxisd(-q5 - q6, Eigen::Vector3d(0, 1, 0));
-  R = Rext * Rint;
-  q2 = atan2(-R(0, 1), R(1, 1));
-  q3 = atan2(R(2, 1), -R(0, 1) * sin(q2) + R(1, 1) * cos(q2));
-  q4 = atan2(-R(2, 0), R(2, 2));
+  q7_ = atan2(hip_from_ankle_(1), hip_from_ankle_(2));
+  if (q7_ > M_PI_2) {
+    q7_ -= M_PI;
+  } else if (q7_ < -M_PI_2) {
+    q7_ += M_PI;
+  }
 
-  LegJoints leg;
-  leg << q2, q3, q4, q5, q6, q7;
-  return leg;
+  Rext_ = base.rotation().transpose() * endEffector.rotation();
+  Rint_ = Eigen::AngleAxisd(-q7_, Eigen::Vector3d(1, 0, 0)) *
+          Eigen::AngleAxisd(-q5_ - q6_, Eigen::Vector3d(0, 1, 0));
+  R_ = Rext_ * Rint_;
+  q2_ = atan2(-R_(0, 1), R_(1, 1));
+  q3_ = atan2(R_(2, 1), -R_(0, 1) * sin(q2_) + R_(1, 1) * cos(q2_));
+  q4_ = atan2(-R_(2, 0), R_(2, 2));
+
+  output_ << q2_, q3_, q4_, q5_, q6_, q7_;
+  return output_;
 }
 
 }  // namespace preview_ik

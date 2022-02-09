@@ -13,6 +13,7 @@
 
 #include <string>
 
+#include "preview_ik/leg_ig.hpp"
 #include "example-robot-data/path.hpp"
 
 namespace preview_ik {
@@ -30,6 +31,25 @@ const std::string left_ankle_joint_name = "leg_left_5_joint";
 const std::string right_ankle_joint_name = "leg_right_5_joint";
 const std::string left_foot_frame_name = "leg_left_sole_fix_joint";
 const std::string right_foot_frame_name = "leg_right_sole_fix_joint";
+
+// hip_from_waist
+// knee_from_hip
+// ankle_from_knee
+// ankle_from_foot
+const LegIGSettings llegs = {
+    (Eigen::Vector3d() << -0.02, 0.085, -0.27105).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()
+};
+
+const LegIGSettings rlegs = {
+    (Eigen::Vector3d() << -0.02, -0.085, -0.27105).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
+    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()
+};
+
 }  // namespace unittests
 }  // namespace preview_ik
 

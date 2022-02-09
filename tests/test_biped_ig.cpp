@@ -50,19 +50,8 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_init_through_biped_ig) {
   const preview_ik::LegIGSettings& llegs = biped_ig.get_left_leg_settings();
   const preview_ik::LegIGSettings& rlegs = biped_ig.get_right_leg_settings();
 
-  preview_ik::LegIGSettings test_llegs;
-  test_llegs.side = preview_ik::LegIGSettings::Side::LEFT;
-  test_llegs.femur_length = 0.38;
-  test_llegs.tibia_length = 0.325;
-  test_llegs.hip_from_waist << -0.02, 0.085, -0.27105;
-  test_llegs.ankle_from_foot << -0, -0, 0.107;
-
-  preview_ik::LegIGSettings test_rlegs;
-  test_rlegs.side = preview_ik::LegIGSettings::Side::RIGHT;
-  test_rlegs.femur_length = 0.38;
-  test_rlegs.tibia_length = 0.325;
-  test_rlegs.hip_from_waist << -0.02, -0.085, -0.27105;
-  test_rlegs.ankle_from_foot << -0, -0, 0.107;
+  preview_ik::LegIGSettings test_llegs = preview_ik::unittests::llegs;
+  preview_ik::LegIGSettings test_rlegs = preview_ik::unittests::rlegs;
 
   BOOST_CHECK_EQUAL(llegs, test_llegs);
   BOOST_CHECK_EQUAL(rlegs, test_rlegs);

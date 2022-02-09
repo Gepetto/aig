@@ -64,24 +64,22 @@ void BipedIG::configurateLegs() {
                             model_.getFrameId(settings_.left_foot_frame_name),
                         rightSoleID =
                             model_.getFrameId(settings_.right_foot_frame_name);
-  left_leg_settings.side = LegIGSettings::Side::LEFT;
   left_leg_settings.hip_from_waist =
       model_.jointPlacements[left_hip_id].translation();
-  left_leg_settings.femur_length =
-      model_.jointPlacements[left_knee_id].translation().norm();
-  left_leg_settings.tibia_length =
-      model_.jointPlacements[left_ankle_id].translation().norm();
+  left_leg_settings.knee_from_hip =
+      model_.jointPlacements[left_knee_id].translation();
+  left_leg_settings.ankle_from_knee =
+      model_.jointPlacements[left_ankle_id].translation();
   left_leg_settings.ankle_from_foot =
       -model_.frames[leftSoleID].placement.translation();
   left_leg_.initialize(left_leg_settings);
 
-  right_leg_settings.side = LegIGSettings::Side::RIGHT;
   right_leg_settings.hip_from_waist =
       model_.jointPlacements[right_hip_id].translation();
-  right_leg_settings.femur_length =
-      model_.jointPlacements[right_knee_id].translation().norm();
-  right_leg_settings.tibia_length =
-      model_.jointPlacements[right_ankle_id].translation().norm();
+  right_leg_settings.knee_from_hip =
+      model_.jointPlacements[right_knee_id].translation();
+  right_leg_settings.ankle_from_knee =
+      model_.jointPlacements[right_ankle_id].translation();
   right_leg_settings.ankle_from_foot =
       -model_.frames[rightSoleID].placement.translation();
   right_leg_.initialize(right_leg_settings);

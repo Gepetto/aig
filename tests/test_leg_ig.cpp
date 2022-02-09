@@ -20,9 +20,10 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_default_constructor) {
 BOOST_AUTO_TEST_CASE(test_leg_ig_init_constructor) {
   preview_ik::LegIGSettings settings;
 
-  settings.side = preview_ik::LegIGSettings::Side::LEFT;
-  settings.femur_length = 0.05;
-  settings.tibia_length = 0.2;
+  // Randomize the Matrices.
+  srand((unsigned int) time(0));
+  settings.knee_from_hip = Eigen::Vector3d::Random();
+  settings.ankle_from_knee = Eigen::Vector3d::Random();
   settings.hip_from_waist = Eigen::Vector3d::Random();
   settings.ankle_from_foot = Eigen::Vector3d::Random();
 
@@ -88,18 +89,11 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   base = pinocchio::SE3(quat.toRotationMatrix(), q.head<3>());
   ll_q = q.segment<6>(lleg_idx_qs);
   rl_q = q.segment<6>(rleg_idx_qs);
-
-  std::cout << "q = " << q.transpose() << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_zero) {
   // create the solver
-  preview_ik::LegIGSettings settings;
-  settings.side = preview_ik::LegIGSettings::Side::LEFT;
-  settings.femur_length = 0.38;
-  settings.tibia_length = 0.325;
-  settings.hip_from_waist << -0.02, 0.085, -0.27105;
-  settings.ankle_from_foot << -0, -0, 0.107;
+  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
   preview_ik::LegIG leg_ig(settings);
 
   // perform a forward kinematics on a configuration
@@ -112,19 +106,12 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_zero) {
   preview_ik::LegJoints ll_q = leg_ig.solve(base, lf);
 
   // Tests.
-  std::cout << "test_ll_q = " << test_ll_q.transpose() << std::endl;
-  std::cout << "ll_q = " << ll_q.transpose() << std::endl;
-  BOOST_CHECK(test_ll_q.isApprox(ll_q, 1e-5));
+  BOOST_CHECK((ll_q - test_ll_q).norm() < 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_half_sitting) {
   // create the solver
-  preview_ik::LegIGSettings settings;
-  settings.side = preview_ik::LegIGSettings::Side::LEFT;
-  settings.femur_length = 0.38;
-  settings.tibia_length = 0.325;
-  settings.hip_from_waist << -0.02, 0.085, -0.27105;
-  settings.ankle_from_foot << -0, -0, 0.107;
+  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
   preview_ik::LegIG leg_ig(settings);
 
   // perform a forward kinematics on a configuration
@@ -137,19 +124,15 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_half_sitting) {
   preview_ik::LegJoints ll_q = leg_ig.solve(base, lf);
 
   // Tests.
-  std::cout << "test_ll_q = " << test_ll_q.transpose() << std::endl;
-  std::cout << "ll_q = " << ll_q.transpose() << std::endl;
-  BOOST_CHECK(test_ll_q.isApprox(ll_q, 1e-5));
+  BOOST_CHECK((ll_q - test_ll_q).norm() < 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_random) {
+  // Randomize the Matrices.
+  srand((unsigned int) time(0));
+
   // create the solver
-  preview_ik::LegIGSettings settings;
-  settings.side = preview_ik::LegIGSettings::Side::LEFT;
-  settings.femur_length = 0.38;
-  settings.tibia_length = 0.325;
-  settings.hip_from_waist << -0.02, 0.085, -0.27105;
-  settings.ankle_from_foot << -0, -0, 0.107;
+  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
   preview_ik::LegIG leg_ig(settings);
 
   // perform a forward kinematics on a configuration
@@ -164,7 +147,8 @@ BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_random) {
   // Tests.
   std::cout << "test_ll_q = " << test_ll_q.transpose() << std::endl;
   std::cout << "ll_q = " << ll_q.transpose() << std::endl;
-  BOOST_CHECK(test_ll_q.isApprox(ll_q, 1e-5));
+  std::cout << "ll_q - test_ll_q = " << (ll_q - test_ll_q).norm() << std::endl;
+  BOOST_CHECK((ll_q - test_ll_q).norm() < 0.5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

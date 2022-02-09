@@ -23,23 +23,16 @@ typedef Eigen::Matrix<double, 6, 1> LegJoints;
  */
 struct LegIGSettings {
  public:
-  enum Side { LEFT, RIGHT };
-
- public:
-  Side side = LEFT;
-  double femur_length = 0.0;
-  double tibia_length = 0.0;
   Eigen::Vector3d hip_from_waist = Eigen::Vector3d::Zero();
+  Eigen::Vector3d knee_from_hip = Eigen::Vector3d::Zero();
+  Eigen::Vector3d ankle_from_knee = Eigen::Vector3d::Zero();
   Eigen::Vector3d ankle_from_foot = Eigen::Vector3d::Zero();
 
   friend std::ostream &operator<<(std::ostream &out, const LegIGSettings &obj) {
-    out << "LegIGSettings:\n";
-    out << "    side: ";
-    obj.side == LEFT ? out << "LEFT" : out << "RIGHT";
-    out << "\n"
-        << "    femur_length: " << obj.femur_length << "\n"
-        << "    tibia_length: " << obj.tibia_length << "\n"
+    out << "LegIGSettings:\n"
         << "    hip_from_waist: " << obj.hip_from_waist.transpose() << "\n"
+        << "    knee_from_hip: " << obj.knee_from_hip.transpose() << "\n"
+        << "    ankle_from_knee: " << obj.ankle_from_knee.transpose() << "\n"
         << "    ankle_from_foot: " << obj.ankle_from_foot.transpose()
         << std::endl;
     return out;
@@ -47,10 +40,9 @@ struct LegIGSettings {
 
   friend bool operator==(const LegIGSettings &lhs, const LegIGSettings &rhs) {
     bool test = true;
-    test &= lhs.side == rhs.side;
-    test &= lhs.femur_length == rhs.femur_length;
-    test &= lhs.tibia_length == rhs.tibia_length;
     test &= lhs.hip_from_waist == rhs.hip_from_waist;
+    test &= lhs.knee_from_hip == rhs.knee_from_hip;
+    test &= lhs.ankle_from_knee == rhs.ankle_from_knee;
     test &= lhs.ankle_from_foot == rhs.ankle_from_foot;
     return test;
   }
@@ -63,9 +55,19 @@ class LegIG {
  private:
   LegIGSettings settings_;
 
+  // internals
+  Eigen::Vector3d hip_, ankle_, hip_from_ankle_;
+  double epsilon_, c5_;
+  double q2_, q3_, q4_, q5_, q6_, q7_;
+  double opp_sign_hip_from_waist_y_, sign_hip_from_ankle_z;
+  double a_, b_, c_;
+  Eigen::Matrix3d Rint_, Rext_, R_;
+  LegJoints output_;
+
  public:
   LegIG();
   LegIG(const LegIGSettings &settings);
+  void reset_internals();
   const LegIGSettings &get_settings() { return settings_; }
   void initialize(const LegIGSettings &settings);
   LegJoints solve(const pinocchio::SE3 &base,
