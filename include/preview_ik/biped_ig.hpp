@@ -82,6 +82,8 @@ class BipedIG {
   ArmIG left_arm_, right_arm_;
   Eigen::VectorXd q0_;
   Eigen::Vector3d com_from_waist_;
+  int lleg_idx_qs_; // Indexes in the configuration vector.
+  int rleg_idx_qs_; // Indexes in the configuration vector.
 
   // Private methods.
  private:
@@ -95,6 +97,8 @@ class BipedIG {
 
   pinocchio::SE3 computeBase(const Eigen::Vector3d &com,
                              const Eigen::Matrix3d &baseRotation);
+
+  void configurateLegs();
 
   // Public methods.
  public:
@@ -113,8 +117,6 @@ class BipedIG {
   };
 
   void checkCompatibility();  // TODO
-
-  void configurateLegs();
 
   void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
              const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,

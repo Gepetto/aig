@@ -39,7 +39,6 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
                                                false);
   q0_ = model_.referenceConfigurations["half_sitting"];
-  pinocchio::Data data(model_);
   com_from_waist_ = pinocchio::centerOfMass(model_, data_, q0_) - q0_.head(3);
 
   configurateLegs();
@@ -61,9 +60,10 @@ void BipedIG::configurateLegs() {
       model_.getJointId(settings_.right_ankle_joint_name);
 
   pinocchio::FrameIndex leftSoleID =
-                            model_.getFrameId(settings_.left_foot_frame_name),
-                        rightSoleID =
-                            model_.getFrameId(settings_.right_foot_frame_name);
+      model_.getFrameId(settings_.left_foot_frame_name);
+  pinocchio::FrameIndex rightSoleID =
+      model_.getFrameId(settings_.right_foot_frame_name);
+
   left_leg_settings.hip_from_waist =
       model_.jointPlacements[left_hip_id].translation();
   left_leg_settings.knee_from_hip =
@@ -83,14 +83,15 @@ void BipedIG::configurateLegs() {
   right_leg_settings.ankle_from_foot =
       -model_.frames[rightSoleID].placement.translation();
   right_leg_.initialize(right_leg_settings);
+
+  // Get the legs joints configuration for the test
+  lleg_idx_qs_ = model_.idx_qs[left_hip_id];
+  rleg_idx_qs_ = model_.idx_qs[right_hip_id];
 }
 
 pinocchio::SE3 BipedIG::computeBase(const Eigen::Vector3d &com,
                                     const Eigen::Matrix3d &baseRotation) {
-  pinocchio::SE3 base;
-  base.rotation(baseRotation);
-  base.translation(com - base.rotation() * com_from_waist_);
-  return base;
+  return pinocchio::SE3(baseRotation, com - baseRotation * com_from_waist_);
 }
 
 pinocchio::SE3 BipedIG::computeBase(const Eigen::Vector3d &com,
@@ -109,13 +110,14 @@ void BipedIG::solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
                     const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
                     Eigen::VectorXd &posture) {
   posture = q0;
-  posture.head(3) = base.translation();
+  posture.head<3>() = base.translation();
   Eigen::Quaterniond quat(base.rotation());
   quat.normalize();
-  posture.segment(3, 4) << quat.x(), quat.y(), quat.z(), quat.w();
-  posture.segment(7, 6) = left_leg_.solve(base, leftFoot);
-  posture.segment(13, 6) = right_leg_.solve(base, rightFoot);
-  // TODO the numbers 7, 6, 13, 6 could be not hard coded.
+  posture.segment<4>(3) << quat.x(), quat.y(), quat.z(), quat.w();
+
+  // Get the legs joints configuration for the test
+  posture.segment<6>(lleg_idx_qs_) = left_leg_.solve(base, leftFoot);
+  posture.segment<6>(rleg_idx_qs_) = right_leg_.solve(base, rightFoot);
 }
 
 void BipedIG::solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,

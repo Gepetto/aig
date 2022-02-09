@@ -11,13 +11,13 @@
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
-BOOST_AUTO_TEST_CASE(test_leg_ig_default_constructor) {
+BOOST_AUTO_TEST_CASE(test_default_constructor) {
   preview_ik::LegIG leg_ig;
   preview_ik::LegIGSettings default_settings;
   BOOST_CHECK_EQUAL(leg_ig.get_settings(), default_settings);
 }
 
-BOOST_AUTO_TEST_CASE(test_leg_ig_init_constructor) {
+BOOST_AUTO_TEST_CASE(test_init_constructor) {
   preview_ik::LegIGSettings settings;
 
   // Randomize the Matrices.
@@ -91,64 +91,66 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   rl_q = q.segment<6>(rleg_idx_qs);
 }
 
-BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_zero) {
+void test_solve(bool left, Mode mode)
+{
   // create the solver
-  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
+  preview_ik::LegIGSettings settings;
+  if (left)
+  {
+    settings = preview_ik::unittests::llegs;
+  }else{
+    settings = preview_ik::unittests::rlegs;
+  }
   preview_ik::LegIG leg_ig(settings);
 
   // perform a forward kinematics on a configuration
   Eigen::VectorXd q;
   preview_ik::LegJoints test_ll_q, test_rl_q;
   pinocchio::SE3 base, lf, rf;
-  generate_references(base, lf, rf, test_ll_q, test_rl_q, Mode::ZERO);
-
+  generate_references(base, lf, rf, test_ll_q, test_rl_q, mode);
+  double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
   // Compute inverse geometry.
-  preview_ik::LegJoints ll_q = leg_ig.solve(base, lf);
+  preview_ik::LegJoints q_leg;
+  if(left){
+    q_leg = leg_ig.solve(base, lf);
+  }else{
+    q_leg = leg_ig.solve(base, rf);
+  }
 
   // Tests.
-  BOOST_CHECK((ll_q - test_ll_q).norm() < 1e-3);
+  if(left){
+    BOOST_CHECK_LE((q_leg - test_ll_q).norm(), precision);
+  }else{
+    BOOST_CHECK_LE((q_leg - test_rl_q).norm(), precision);
+  }
 }
 
-BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_half_sitting) {
-  // create the solver
-  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
-  preview_ik::LegIG leg_ig(settings);
-
-  // perform a forward kinematics on a configuration
-  Eigen::VectorXd q;
-  preview_ik::LegJoints test_ll_q, test_rl_q;
-  pinocchio::SE3 base, lf, rf;
-  generate_references(base, lf, rf, test_ll_q, test_rl_q, Mode::HALF_SITTING);
-
-  // Compute inverse geometry.
-  preview_ik::LegJoints ll_q = leg_ig.solve(base, lf);
-
-  // Tests.
-  BOOST_CHECK((ll_q - test_ll_q).norm() < 1e-3);
+BOOST_AUTO_TEST_CASE(test_solve_left_zero) {
+  test_solve(true, Mode::ZERO);
 }
 
-BOOST_AUTO_TEST_CASE(test_leg_ig_solve_left_random) {
+BOOST_AUTO_TEST_CASE(test_solve_left_half_sitting) {
+  test_solve(true, Mode::HALF_SITTING);
+}
+
+BOOST_AUTO_TEST_CASE(test_solve_left_random) {
   // Randomize the Matrices.
   srand((unsigned int) time(0));
+  test_solve(true, Mode::RANDOM);
+}
 
-  // create the solver
-  preview_ik::LegIGSettings settings = preview_ik::unittests::llegs;
-  preview_ik::LegIG leg_ig(settings);
+BOOST_AUTO_TEST_CASE(test_solve_right_zero) {
+  test_solve(false, Mode::ZERO);
+}
 
-  // perform a forward kinematics on a configuration
-  Eigen::VectorXd q;
-  preview_ik::LegJoints test_ll_q, test_rl_q;
-  pinocchio::SE3 base, lf, rf;
-  generate_references(base, lf, rf, test_ll_q, test_rl_q, Mode::RANDOM);
+BOOST_AUTO_TEST_CASE(test_solve_right_half_sitting) {
+  test_solve(false, Mode::HALF_SITTING);
+}
 
-  // Compute inverse geometry.
-  preview_ik::LegJoints ll_q = leg_ig.solve(base, lf);
-
-  // Tests.
-  std::cout << "test_ll_q = " << test_ll_q.transpose() << std::endl;
-  std::cout << "ll_q = " << ll_q.transpose() << std::endl;
-  std::cout << "ll_q - test_ll_q = " << (ll_q - test_ll_q).norm() << std::endl;
-  BOOST_CHECK((ll_q - test_ll_q).norm() < 0.5);
+BOOST_AUTO_TEST_CASE(test_solve_right_random) {
+  // Randomize the Matrices.
+  srand((unsigned int) time(0));
+  test_solve(false, Mode::RANDOM);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

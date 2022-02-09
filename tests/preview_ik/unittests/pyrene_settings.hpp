@@ -13,8 +13,9 @@
 
 #include <string>
 
-#include "preview_ik/leg_ig.hpp"
 #include "example-robot-data/path.hpp"
+#include "preview_ik/biped_ig.hpp"
+#include "preview_ik/leg_ig.hpp"
 
 namespace preview_ik {
 namespace unittests {
@@ -37,17 +38,30 @@ const std::string right_foot_frame_name = "leg_right_sole_fix_joint";
 // ankle_from_knee
 // ankle_from_foot
 const LegIGSettings llegs = {
-    (Eigen::Vector3d() << -0.02, 0.085, -0.27105).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()
+    (Eigen::Vector3d() << -0.02, 0.085, -0.27105)
+        .finished(),                                    /* hip_from_waist */
+    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),  /* knee_from_hip */
+    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(), /* ankle_from_knee */
+    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()   /* ankle_from_foot */
 };
 
 const LegIGSettings rlegs = {
     (Eigen::Vector3d() << -0.02, -0.085, -0.27105).finished(),
     (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),
     (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()
+    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()};
+
+preview_ik::BipedIGSettings bipeds = {
+    left_hip_joint_name,    /* left_hip_joint_name */
+    left_knee_joint_name,   /* left_knee_joint_name */
+    left_ankle_joint_name,  /* left_ankle_joint_name */
+    left_foot_frame_name,   /* left_foot_frame_name */
+    right_hip_joint_name,   /* right_hip_joint_name */
+    right_knee_joint_name,  /* right_knee_joint_name */
+    right_ankle_joint_name, /* right_ankle_joint_name */
+    right_foot_frame_name,  /* right_foot_frame_name */
+    urdf_path,              /* urdf_path */
+    srdf_path               /* srdf_path */
 };
 
 }  // namespace unittests
