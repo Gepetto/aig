@@ -65,13 +65,11 @@ if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 endif()
 
-# Add some checking
-add_executable(checker src/checker.cpp src/postures.cpp)
-target_include_directories(checker PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(checker PUBLIC pinocchio::pinocchio
-                                     example-robot-data::example-robot-data)
-install(TARGETS checker DESTINATION bin)
-
+# Add some checking executable
+# add_executable(checker src/checker.cpp src/postures.cpp)
+# target_include_directories(checker PUBLIC $<INSTALL_INTERFACE:include>)
+# target_link_libraries(checker PUBLIC pinocchio::pinocchio
+#                                      example-robot-data::example-robot-data)
 # add_executable(postures src/postures.cpp ${${PROJECT_NAME}_HEADERS})
 # target_link_libraries(postures PUBLIC pinocchio::pinocchio
 # example-robot-data::example-robot-data)
