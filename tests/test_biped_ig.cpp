@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 
+#include "aig/biped_ig.hpp"
+#include "aig/unittests/pyrene_settings.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "aig/biped_ig.hpp"
-#include "aig/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
@@ -49,8 +49,8 @@ void generate_references(Eigen::Vector3d& com, pinocchio::SE3& base,
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
-  pinocchio::srdf::loadReferenceConfigurations(
-      model, aig::unittests::srdf_path, false);
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+                                               false);
 
   // Generate a robot configuration.
   switch (mode) {

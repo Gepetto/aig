@@ -1,13 +1,13 @@
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include "aig/leg_ig.hpp"
+#include "aig/unittests/pyrene_settings.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
 #include "pinocchio/algorithm/kinematics.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "aig/leg_ig.hpp"
-#include "aig/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(test_init_constructor) {
   aig::LegIGSettings settings;
 
   // Randomize the Matrices.
-  srand((unsigned int) time(0));
+  srand((unsigned int)time(0));
   settings.knee_from_hip = Eigen::Vector3d::Random();
   settings.ankle_from_knee = Eigen::Vector3d::Random();
   settings.hip_from_waist = Eigen::Vector3d::Random();
@@ -41,8 +41,8 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
-  pinocchio::srdf::loadReferenceConfigurations(
-      model, aig::unittests::srdf_path, false);
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+                                               false);
 
   // Generate a robot configuration.
   Eigen::VectorXd q;
@@ -76,10 +76,9 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
 
   // Get the legs joints configuration for the test
   int lleg_idx_qs =
-      model
-          .idx_qs[model.getJointId(aig::unittests::left_hip_joint_name)];
-  int rleg_idx_qs = model.idx_qs[model.getJointId(
-      aig::unittests::right_hip_joint_name)];
+      model.idx_qs[model.getJointId(aig::unittests::left_hip_joint_name)];
+  int rleg_idx_qs =
+      model.idx_qs[model.getJointId(aig::unittests::right_hip_joint_name)];
 
   // outputs
   lf = data.oMf[lf_id];
@@ -91,14 +90,12 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   rl_q = q.segment<6>(rleg_idx_qs);
 }
 
-void test_solve(bool left, Mode mode)
-{
+void test_solve(bool left, Mode mode) {
   // create the solver
   aig::LegIGSettings settings;
-  if (left)
-  {
+  if (left) {
     settings = aig::unittests::llegs;
-  }else{
+  } else {
     settings = aig::unittests::rlegs;
   }
   aig::LegIG leg_ig(settings);
@@ -111,23 +108,21 @@ void test_solve(bool left, Mode mode)
   double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
   // Compute inverse geometry.
   aig::LegJoints q_leg;
-  if(left){
+  if (left) {
     q_leg = leg_ig.solve(base, lf);
-  }else{
+  } else {
     q_leg = leg_ig.solve(base, rf);
   }
 
   // Tests.
-  if(left){
+  if (left) {
     BOOST_CHECK_LE((q_leg - test_ll_q).norm(), precision);
-  }else{
+  } else {
     BOOST_CHECK_LE((q_leg - test_rl_q).norm(), precision);
   }
 }
 
-BOOST_AUTO_TEST_CASE(test_solve_left_zero) {
-  test_solve(true, Mode::ZERO);
-}
+BOOST_AUTO_TEST_CASE(test_solve_left_zero) { test_solve(true, Mode::ZERO); }
 
 BOOST_AUTO_TEST_CASE(test_solve_left_half_sitting) {
   test_solve(true, Mode::HALF_SITTING);
@@ -135,13 +130,11 @@ BOOST_AUTO_TEST_CASE(test_solve_left_half_sitting) {
 
 BOOST_AUTO_TEST_CASE(test_solve_left_random) {
   // Randomize the Matrices.
-  srand((unsigned int) time(0));
+  srand((unsigned int)time(0));
   test_solve(true, Mode::RANDOM);
 }
 
-BOOST_AUTO_TEST_CASE(test_solve_right_zero) {
-  test_solve(false, Mode::ZERO);
-}
+BOOST_AUTO_TEST_CASE(test_solve_right_zero) { test_solve(false, Mode::ZERO); }
 
 BOOST_AUTO_TEST_CASE(test_solve_right_half_sitting) {
   test_solve(false, Mode::HALF_SITTING);
@@ -149,7 +142,7 @@ BOOST_AUTO_TEST_CASE(test_solve_right_half_sitting) {
 
 BOOST_AUTO_TEST_CASE(test_solve_right_random) {
   // Randomize the Matrices.
-  srand((unsigned int) time(0));
+  srand((unsigned int)time(0));
   test_solve(false, Mode::RANDOM);
 }
 

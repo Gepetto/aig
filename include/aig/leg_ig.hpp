@@ -12,6 +12,7 @@
 
 #include <Eigen/Dense>
 
+#include "pinocchio/fwd.hpp"
 #include "pinocchio/spatial/se3.hpp"
 
 namespace aig {

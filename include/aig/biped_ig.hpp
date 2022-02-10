@@ -12,11 +12,12 @@
 
 #include <Eigen/Dense>
 
+#include "aig/arm_ig.hpp"
+#include "aig/leg_ig.hpp"
+#include "pinocchio/fwd.hpp"
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/spatial/se3.hpp"
-#include "aig/arm_ig.hpp"
-#include "aig/leg_ig.hpp"
 
 namespace aig {
 /**
@@ -82,8 +83,8 @@ class BipedIG {
   ArmIG left_arm_, right_arm_;
   Eigen::VectorXd q0_;
   Eigen::Vector3d com_from_waist_;
-  int lleg_idx_qs_; // Indexes in the configuration vector.
-  int rleg_idx_qs_; // Indexes in the configuration vector.
+  int lleg_idx_qs_;  // Indexes in the configuration vector.
+  int rleg_idx_qs_;  // Indexes in the configuration vector.
 
   // Private methods.
  private:

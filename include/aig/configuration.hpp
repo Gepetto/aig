@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "example-robot-data/path.hpp"
+#include "pinocchio/fwd.hpp"
 
 namespace conf {
 const std::string path_to_robots(EXAMPLE_ROBOT_DATA_MODEL_DIR);

@@ -1,10 +1,10 @@
 #include <boost/test/unit_test.hpp>
 
+#include "aig/unittests/pyrene_settings.hpp"
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "aig/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 

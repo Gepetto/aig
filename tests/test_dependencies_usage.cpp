@@ -1,10 +1,10 @@
 #include <boost/test/unit_test.hpp>
 
+#include "aig/unittests/pyrene_settings.hpp"
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "aig/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
@@ -19,8 +19,8 @@ BOOST_AUTO_TEST_CASE(test_get_reference_config) {
   pinocchio::Model model;
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(
-      model, aig::unittests::srdf_path, false);
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+                                               false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
   BOOST_CHECK_EQUAL(q.size(), model.nq);
 }
@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE(test_compute_joint_placement) {
   pinocchio::Model model;
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(
-      model, aig::unittests::srdf_path, false);
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+                                               false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
 
   Eigen::Vector3d test;
@@ -42,8 +42,8 @@ BOOST_AUTO_TEST_CASE(test_compute_com) {
   pinocchio::Model model;
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(
-      model, aig::unittests::srdf_path, false);
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+                                               false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
   pinocchio::Data data(model);
   Eigen::Vector3d com = pinocchio::centerOfMass(model, data, q);
