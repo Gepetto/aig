@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 
 #include "pinocchio/algorithm/frames.hpp"
+#include "pinocchio/fwd.hpp"
 #include "pinocchio/parsers/sample-models.hpp"
 
 namespace pin = pinocchio;

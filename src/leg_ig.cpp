@@ -27,7 +27,6 @@ void LegIG::reset_internals() {
   a_ = b_ = c_ = 0.0;
   Rint_ = Rext_ = R_ = Eigen::Matrix3d::Zero();
   output_ = LegJoints::Zero();
-
 }
 
 LegJoints LegIG::solve(const pinocchio::SE3 &base,

@@ -13,9 +13,9 @@
 
 #include <string>
 
-#include "example-robot-data/path.hpp"
 #include "aig/biped_ig.hpp"
 #include "aig/leg_ig.hpp"
+#include "example-robot-data/path.hpp"
 
 namespace aig {
 namespace unittests {
