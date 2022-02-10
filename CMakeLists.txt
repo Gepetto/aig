@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 
 # Project properties
 set(PROJECT_NAMESPACE gepetto)
-set(PROJECT_NAME preview_ik)
+set(PROJECT_NAME aig)
 set(PROJECT_DESCRIPTION "Analytical inverse geomery for MPC in bipeds")
 set(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/${PROJECT_NAME})
 
@@ -37,7 +37,7 @@ include("${JRL_CMAKE_MODULES}/test.cmake")
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
-project(preview_ik ${PROJECT_ARGS})
+project(aig ${PROJECT_ARGS})
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)

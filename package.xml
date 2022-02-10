@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>preview_ik</name>
+  <name>aig</name>
   <version>0.0.0</version>
   <description>
     Analitcical inverse geometry for 6 links kinematic chains
@@ -8,7 +8,7 @@
   <maintainer email="guilhem.saurel@laas.fr">Guilhem saurel</maintainer>
   <license>BSD</license>
 
-  <url>https://gepgitlab.laas.fr/nvilla/preview_ik</url>
+  <url>https://gepgitlab.laas.fr/nvilla/aig</url>
   <author>Nahuel Villa</author>
   <author>Maximilien Naveau</author>
 

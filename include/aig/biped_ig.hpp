@@ -7,18 +7,18 @@
  * @brief Class to perform inverse geometry on a biped robot.
  */
 
-#ifndef PREVIEW_IK_BIPED_IG
-#define PREVIEW_IK_BIPED_IG
+#ifndef AIG_BIPED_IG
+#define AIG_BIPED_IG
 
 #include <Eigen/Dense>
 
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/spatial/se3.hpp"
-#include "preview_ik/arm_ig.hpp"
-#include "preview_ik/leg_ig.hpp"
+#include "aig/arm_ig.hpp"
+#include "aig/leg_ig.hpp"
 
-namespace preview_ik {
+namespace aig {
 /**
  * @brief @todo Describe BipedIGSettings
  */
@@ -163,5 +163,5 @@ class BipedIG {
                              const Eigen::Matrix<double, 6, 1> &externalWrench,
                              bool flatHorizontalGround = true);
 };
-}  // namespace preview_ik
-#endif  // PREVIEW_IK_BIPED_IG
+}  // namespace aig
+#endif  // AIG_BIPED_IG

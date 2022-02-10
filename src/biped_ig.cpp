@@ -4,14 +4,14 @@
  * @brief
  */
 
-#include "preview_ik/biped_ig.hpp"
+#include "aig/biped_ig.hpp"
 
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
-namespace preview_ik {
+namespace aig {
 
 BipedIG::BipedIG() {
   // initialized by default:
@@ -226,4 +226,4 @@ Eigen::Vector2d BipedIG::computeCoP(const Eigen::VectorXd &posture,
                     flatHorizontalGround);
 }
 
-}  // namespace preview_ik
+}  // namespace aig

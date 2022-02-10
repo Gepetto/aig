@@ -8,16 +8,16 @@
  *        LAAS-CNRS) parameters in order to perform the inverse geometry (IG).
  */
 
-#ifndef PREVIEW_IK_PYRENE_SETTINGS
-#define PREVIEW_IK_PYRENE_SETTINGS
+#ifndef AIG_PYRENE_SETTINGS
+#define AIG_PYRENE_SETTINGS
 
 #include <string>
 
 #include "example-robot-data/path.hpp"
-#include "preview_ik/biped_ig.hpp"
-#include "preview_ik/leg_ig.hpp"
+#include "aig/biped_ig.hpp"
+#include "aig/leg_ig.hpp"
 
-namespace preview_ik {
+namespace aig {
 namespace unittests {
 const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR;
 const std::string urdf_path =
@@ -51,7 +51,7 @@ const LegIGSettings rlegs = {
     (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
     (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()};
 
-preview_ik::BipedIGSettings bipeds = {
+aig::BipedIGSettings bipeds = {
     left_hip_joint_name,    /* left_hip_joint_name */
     left_knee_joint_name,   /* left_knee_joint_name */
     left_ankle_joint_name,  /* left_ankle_joint_name */
@@ -65,6 +65,6 @@ preview_ik::BipedIGSettings bipeds = {
 };
 
 }  // namespace unittests
-}  // namespace preview_ik
+}  // namespace aig
 
-#endif  // PREVIEW_IK_PYRENE_SETTINGS
+#endif  // AIG_PYRENE_SETTINGS

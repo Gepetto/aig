@@ -7,14 +7,14 @@
  * @brief Class to perform inverse geometry on a robot arm.
  */
 
-#ifndef PREVIEW_IK_ARM_IG
-#define PREVIEW_IK_ARM_IG
+#ifndef AIG_ARM_IG
+#define AIG_ARM_IG
 
 #include <Eigen/Dense>
 
 #include "pinocchio/spatial/se3.hpp"
 
-namespace preview_ik {
+namespace aig {
 /**
  * @brief @todo Describe ArmIG
  */
@@ -24,6 +24,6 @@ class ArmIG {
   Eigen::VectorXd solve(const pinocchio::SE3 &base,
                         const pinocchio::SE3 &endEffector);
 };
-}  // namespace preview_ik
+}  // namespace aig
 
-#endif  // PREVIEW_IK_ARM_IG
+#endif  // AIG_ARM_IG

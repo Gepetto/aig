@@ -7,14 +7,14 @@
  * @brief Class to perform inverse geometry on a robot leg.
  */
 
-#ifndef PREVIEW_IK_LEG_IG
-#define PREVIEW_IK_LEG_IG
+#ifndef AIG_LEG_IG
+#define AIG_LEG_IG
 
 #include <Eigen/Dense>
 
 #include "pinocchio/spatial/se3.hpp"
 
-namespace preview_ik {
+namespace aig {
 
 typedef Eigen::Matrix<double, 6, 1> LegJoints;
 
@@ -73,6 +73,6 @@ class LegIG {
   LegJoints solve(const pinocchio::SE3 &base,
                   const pinocchio::SE3 &endEffector);
 };
-}  // namespace preview_ik
+}  // namespace aig
 
-#endif  // PREVIEW_IK_LEG_IG
+#endif  // AIG_LEG_IG

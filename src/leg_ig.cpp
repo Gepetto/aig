@@ -4,9 +4,9 @@
  * @brief
  */
 
-#include "preview_ik/leg_ig.hpp"
+#include "aig/leg_ig.hpp"
 
-namespace preview_ik {
+namespace aig {
 
 LegIG::LegIG() { reset_internals(); }
 
@@ -87,4 +87,4 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   return output_;
 }
 
-}  // namespace preview_ik
+}  // namespace aig

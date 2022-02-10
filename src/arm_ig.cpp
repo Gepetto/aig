@@ -7,9 +7,9 @@
 #ifndef NDEBUG  // debug mode
 #include <iostream>
 #endif
-#include "preview_ik/arm_ig.hpp"
+#include "aig/arm_ig.hpp"
 
-namespace preview_ik {
+namespace aig {
 
 ArmIG::ArmIG() {
 #ifndef NDEBUG  // debug mode
@@ -26,4 +26,4 @@ Eigen::VectorXd ArmIG::solve(const pinocchio::SE3& /*base*/,
   return q;
 }
 
-}  // namespace preview_ik
+}  // namespace aig

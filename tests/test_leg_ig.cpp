@@ -6,19 +6,19 @@
 #include "pinocchio/algorithm/kinematics.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "preview_ik/leg_ig.hpp"
-#include "preview_ik/unittests/pyrene_settings.hpp"
+#include "aig/leg_ig.hpp"
+#include "aig/unittests/pyrene_settings.hpp"
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(test_default_constructor) {
-  preview_ik::LegIG leg_ig;
-  preview_ik::LegIGSettings default_settings;
+  aig::LegIG leg_ig;
+  aig::LegIGSettings default_settings;
   BOOST_CHECK_EQUAL(leg_ig.get_settings(), default_settings);
 }
 
 BOOST_AUTO_TEST_CASE(test_init_constructor) {
-  preview_ik::LegIGSettings settings;
+  aig::LegIGSettings settings;
 
   // Randomize the Matrices.
   srand((unsigned int) time(0));
@@ -27,22 +27,22 @@ BOOST_AUTO_TEST_CASE(test_init_constructor) {
   settings.hip_from_waist = Eigen::Vector3d::Random();
   settings.ankle_from_foot = Eigen::Vector3d::Random();
 
-  preview_ik::LegIG leg_ig(settings);
+  aig::LegIG leg_ig(settings);
   BOOST_CHECK_EQUAL(leg_ig.get_settings(), settings);
 }
 
 enum Mode { ZERO, HALF_SITTING, RANDOM };
 
 void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
-                         pinocchio::SE3& rf, preview_ik::LegJoints& ll_q,
-                         preview_ik::LegJoints& rl_q, const Mode& mode) {
+                         pinocchio::SE3& rf, aig::LegJoints& ll_q,
+                         aig::LegJoints& rl_q, const Mode& mode) {
   // Get the model and data
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(preview_ik::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
   pinocchio::srdf::loadReferenceConfigurations(
-      model, preview_ik::unittests::srdf_path, false);
+      model, aig::unittests::srdf_path, false);
 
   // Generate a robot configuration.
   Eigen::VectorXd q;
@@ -70,16 +70,16 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   pinocchio::forwardKinematics(model, data, q);
   pinocchio::updateFramePlacements(model, data);
   pinocchio::FrameIndex lf_id =
-      model.getFrameId(preview_ik::unittests::left_foot_frame_name);
+      model.getFrameId(aig::unittests::left_foot_frame_name);
   pinocchio::FrameIndex rf_id =
-      model.getFrameId(preview_ik::unittests::right_foot_frame_name);
+      model.getFrameId(aig::unittests::right_foot_frame_name);
 
   // Get the legs joints configuration for the test
   int lleg_idx_qs =
       model
-          .idx_qs[model.getJointId(preview_ik::unittests::left_hip_joint_name)];
+          .idx_qs[model.getJointId(aig::unittests::left_hip_joint_name)];
   int rleg_idx_qs = model.idx_qs[model.getJointId(
-      preview_ik::unittests::right_hip_joint_name)];
+      aig::unittests::right_hip_joint_name)];
 
   // outputs
   lf = data.oMf[lf_id];
@@ -94,23 +94,23 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
 void test_solve(bool left, Mode mode)
 {
   // create the solver
-  preview_ik::LegIGSettings settings;
+  aig::LegIGSettings settings;
   if (left)
   {
-    settings = preview_ik::unittests::llegs;
+    settings = aig::unittests::llegs;
   }else{
-    settings = preview_ik::unittests::rlegs;
+    settings = aig::unittests::rlegs;
   }
-  preview_ik::LegIG leg_ig(settings);
+  aig::LegIG leg_ig(settings);
 
   // perform a forward kinematics on a configuration
   Eigen::VectorXd q;
-  preview_ik::LegJoints test_ll_q, test_rl_q;
+  aig::LegJoints test_ll_q, test_rl_q;
   pinocchio::SE3 base, lf, rf;
   generate_references(base, lf, rf, test_ll_q, test_rl_q, mode);
   double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
   // Compute inverse geometry.
-  preview_ik::LegJoints q_leg;
+  aig::LegJoints q_leg;
   if(left){
     q_leg = leg_ig.solve(base, lf);
   }else{
