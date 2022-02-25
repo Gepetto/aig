@@ -117,6 +117,9 @@ class BipedIG {
     return right_leg_.get_settings();
   };
 
+  const Eigen::VectorXd &getQ0() {
+    return q0_;
+  }
   void checkCompatibility();  // TODO
 
   void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
