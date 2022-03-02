@@ -10,14 +10,15 @@
 #ifndef AIG_BIPED_IG
 #define AIG_BIPED_IG
 
+// clang-format off
 #include <Eigen/Dense>
-
-#include "aig/arm_ig.hpp"
-#include "aig/leg_ig.hpp"
 #include "pinocchio/fwd.hpp"
 #include "pinocchio/multibody/data.hpp"
 #include "pinocchio/multibody/model.hpp"
 #include "pinocchio/spatial/se3.hpp"
+#include "aig/arm_ig.hpp"
+#include "aig/leg_ig.hpp"
+// clang-format on
 
 namespace aig {
 /**

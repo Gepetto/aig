@@ -1,11 +1,12 @@
 #ifndef __PREVIEW_IK_POSTURES___
 #define __PREVIEW_IK_POSTURES___
 
+// clang-format off
 #include <Eigen/Dense>
-
-#include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/fwd.hpp"
+#include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/parsers/sample-models.hpp"
+// clang-format on
 
 namespace pin = pinocchio;
 namespace IK_tools {

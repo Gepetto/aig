@@ -2,8 +2,10 @@
 #define __PREVIEW_IK_CONFIGURATION___
 #include <iostream>
 
-#include "example-robot-data/path.hpp"
+// clang-format off
 #include "pinocchio/fwd.hpp"
+#include "example-robot-data/path.hpp"
+// clang-format on
 
 namespace conf {
 const std::string path_to_robots(EXAMPLE_ROBOT_DATA_MODEL_DIR);

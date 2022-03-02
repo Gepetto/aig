@@ -10,10 +10,12 @@
 #ifndef AIG_LEG_IG
 #define AIG_LEG_IG
 
+// clang-format off
 #include <Eigen/Dense>
 
 #include "pinocchio/fwd.hpp"
 #include "pinocchio/spatial/se3.hpp"
+// clang-format on
 
 namespace aig {
 
