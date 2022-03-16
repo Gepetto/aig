@@ -35,6 +35,13 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
                               pinocchio::JointModelFreeFlyer(), model_);
   data_ = pinocchio::Data(model_);
 
+  gravity_ = 9.81;
+  mass_ = 0.0;
+  for(size_t k = 0; k < model_.inertias.size(); ++k)
+  {
+    mass_ += model_.inertias[k].mass();
+  }
+
   // Extract the CoM to Waist level arm.
   pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
                                                false);

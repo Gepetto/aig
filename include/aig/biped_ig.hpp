@@ -86,7 +86,8 @@ class BipedIG {
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
-  double mass_, gravity_ = 9.81;
+  double mass_;
+  double gravity_;
 
   // Private methods.
  private:
