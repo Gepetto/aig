@@ -86,6 +86,7 @@ class BipedIG {
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
+  double mass_, gravity_ = 9.81;
 
   // Private methods.
  private:
@@ -102,6 +103,16 @@ class BipedIG {
 
   void configurateLegs();
 
+  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+                             const Eigen::VectorXd &velocity,
+                             const Eigen::VectorXd &acceleration,
+                             bool flatHorizontalGround = true);
+
+  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+                             const Eigen::VectorXd &velocity,
+                             const Eigen::VectorXd &acceleration,
+                             const Eigen::Matrix<double, 6, 1> &externalWrench,
+                             bool flatHorizontalGround = true);
   // Public methods.
  public:
   BipedIG();
@@ -157,16 +168,20 @@ class BipedIG {
              Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
-                             const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration,
-                             bool flatHorizontalGround = true);
+  void set_com_from_waist(const Eigen::Vector3d &com_from_waist); 
 
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
-                             const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration,
-                             const Eigen::Matrix<double, 6, 1> &externalWrench,
-                             bool flatHorizontalGround = true);
+  void set_com_from_waist(const Eigen::VectorXd &q);
+
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
+                            const Eigen::VectorXd &velocity,
+                            const Eigen::VectorXd &acceleration,
+                            const Eigen::Matrix<double, 6, 1> &externalWrench,
+                            bool flatHorizontalGround = true);
+
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
+                            const Eigen::VectorXd &velocity,
+                            const Eigen::VectorXd &acceleration,
+                            bool flatHorizontalGround = true);
 };
 }  // namespace aig
 #endif  // AIG_BIPED_IG

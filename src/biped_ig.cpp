@@ -39,7 +39,7 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
                                                false);
   q0_ = model_.referenceConfigurations["half_sitting"];
-  com_from_waist_ = pinocchio::centerOfMass(model_, data_, q0_) - q0_.head(3);
+  set_com_from_waist(q0_);
 
   configurateLegs();
 }
@@ -189,6 +189,15 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
   derivatives(q1, q3, posture, velocity, acceleration, dt);
 }
 
+void BipedIG::set_com_from_waist(const Eigen::Vector3d &com_from_waist) {
+  com_from_waist_ = com_from_waist;
+}
+
+void BipedIG::set_com_from_waist(const Eigen::VectorXd &q) {
+  Eigen::Vector3d com_from_waist = pinocchio::centerOfMass(model_, data_, q) - q.head(3);
+  set_com_from_waist(com_from_waist);
+}
+
 Eigen::Vector2d BipedIG::computeCoP(
     const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
     const Eigen::VectorXd &acceleration,
@@ -213,7 +222,7 @@ Eigen::Vector2d BipedIG::computeCoP(
   }
 
   return Eigen::Vector2d(-pressureTorqueMo(1) / (tauMw(2) - externalWrench(2)),
-                         pressureTorqueMo(0) / (tauMw(2) - externalWrench(2)));
+                          pressureTorqueMo(0) / (tauMw(2) - externalWrench(2)));
 }
 
 Eigen::Vector2d BipedIG::computeCoP(const Eigen::VectorXd &posture,
@@ -224,6 +233,28 @@ Eigen::Vector2d BipedIG::computeCoP(const Eigen::VectorXd &posture,
       Eigen::Matrix<double, 6, 1>::Zero();
   return computeCoP(posture, velocity, acceleration, externalWrench,
                     flatHorizontalGround);
+}
+
+Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
+                                   const Eigen::VectorXd &velocity,
+                                   const Eigen::VectorXd &acceleration,
+                                   const Eigen::Matrix<double, 6, 1> &externalWrench,
+                                   bool flatHorizontalGround) {
+  Eigen::Vector2d cop = computeCoP(posture, velocity, acceleration, 
+                                   externalWrench, flatHorizontalGround);
+  pinocchio::centerOfMass(model_, data_, posture);                          
+  Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3)/mass_);
+  
+  return cop - com.head(2) + ddcom.head(2)*com.z()/gravity_;
+}
+
+Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
+                          const Eigen::VectorXd &velocity,
+                          const Eigen::VectorXd &acceleration,
+                          bool flatHorizontalGround) {
+  Eigen::Matrix<double, 6, 1> withoutWrench = Eigen::Matrix<double, 6, 1>::Zero();
+  return computeNL(posture, velocity, acceleration, withoutWrench,
+                   flatHorizontalGround);
 }
 
 }  // namespace aig
