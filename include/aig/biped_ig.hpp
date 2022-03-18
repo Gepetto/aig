@@ -88,6 +88,8 @@ class BipedIG {
   int rleg_idx_qs_;  // Indexes in the configuration vector.
   double mass_;
   double gravity_;
+  Eigen::Vector2d cop_;
+  Eigen::Vector3d dL_;
 
   // Private methods.
  private:
@@ -104,12 +106,12 @@ class BipedIG {
 
   void configurateLegs();
 
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+  void computeDynamics(const Eigen::VectorXd &posture,
                              const Eigen::VectorXd &velocity,
                              const Eigen::VectorXd &acceleration,
                              bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeCoP(const Eigen::VectorXd &posture,
+  void computeDynamics(const Eigen::VectorXd &posture,
                              const Eigen::VectorXd &velocity,
                              const Eigen::VectorXd &acceleration,
                              const Eigen::Matrix<double, 6, 1> &externalWrench,

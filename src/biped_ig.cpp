@@ -205,20 +205,19 @@ void BipedIG::set_com_from_waist(const Eigen::VectorXd &q) {
   set_com_from_waist(com_from_waist);
 }
 
-Eigen::Vector2d BipedIG::computeCoP(
-    const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
-    const Eigen::VectorXd &acceleration,
-    const Eigen::Matrix<double, 6, 1> &externalWrench,
-    bool flatHorizontalGround) {
-  // The external wrench is supposed to be expressed in the frame of the root
-  // link.
-
-  Eigen::Matrix<double, 6, 1> tauMw =
-      pinocchio::rnea(model_, data_, posture, velocity, acceleration).head(6);
-  Eigen::Vector3d groundTorqueMo =
-      tauMw.tail(3) - externalWrench.tail(3) +
-      pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
-          (tauMw.head(3) - externalWrench.head(3));
+void BipedIG::computeDynamics(const Eigen::VectorXd &posture, 
+                              const Eigen::VectorXd &velocity,
+                              const Eigen::VectorXd &acceleration,
+                              const Eigen::Matrix<double, 6, 1> &externalWrench,
+                              bool flatHorizontalGround) {
+  // The external wrench is supposed to be expressed 
+  // in the frame of the root link.
+  Eigen::Matrix<double, 6, 1> tauMw = pinocchio::rnea(model_, data_, 
+                                                      posture, velocity,
+                                                      acceleration).head(6);
+  Eigen::Vector3d groundTorqueMo = tauMw.tail(3) - externalWrench.tail(3) +
+                                  pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
+                                  (tauMw.head(3) - externalWrench.head(3));
 
   Eigen::Vector3d pressureTorqueMo;
   if (flatHorizontalGround) {
@@ -228,18 +227,23 @@ Eigen::Vector2d BipedIG::computeCoP(
     // the CoP computation. for now, we assume a flat and horizontal ground.
   }
 
-  return Eigen::Vector2d(-pressureTorqueMo(1) / (tauMw(2) - externalWrench(2)),
+  cop_ = Eigen::Vector2d(-pressureTorqueMo(1) / (tauMw(2) - externalWrench(2)),
                           pressureTorqueMo(0) / (tauMw(2) - externalWrench(2)));
+  pinocchio::centerOfMass(model_, data_, posture);
+
+  dL_ = tauMw.tail(3) + 
+        pinocchio::skew(Eigen::Vector3d(posture.head(3)-
+                                        data_.com[0])) * tauMw.tail(3);
 }
 
-Eigen::Vector2d BipedIG::computeCoP(const Eigen::VectorXd &posture,
+void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                                     const Eigen::VectorXd &velocity,
                                     const Eigen::VectorXd &acceleration,
                                     bool flatHorizontalGround) {
   Eigen::Matrix<double, 6, 1> externalWrench =
       Eigen::Matrix<double, 6, 1>::Zero();
-  return computeCoP(posture, velocity, acceleration, externalWrench,
-                    flatHorizontalGround);
+  computeDynamics(posture, velocity, acceleration, externalWrench,
+                  flatHorizontalGround);
 }
 
 Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
@@ -247,12 +251,11 @@ Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
                                    const Eigen::VectorXd &acceleration,
                                    const Eigen::Matrix<double, 6, 1> &externalWrench,
                                    bool flatHorizontalGround) {
-  Eigen::Vector2d cop = computeCoP(posture, velocity, acceleration, 
-                                   externalWrench, flatHorizontalGround);
-  pinocchio::centerOfMass(model_, data_, posture);                          
+  computeDynamics(posture, velocity, acceleration, 
+                  externalWrench, flatHorizontalGround);//it updates data_.com
   Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3)/mass_);
   
-  return cop - com.head(2) + ddcom.head(2)*com.z()/gravity_;
+  return cop_ - com.head(2) + ddcom.head(2)*com.z()/gravity_;
 }
 
 Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
