@@ -30,21 +30,50 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   // Copy the settings internally.
   settings_ = settings;
 
-  // Build the robot model and cache.
-  pinocchio::urdf::buildModel(settings_.urdf_path,
-                              pinocchio::JointModelFreeFlyer(), model_);
+  // Check if the urdf and the srdf file exists or not.
+  bool urdf_file_exists = false;
+  bool srdf_file_exists = false;
+  {
+    std::ifstream f(settings_.urdf_path.c_str());
+    urdf_file_exists = f.good();
+  }
+  {
+    std::ifstream f(settings_.srdf_path.c_str());
+    srdf_file_exists = f.good();
+  }
+
+  // Build the robot model.
+  if (urdf_file_exists) {
+    pinocchio::urdf::buildModel(settings_.urdf_path,
+                                pinocchio::JointModelFreeFlyer(), model_);
+  } else if (settings_.urdf_path != "") {
+    pinocchio::urdf::buildModelFromXML(
+        settings_.urdf_path, pinocchio::JointModelFreeFlyer(), model_);
+  } else {
+    throw std::runtime_error(
+        "BipedIG::BipedIG(): settings_.urdf_path is empty");
+  }
+  // Build pinocchio cache.
   data_ = pinocchio::Data(model_);
 
   gravity_ = 9.81;
   mass_ = 0.0;
-  for(size_t k = 0; k < model_.inertias.size(); ++k)
-  {
+  for (size_t k = 0; k < model_.inertias.size(); ++k) {
     mass_ += model_.inertias[k].mass();
   }
 
   // Extract the CoM to Waist level arm.
-  pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
-                                               false);
+  if (srdf_file_exists) {
+    pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
+                                                 false);
+  } else if (settings_.srdf_path != "") {
+    std::stringstream buffer;
+    buffer << settings_.srdf_path;
+    pinocchio::srdf::loadReferenceConfigurationsFromXML(model_, buffer, false);
+  } else {
+    throw std::runtime_error(
+        "BipedIG::BipedIG(): settings_.srdf_path is empty");
+  }
   q0_ = model_.referenceConfigurations["half_sitting"];
   set_com_from_waist(q0_);
 

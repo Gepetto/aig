@@ -24,6 +24,38 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor) {
   BOOST_CHECK_EQUAL(biped_ig.get_settings(), settings);
 }
 
+BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_urdf_content) {
+  aig::BipedIGSettings settings = aig::unittests::bipeds;
+  aig::BipedIG biped_ig_1(settings);
+  
+  // read the urdf:
+  std::ifstream file(settings.urdf_path.c_str());
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  // Save the urdf content into a string
+  settings.urdf_path = buffer.str();
+  aig::BipedIG biped_ig_2(settings);
+
+  // Check that both pinocchio model are equal.
+  BOOST_CHECK_EQUAL(biped_ig_1.get_model(), biped_ig_2.get_model());
+}
+
+BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_srdf_content) {
+  aig::BipedIGSettings settings = aig::unittests::bipeds;
+  aig::BipedIG biped_ig_1(settings);
+  
+  // read the urdf:
+  std::ifstream file(settings.srdf_path.c_str());
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  // Save the urdf content into a string
+  settings.srdf_path = buffer.str();
+  aig::BipedIG biped_ig_2(settings);
+
+  // Check that both pinocchio model are equal.
+  BOOST_CHECK_EQUAL(biped_ig_1.get_model(), biped_ig_2.get_model());
+}
+
 BOOST_AUTO_TEST_CASE(test_leg_ig_init_through_biped_ig) {
   aig::BipedIGSettings settings = aig::unittests::bipeds;
 

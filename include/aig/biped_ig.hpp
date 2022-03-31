@@ -185,6 +185,8 @@ class BipedIG {
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             bool flatHorizontalGround = true);
+  
+  pinocchio::Model& get_model(){return model_;}
 };
 }  // namespace aig
 #endif  // AIG_BIPED_IG

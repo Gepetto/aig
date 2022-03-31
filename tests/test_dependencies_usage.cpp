@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include <sstream>
 
 #include "aig/unittests/pyrene_settings.hpp"
 #include "example-robot-data/path.hpp"
@@ -13,6 +14,33 @@ BOOST_AUTO_TEST_CASE(test_load_talos_model) {
   pinocchio::urdf::buildModel(aig::unittests::urdf_path,
                               pinocchio::JointModelFreeFlyer(), model);
   BOOST_CHECK_EQUAL(model.name, "talos");
+}
+
+BOOST_AUTO_TEST_CASE(test_load_talos_model_from_xml) {
+  pinocchio::Model model;
+
+  // Read file as XML
+  std::ifstream file(aig::unittests::urdf_path.c_str());
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  pinocchio::urdf::buildModelFromXML(buffer.str(),
+                                     pinocchio::JointModelFreeFlyer(), model);
+  BOOST_CHECK_EQUAL(model.name, "talos");
+}
+
+BOOST_AUTO_TEST_CASE(test_get_reference_config_from_xml) {
+  pinocchio::Model model;
+  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+                              pinocchio::JointModelFreeFlyer(), model);
+  // creating the srdf file stream
+  std::ifstream srdf_file(aig::unittests::srdf_path.c_str());
+
+  // Load the srdf
+  std::stringstream buffer;
+  buffer << srdf_file.rdbuf();
+  pinocchio::srdf::loadReferenceConfigurationsFromXML(model, buffer, false);
+  Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
+  BOOST_CHECK_EQUAL(q.size(), model.nq);
 }
 
 BOOST_AUTO_TEST_CASE(test_get_reference_config) {
