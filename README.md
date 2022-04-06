@@ -2,6 +2,11 @@
 
 # AIG
 
+[![Pipeline status](https://gitlab.laas.fr/gepetto/aig/badges/master/pipeline.svg)](https://gitlab.laas.fr/gepetto/aig/commits/master)
+[![Coverage report](https://gitlab.laas.fr/gepetto/aig/badges/master/coverage.svg?job=doc-coverage)](https://gepettoweb.laas.fr/doc/gepetto/aig/master/coverage/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/gepetto/aig/master.svg)](https://results.pre-commit.ci/latest/github/gepetto/aig)
+
 Stand alone computation of inverse geometry for biped robots or robotic arms.
 
 Here inverse geometry refer to function that compute the robot joint
@@ -33,7 +38,7 @@ with [robotpkg](http://robotpkg.openrobots.org)
 
 1. If you have never added robotpkg's software repository,
    [do it now](http://robotpkg.openrobots.org/debian.html):
-   
+
    ```bash
    sudo tee /etc/apt/sources.list.d/robotpkg.list <<EOF
    deb [arch=amd64] http://robotpkg.openrobots.org/packages/debian/pub $(lsb_release -sc) robotpkg
