@@ -107,15 +107,15 @@ class BipedIG {
   void configurateLegs();
 
   void computeDynamics(const Eigen::VectorXd &posture,
-                             const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration,
-                             bool flatHorizontalGround = true);
+                       const Eigen::VectorXd &velocity,
+                       const Eigen::VectorXd &acceleration,
+                       bool flatHorizontalGround = true);
 
   void computeDynamics(const Eigen::VectorXd &posture,
-                             const Eigen::VectorXd &velocity,
-                             const Eigen::VectorXd &acceleration,
-                             const Eigen::Matrix<double, 6, 1> &externalWrench,
-                             bool flatHorizontalGround = true);
+                       const Eigen::VectorXd &velocity,
+                       const Eigen::VectorXd &acceleration,
+                       const Eigen::Matrix<double, 6, 1> &externalWrench,
+                       bool flatHorizontalGround = true);
   // Public methods.
  public:
   BipedIG();
@@ -132,9 +132,7 @@ class BipedIG {
     return right_leg_.get_settings();
   };
 
-  const Eigen::VectorXd &getQ0() {
-    return q0_;
-  }
+  const Eigen::VectorXd &getQ0() { return q0_; }
   void checkCompatibility();  // TODO
 
   void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
@@ -171,7 +169,7 @@ class BipedIG {
              Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
-  void set_com_from_waist(const Eigen::Vector3d &com_from_waist); 
+  void set_com_from_waist(const Eigen::Vector3d &com_from_waist);
 
   void set_com_from_waist(const Eigen::VectorXd &q);
 
@@ -185,8 +183,8 @@ class BipedIG {
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             bool flatHorizontalGround = true);
-  
-  pinocchio::Model& get_model(){return model_;}
+
+  pinocchio::Model &get_model() { return model_; }
 };
 }  // namespace aig
 #endif  // AIG_BIPED_IG

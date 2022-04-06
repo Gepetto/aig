@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor) {
 BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_urdf_content) {
   aig::BipedIGSettings settings = aig::unittests::bipeds;
   aig::BipedIG biped_ig_1(settings);
-  
+
   // read the urdf:
   std::ifstream file(settings.urdf_path.c_str());
   std::stringstream buffer;
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_urdf_content) {
 BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_srdf_content) {
   aig::BipedIGSettings settings = aig::unittests::bipeds;
   aig::BipedIG biped_ig_1(settings);
-  
+
   // read the urdf:
   std::ifstream file(settings.srdf_path.c_str());
   std::stringstream buffer;

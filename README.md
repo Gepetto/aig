@@ -82,4 +82,3 @@ Please read the unit-test to see how to use the code.
 
 License BSD-2-Clause
 Copyright (c) 2022, CNRS, Gepetto
-
