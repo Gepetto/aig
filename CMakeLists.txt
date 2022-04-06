@@ -36,6 +36,7 @@ include("${JRL_CMAKE_MODULES}/base.cmake")
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(aig ${PROJECT_ARGS})
+check_minimal_cxx_standard(11 ENFORCE)
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
