@@ -133,6 +133,10 @@ class BipedIG {
   };
 
   const Eigen::VectorXd &getQ0() { return q0_; }
+
+  const Eigen::Vector3d &getAMVariation() { return dL_; }
+  const Eigen::Vector2d &getCoP() { return cop_; }
+
   void checkCompatibility();  // TODO
 
   void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
@@ -150,6 +154,13 @@ class BipedIG {
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt);
+            
+  void solve(const std::array<Eigen::Vector3d, 3> &coms,
+             const std::array<Eigen::Isometry3d, 3> &leftFeet,
+             const std::array<Eigen::Isometry3d, 3> &rightFeet,
              const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
              Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);

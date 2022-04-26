@@ -197,6 +197,23 @@ void BipedIG::solve(const std::array<pinocchio::SE3, 3> &bases,
 }
 
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
+             const std::array<Eigen::Isometry3d, 3> &leftFeet,
+             const std::array<Eigen::Isometry3d, 3> &rightFeet,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt) {
+  
+  std::array<pinocchio::SE3, 3> LFs{ {pinocchio::SE3(leftFeet[0].matrix()),
+                                      pinocchio::SE3(leftFeet[1].matrix()), 
+                                      pinocchio::SE3(leftFeet[2].matrix())} };
+  std::array<pinocchio::SE3, 3> RFs{ {pinocchio::SE3(rightFeet[0].matrix()),
+                                      pinocchio::SE3(rightFeet[1].matrix()), 
+                                      pinocchio::SE3(rightFeet[2].matrix())} };
+
+  solve(coms, LFs, RFs, q0, posture, velocity, acceleration, dt);
+}
+
+void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<pinocchio::SE3, 3> &leftFeet,
                     const std::array<pinocchio::SE3, 3> &rightFeet,
                     const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
