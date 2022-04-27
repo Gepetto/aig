@@ -85,7 +85,7 @@ class BipedIG {
   pinocchio::Data data_;
   BipedIGSettings settings_;
   LegIG left_leg_, right_leg_;
-  ArmIG left_arm_, right_arm_;
+  //ArmIG left_arm_, right_arm_;
   Eigen::VectorXd q0_;
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
