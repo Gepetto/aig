@@ -13,7 +13,7 @@
 
 namespace aig {
 
-BipedIGSettings make_settings_for(std::string robot_name){
+BipedIGSettings makeSettingsFor(std::string robot_name){
   BipedIGSettings robot_settings;
   if (robot_name == "talos" || robot_name == "Talos" || robot_name == "TALOS"){
     const std::string path_to_robots = "/opt/pal/ferrum/share/talos_description";

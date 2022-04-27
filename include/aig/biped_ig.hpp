@@ -71,7 +71,7 @@ struct BipedIGSettings {
   }
 };
 
-BipedIGSettings make_settings_for(std::string robot_name);
+BipedIGSettings makeSettingsFor(std::string robot_name);
 
 
 /**
