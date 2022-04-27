@@ -24,6 +24,7 @@ namespace aig {
 /**
  * @brief @todo Describe BipedIGSettings
  */
+
 struct BipedIGSettings {
  public:
   std::string left_hip_joint_name = "";
@@ -69,6 +70,9 @@ struct BipedIGSettings {
     return test;
   }
 };
+
+BipedIGSettings make_settings_for(std::string robot_name);
+
 
 /**
  * @brief @todo Describe BipedIG

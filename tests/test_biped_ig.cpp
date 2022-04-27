@@ -11,6 +11,12 @@
 
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
+BOOST_AUTO_TEST_CASE(test_biped_ig_talos_settings) {
+  aig::BipedIGSettings talos_settings = aig::make_settings_for("talos");
+  aig::BipedIG biped_ig(talos_settings);
+  BOOST_CHECK_EQUAL(biped_ig.get_settings(), talos_settings);
+}
+
 BOOST_AUTO_TEST_CASE(test_biped_ig_default_constructor) {
   aig::BipedIG biped_ig;
   aig::BipedIGSettings default_settings;
