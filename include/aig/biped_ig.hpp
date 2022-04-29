@@ -94,6 +94,7 @@ class BipedIG {
   double gravity_;
   Eigen::Vector2d cop_;
   Eigen::Vector3d dL_;
+  Eigen::Vector2d n_;
 
   // Private methods.
  private:
@@ -110,16 +111,6 @@ class BipedIG {
 
   void configurateLegs();
 
-  void computeDynamics(const Eigen::VectorXd &posture,
-                       const Eigen::VectorXd &velocity,
-                       const Eigen::VectorXd &acceleration,
-                       bool flatHorizontalGround = true);
-
-  void computeDynamics(const Eigen::VectorXd &posture,
-                       const Eigen::VectorXd &velocity,
-                       const Eigen::VectorXd &acceleration,
-                       const Eigen::Matrix<double, 6, 1> &externalWrench,
-                       bool flatHorizontalGround = true);
   // Public methods.
  public:
   BipedIG();
@@ -140,61 +131,126 @@ class BipedIG {
 
   const Eigen::Vector3d &getAMVariation() { return dL_; }
   const Eigen::Vector2d &getCoP() { return cop_; }
+  const Eigen::Vector2d &getNL() { return n_; }
 
   void checkCompatibility();  // TODO
 
-  void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+  void solve(const Eigen::Vector3d &com, 
+             const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, 
+             const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
-             const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture);
+  void solve(const Eigen::Vector3d &com,
+             const Eigen::Isometry3d &leftFeet,
+             const Eigen::Isometry3d &rightFeet,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture);
 
-  void solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+  void solve(const Eigen::Vector3d &com, 
+             const Eigen::Matrix3d &baseRotation,
+             const pinocchio::SE3 &leftFoot, 
+             const pinocchio::SE3 &rightFoot,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture);
+
+  void solve(const Eigen::Vector3d &com,
+             const Eigen::Matrix3d &baseRotation,
+             const Eigen::Isometry3d &leftFoot,
+             const Eigen::Isometry3d &rightFoot,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture);
+
+  void solve(const pinocchio::SE3 &base, 
+             const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, 
+             const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture);
+
+  void solve(const Eigen::Isometry3d &base, 
+             const Eigen::Isometry3d &leftFoot,
+             const Eigen::Isometry3d &rightFoot,
+             const Eigen::VectorXd &q0, 
              Eigen::VectorXd &posture);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
              const double &dt);
             
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
+             const double &dt);
+
+  void solve(const std::array<Eigen::Vector3d, 3> &coms,
+             const std::array<Eigen::Matrix3d, 3> &baseRotations,
+             const std::array<Eigen::Isometry3d, 3> &leftFeet,
+             const std::array<Eigen::Isometry3d, 3> &rightFeet,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<pinocchio::SE3, 3> &bases,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
+             const double &dt);
+
+  void solve(const std::array<Eigen::Isometry3d, 3> &bases,
+             const std::array<Eigen::Isometry3d, 3> &leftFeet,
+             const std::array<Eigen::Isometry3d, 3> &rightFeet,
+             const Eigen::VectorXd &q0, 
+             Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, 
+             Eigen::VectorXd &acceleration,
              const double &dt);
 
   void set_com_from_waist(const Eigen::Vector3d &com_from_waist);
 
   void set_com_from_waist(const Eigen::VectorXd &q);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
+  void computeDynamics(const Eigen::VectorXd &posture,
+                       const Eigen::VectorXd &velocity,
+                       const Eigen::VectorXd &acceleration,
+                       bool flatHorizontalGround = true);
+
+  void computeDynamics(const Eigen::VectorXd &posture,
+                       const Eigen::VectorXd &velocity,
+                       const Eigen::VectorXd &acceleration,
+                       const Eigen::Matrix<double, 6, 1> &externalWrench,
+                       bool flatHorizontalGround = true);
+
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture, // deprecate it
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             const Eigen::Matrix<double, 6, 1> &externalWrench,
                             bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture, // deprecate it
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             bool flatHorizontalGround = true);
