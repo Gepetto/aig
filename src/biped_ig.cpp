@@ -336,10 +336,29 @@ void BipedIG::set_com_from_waist(const Eigen::Vector3d &com_from_waist) {
 }
 
 void BipedIG::set_com_from_waist(const Eigen::VectorXd &q) {
-  Eigen::Vector3d com_from_waist =
-      pinocchio::centerOfMass(model_, data_, q) - q.head(3);
+  Eigen::Quaterniond baseRotation(q(6), q(3), q(4), q(5));
+  Eigen::Vector3d com_from_waist = baseRotation.matrix().transpose() *
+      (pinocchio::centerOfMass(model_, data_, q) - q.head(3));
   set_com_from_waist(com_from_waist);
 }
+
+void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com, 
+                                  const pinocchio::SE3 &leftFoot,
+                                  const pinocchio::SE3 &rightFoot, 
+                                  const Eigen::VectorXd &q0, 
+                                  const double &tolerance){
+  Eigen::Vector3d error(1, 1, 1), com_temp;
+  Eigen::VectorXd posture;
+  Eigen::Matrix3d baseRotation = computeBase(com, leftFoot, rightFoot).rotation();
+  while (error.norm() > tolerance){
+    solve(com, leftFoot, rightFoot, q0, posture);
+    com_temp = pinocchio::centerOfMass(model_, data_, posture);
+    error = com_temp - com;
+    com_from_waist_ = baseRotation.transpose() * (com_temp - posture.head(3) + 0.2*error);
+  }
+}// @TODO: Use this function for the numerical derivatives (improving the presicion of each posture)
+// @TODO: Use this function to initialize the posture reference
+// @TODO: Test this function
 
 void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &velocity,
@@ -385,19 +404,21 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                   flatHorizontalGround);
 }
 
-Eigen::Vector2d BipedIG::computeNL(
+Eigen::Vector2d BipedIG::computeNL(// Deprecate, it is already computed in the computeDynamics
     const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
     const Eigen::VectorXd &acceleration,
     const Eigen::Matrix<double, 6, 1> &externalWrench,
     bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
                   flatHorizontalGround);  // it updates data_.com
+  return n_;/*
   Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3) / mass_);
 
-  return cop_ - com.head(2) + ddcom.head(2) * com.z() / gravity_;
+  return cop_ - com.head(2) + ddcom.head(2) * com.z() / gravity_;*/
 }
 
-Eigen::Vector2d BipedIG::computeNL(const Eigen::VectorXd &posture,
+Eigen::Vector2d BipedIG::computeNL(// Deprecate, it is already computed in the computeDynamics
+                                   const Eigen::VectorXd &posture,
                                    const Eigen::VectorXd &velocity,
                                    const Eigen::VectorXd &acceleration,
                                    bool flatHorizontalGround) {

@@ -86,7 +86,7 @@ class BipedIG {
   BipedIGSettings settings_;
   LegIG left_leg_, right_leg_;
   //ArmIG left_arm_, right_arm_;
-  Eigen::VectorXd q0_;
+  Eigen::VectorXd q0_; // q0_ is a reference configuration used to take all not computed joints (such as head and arms)
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
@@ -128,6 +128,7 @@ class BipedIG {
   };
 
   const Eigen::VectorXd &getQ0() { return q0_; }
+  void setQ0(const Eigen::VectorXd q0) { q0_ = q0; }
 
   const Eigen::Vector3d &getAMVariation() { return dL_; }
   const Eigen::Vector2d &getCoP() { return cop_; }
@@ -232,6 +233,12 @@ class BipedIG {
   void set_com_from_waist(const Eigen::Vector3d &com_from_waist);
 
   void set_com_from_waist(const Eigen::VectorXd &q);
+
+  void correctCoMfromWaist(const Eigen::Vector3d &com, 
+                           const pinocchio::SE3 &leftFoot,
+                           const pinocchio::SE3 &rightFoot, 
+                           const Eigen::VectorXd &q0, 
+                           const double &tolerance = 1e-10);
 
   void computeDynamics(const Eigen::VectorXd &posture,
                        const Eigen::VectorXd &velocity,
