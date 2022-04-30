@@ -73,7 +73,6 @@ struct BipedIGSettings {
 
 BipedIGSettings makeSettingsFor(std::string robot_name);
 
-
 /**
  * @brief @todo Describe BipedIG
  *
@@ -85,8 +84,9 @@ class BipedIG {
   pinocchio::Data data_;
   BipedIGSettings settings_;
   LegIG left_leg_, right_leg_;
-  //ArmIG left_arm_, right_arm_;
-  Eigen::VectorXd q0_; // q0_ is a reference configuration used to take all not computed joints (such as head and arms)
+  // ArmIG left_arm_, right_arm_;
+  Eigen::VectorXd q0_;  // q0_ is a reference configuration used to take all not
+                        // computed joints (such as head and arms)
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
@@ -136,108 +136,83 @@ class BipedIG {
 
   void checkCompatibility();  // TODO
 
-  void solve(const Eigen::Vector3d &com, 
-             const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, 
-             const Eigen::VectorXd &q0,
+  void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Vector3d &com,
-             const Eigen::Isometry3d &leftFeet,
-             const Eigen::Isometry3d &rightFeet,
-             const Eigen::VectorXd &q0, 
+  void solve(const Eigen::Vector3d &com, const Eigen::Isometry3d &leftFeet,
+             const Eigen::Isometry3d &rightFeet, const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Vector3d &com, 
-             const Eigen::Matrix3d &baseRotation,
-             const pinocchio::SE3 &leftFoot, 
-             const pinocchio::SE3 &rightFoot,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture);
+  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
+             const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Vector3d &com,
-             const Eigen::Matrix3d &baseRotation,
+  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
              const Eigen::Isometry3d &leftFoot,
-             const Eigen::Isometry3d &rightFoot,
-             const Eigen::VectorXd &q0, 
+             const Eigen::Isometry3d &rightFoot, const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
-  void solve(const pinocchio::SE3 &base, 
-             const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, 
-             const Eigen::VectorXd &q0,
+  void solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
-  void solve(const Eigen::Isometry3d &base, 
-             const Eigen::Isometry3d &leftFoot,
-             const Eigen::Isometry3d &rightFoot,
-             const Eigen::VectorXd &q0, 
+  void solve(const Eigen::Isometry3d &base, const Eigen::Isometry3d &leftFoot,
+             const Eigen::Isometry3d &rightFoot, const Eigen::VectorXd &q0,
              Eigen::VectorXd &posture);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
-            
+
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<pinocchio::SE3, 3> &bases,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
   void solve(const std::array<Eigen::Isometry3d, 3> &bases,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
              const double &dt);
 
   void set_com_from_waist(const Eigen::Vector3d &com_from_waist);
 
   void set_com_from_waist(const Eigen::VectorXd &q);
 
-  void correctCoMfromWaist(const Eigen::Vector3d &com, 
+  void correctCoMfromWaist(const Eigen::Vector3d &com,
                            const pinocchio::SE3 &leftFoot,
-                           const pinocchio::SE3 &rightFoot, 
-                           const Eigen::VectorXd &q0, 
+                           const pinocchio::SE3 &rightFoot,
+                           const Eigen::VectorXd &q0,
                            const double &tolerance = 1e-10);
 
   void computeDynamics(const Eigen::VectorXd &posture,
@@ -251,13 +226,13 @@ class BipedIG {
                        const Eigen::Matrix<double, 6, 1> &externalWrench,
                        bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture, // deprecate it
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,  // deprecate it
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             const Eigen::Matrix<double, 6, 1> &externalWrench,
                             bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture, // deprecate it
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,  // deprecate it
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             bool flatHorizontalGround = true);
