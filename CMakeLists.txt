@@ -36,12 +36,13 @@ include("${JRL_CMAKE_MODULES}/base.cmake")
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(aig ${PROJECT_ARGS})
+check_minimal_cxx_standard(11 ENFORCE)
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
-add_project_dependency(example-robot-data REQUIRED)
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+  find_package(example-robot-data REQUIRED)
 endif()
 
 # Main library
@@ -58,8 +59,7 @@ set(${PROJECT_NAME}_SOURCES
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC
-  pinocchio::pinocchio example-robot-data::example-robot-data)
+target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio)
 if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 endif()
@@ -85,7 +85,7 @@ if(BUILD_TESTING)
   foreach(unittest_name ${${PROJECT_NAME}_CPP_TESTS})
     add_unit_test(${unittest_name} tests/${unittest_name}.cpp)
     target_link_libraries(${unittest_name} ${PROJECT_NAME}
-      Boost::unit_test_framework)
+      Boost::unit_test_framework example-robot-data::example-robot-data)
     target_compile_definitions(${unittest_name} PUBLIC
       "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN")
   endforeach()
