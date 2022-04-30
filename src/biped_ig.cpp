@@ -292,12 +292,17 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     Eigen::VectorXd &acceleration,
                     const double &dt) {
   Eigen::VectorXd q1, q3;
+  correctCoMfromWaist(coms[0], leftFeet[0], rightFeet[0], q0, 1e-10);
   solve(coms[0], leftFeet[0], rightFeet[0], q0, q1);
+
+  correctCoMfromWaist(coms[1], leftFeet[1], rightFeet[1], q0, 1e-10);
   solve(coms[1], leftFeet[1], rightFeet[1], q0, posture);
+
+  correctCoMfromWaist(coms[2], leftFeet[2], rightFeet[2], q0, 1e-10);
   solve(coms[2], leftFeet[2], rightFeet[2], q0, q3);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
-}
+}// @TODO: Include the parameter tolerance in each method solve. and incorporate the correctCoMfromWaist in the methods solve.
 
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Matrix3d, 3> &baseRotations,
@@ -359,6 +364,18 @@ void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
 }// @TODO: Use this function for the numerical derivatives (improving the presicion of each posture)
 // @TODO: Use this function to initialize the posture reference
 // @TODO: Test this function
+// @TODO: after some iterations, it converges geometrically. So, we can write the exact value from the convergence.
+// by doing that, we can reduce the computation time and reduce the error. Or try An inner approximation.
+
+void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com, 
+                                  const Eigen::Isometry3d &leftFoot,
+                                  const Eigen::Isometry3d &rightFoot, 
+                                  const Eigen::VectorXd &q0, 
+                                  const double &tolerance){
+  pinocchio::SE3 LF(leftFoot.matrix());
+  pinocchio::SE3 RF(rightFoot.matrix());
+  correctCoMfromWaist(com, LF, RF, q0, tolerance);
+}
 
 void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &velocity,
