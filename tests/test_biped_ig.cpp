@@ -168,40 +168,41 @@ void test_solve_derivatives(Mode mode) {
   aig::BipedIG biped_ig(settings);
 
   // perform a forward kinematics on a configuration
-  Eigen::VectorXd q_test, q_ig_com, q_ig_com_baserot, q_ig_base, v_ig_com, a_ig_com;
+  Eigen::VectorXd q_test, q_ig_com, q_ig_com_baserot, q_ig_base, v_ig_com,
+      a_ig_com;
   Eigen::Vector3d com;
-  pinocchio::SE3 base, lf, rf;//
+  pinocchio::SE3 base, lf, rf;  //
   generate_references(com, base, lf, rf, q_test, mode);
-  //double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
+  // double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
 
   double dt = 1e-5;
-  //std::array<pinocchio::SE3, 3> bases{ {base, base, base} };
-  std::array<Eigen::Vector3d, 3> coms{ {com, com, com} };
-  std::array<pinocchio::SE3, 3> lfs{ {lf, lf, lf} };
-  std::array<pinocchio::SE3, 3> rfs{ {rf, rf, rf} };
+  // std::array<pinocchio::SE3, 3> bases{ {base, base, base} };
+  std::array<Eigen::Vector3d, 3> coms{{com, com, com}};
+  std::array<pinocchio::SE3, 3> lfs{{lf, lf, lf}};
+  std::array<pinocchio::SE3, 3> rfs{{rf, rf, rf}};
 
   // Compute inverse geometry and tests
   biped_ig.solve(coms, lfs, rfs, q_test, q_ig_com, v_ig_com, a_ig_com, dt);
   BOOST_CHECK_EQUAL(q_test.size(), q_ig_com.size());
-  BOOST_CHECK_EQUAL(q_test.size()-1, v_ig_com.size());
-  BOOST_CHECK_EQUAL(q_test.size()-1, a_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, v_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, a_ig_com.size());
 
   // Compute with Eigen::Isometry3d instead of pinocchio::SE3
-  Eigen::Isometry3d LF, RF;//()//(lf.toHomogeneousMatrix())
+  Eigen::Isometry3d LF, RF;  //()//(lf.toHomogeneousMatrix())
   LF.rotate(lf.rotation());
   LF.translate(lf.translation());
   RF.rotate(rf.rotation());
   RF.translate(rf.translation());
-  std::array<Eigen::Isometry3d, 3> LFs { {LF, LF, LF} };
-  std::array<Eigen::Isometry3d, 3> RFs { {RF, RF, RF} };
+  std::array<Eigen::Isometry3d, 3> LFs{{LF, LF, LF}};
+  std::array<Eigen::Isometry3d, 3> RFs{{RF, RF, RF}};
 
   biped_ig.solve(coms, LFs, RFs, q_test, q_ig_com, v_ig_com, a_ig_com, dt);
   BOOST_CHECK_EQUAL(q_test.size(), q_ig_com.size());
-  BOOST_CHECK_EQUAL(q_test.size()-1, v_ig_com.size());
-  BOOST_CHECK_EQUAL(q_test.size()-1, a_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, v_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, a_ig_com.size());
 
   /*BOOST_CHECK_LE((q_test - q_ig_com).norm(), precision);
-  
+
   biped_ig.solve(com, base.rotation(), lf, rf, q_test, q_ig_com_baserot);
   BOOST_CHECK_EQUAL(q_test.size(), q_ig_com_baserot.size());
   // BOOST_CHECK_LE((q_test - q_ig_com_baserot).norm(), precision);

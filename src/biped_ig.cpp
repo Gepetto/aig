@@ -6,20 +6,21 @@
 
 #include "aig/biped_ig.hpp"
 
+#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
-#include "example-robot-data/path.hpp"
-
 namespace aig {
 
-BipedIGSettings makeSettingsFor(std::string robot_name){
+BipedIGSettings makeSettingsFor(std::string robot_name) {
   BipedIGSettings robot_settings;
-  if (robot_name == "talos" || robot_name == "Talos" || robot_name == "TALOS"){
-    //const std::string path_to_robots = "/opt/pal/ferrum/share/talos_description";
-    const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data";
+  if (robot_name == "talos" || robot_name == "Talos" || robot_name == "TALOS") {
+    // const std::string path_to_robots =
+    // "/opt/pal/ferrum/share/talos_description";
+    const std::string path_to_robots =
+        EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data";
     robot_settings.urdf_path = path_to_robots + "/robots/talos_reduced.urdf";
     robot_settings.srdf_path = path_to_robots + "/srdf/talos.srdf";
 
@@ -31,7 +32,7 @@ BipedIGSettings makeSettingsFor(std::string robot_name){
     robot_settings.right_ankle_joint_name = "leg_right_5_joint";
     robot_settings.left_foot_frame_name = "leg_left_sole_fix_joint";
     robot_settings.right_foot_frame_name = "leg_right_sole_fix_joint";
-  }else{
+  } else {
     throw std::runtime_error(
         "biped_ig::aig::make_settings_for: No default settings for "
         "a robot with this name were specified yet.");
@@ -168,10 +169,8 @@ pinocchio::SE3 BipedIG::computeBase(const Eigen::Vector3d &com,
                               .toRotationMatrix());
 }
 
-void BipedIG::solve(const pinocchio::SE3 &base,
-                    const pinocchio::SE3 &leftFoot,
-                    const pinocchio::SE3 &rightFoot,
-                    const Eigen::VectorXd &q0,
+void BipedIG::solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
+                    const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
                     Eigen::VectorXd &posture) {
   posture = q0;
   posture.head<3>() = base.translation();
@@ -187,18 +186,15 @@ void BipedIG::solve(const pinocchio::SE3 &base,
 void BipedIG::solve(const Eigen::Isometry3d &base,
                     const Eigen::Isometry3d &leftFoot,
                     const Eigen::Isometry3d &rightFoot,
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture) {
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture) {
   pinocchio::SE3 root(base.matrix());
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   solve(root, LF, RF, q0, posture);
 }
 
-void BipedIG::solve(const Eigen::Vector3d &com,
-                    const pinocchio::SE3 &leftFoot,
-                    const pinocchio::SE3 &rightFoot,
-                    const Eigen::VectorXd &q0,
+void BipedIG::solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+                    const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
                     Eigen::VectorXd &posture) {
   pinocchio::SE3 base = computeBase(com, leftFoot, rightFoot);
   solve(base, leftFoot, rightFoot, q0, posture);
@@ -207,8 +203,7 @@ void BipedIG::solve(const Eigen::Vector3d &com,
 void BipedIG::solve(const Eigen::Vector3d &com,
                     const Eigen::Isometry3d &leftFoot,
                     const Eigen::Isometry3d &rightFoot,
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture) {
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture) {
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   solve(com, LF, RF, q0, posture);
@@ -227,8 +222,7 @@ void BipedIG::solve(const Eigen::Vector3d &com,
                     const Eigen::Matrix3d &baseRotation,
                     const Eigen::Isometry3d &leftFoot,
                     const Eigen::Isometry3d &rightFoot,
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture) {
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture) {
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   solve(com, baseRotation, LF, RF, q0, posture);
@@ -289,10 +283,8 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Isometry3d, 3> &leftFeet,
                     const std::array<Eigen::Isometry3d, 3> &rightFeet,
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture,
-                    Eigen::VectorXd &velocity,
-                    Eigen::VectorXd &acceleration,
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
                     const double &dt) {
   Eigen::VectorXd q1, q3;
   solve(coms[0], leftFeet[0], rightFeet[0], q0, q1);
@@ -321,10 +313,8 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Matrix3d, 3> &baseRotations,
                     const std::array<Eigen::Isometry3d, 3> &leftFeet,
                     const std::array<Eigen::Isometry3d, 3> &rightFeet,
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture,
-                    Eigen::VectorXd &velocity,
-                    Eigen::VectorXd &acceleration,
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
                     const double &dt) {
   Eigen::VectorXd q1, q3;
   solve(coms[0], baseRotations[0], leftFeet[0], rightFeet[0], q0, q1);
@@ -340,7 +330,8 @@ void BipedIG::set_com_from_waist(const Eigen::Vector3d &com_from_waist) {
 
 void BipedIG::set_com_from_waist(const Eigen::VectorXd &q) {
   Eigen::Quaterniond baseRotation(q(6), q(3), q(4), q(5));
-  Eigen::Vector3d com_from_waist = baseRotation.matrix().transpose() *
+  Eigen::Vector3d com_from_waist =
+      baseRotation.matrix().transpose() *
       (pinocchio::centerOfMass(model_, data_, q) - q.head(3));
   set_com_from_waist(com_from_waist);
 }
@@ -349,17 +340,20 @@ void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
                                   const pinocchio::SE3 &leftFoot,
                                   const pinocchio::SE3 &rightFoot,
                                   const Eigen::VectorXd &q0,
-                                  const double &tolerance){
+                                  const double &tolerance) {
   Eigen::Vector3d error(1, 1, 1), com_temp;
   Eigen::VectorXd posture;
-  Eigen::Matrix3d baseRotation = computeBase(com, leftFoot, rightFoot).rotation();
-  while (error.norm() > tolerance){
+  Eigen::Matrix3d baseRotation =
+      computeBase(com, leftFoot, rightFoot).rotation();
+  while (error.norm() > tolerance) {
     solve(com, leftFoot, rightFoot, q0, posture);
     com_temp = pinocchio::centerOfMass(model_, data_, posture);
     error = com_temp - com;
-    com_from_waist_ = baseRotation.transpose() * (com_temp - posture.head(3) + 0.2*error);
+    com_from_waist_ =
+        baseRotation.transpose() * (com_temp - posture.head(3) + 0.2 * error);
   }
-}// @TODO: Use this function for the numerical derivatives (improving the presicion of each posture)
+}  // @TODO: Use this function for the numerical derivatives (improving the
+   // presicion of each posture)
 // @TODO: Use this function to initialize the posture reference
 // @TODO: Test this function
 
@@ -407,24 +401,23 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                   flatHorizontalGround);
 }
 
-Eigen::Vector2d BipedIG::computeNL(// Deprecate, it is already computed in the computeDynamics
+Eigen::Vector2d
+BipedIG::computeNL(  // Deprecate, it is already computed in the computeDynamics
     const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
     const Eigen::VectorXd &acceleration,
     const Eigen::Matrix<double, 6, 1> &externalWrench,
     bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
                   flatHorizontalGround);  // it updates data_.com
-  return n_;/*
-  Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3) / mass_);
-
-  return cop_ - com.head(2) + ddcom.head(2) * com.z() / gravity_;*/
+  return n_;                              /*
+                                Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3) / mass_);
+                                return cop_ - com.head(2) + ddcom.head(2) * com.z() / gravity_;*/
 }
 
-Eigen::Vector2d BipedIG::computeNL(// Deprecate, it is already computed in the computeDynamics
-                                   const Eigen::VectorXd &posture,
-                                   const Eigen::VectorXd &velocity,
-                                   const Eigen::VectorXd &acceleration,
-                                   bool flatHorizontalGround) {
+Eigen::Vector2d
+BipedIG::computeNL(  // Deprecate, it is already computed in the computeDynamics
+    const Eigen::VectorXd &posture, const Eigen::VectorXd &velocity,
+    const Eigen::VectorXd &acceleration, bool flatHorizontalGround) {
   Eigen::Matrix<double, 6, 1> withoutWrench =
       Eigen::Matrix<double, 6, 1>::Zero();
   return computeNL(posture, velocity, acceleration, withoutWrench,
