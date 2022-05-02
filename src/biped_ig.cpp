@@ -371,20 +371,18 @@ void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
                                   const Eigen::VectorXd &q0, 
                                   const double &tolerance,
                                   const int &max_iterations){
-  Eigen::Vector3d error(1, 1, 1), com_temp;
-  Eigen::VectorXd posture;
-  Eigen::Matrix3d baseRotation = computeBase(com, leftFoot, rightFoot).rotation();// @TODO: remove the dynamic allocation
+  error_ << 1, 1, 1;
+  baseRotation_temp_ = computeBase(com, leftFoot, rightFoot).rotation();
   int i = 0;
-  while (error.norm() > tolerance && i++ < max_iterations){
-    solve(com, leftFoot, rightFoot, q0, posture);
-    com_temp = pinocchio::centerOfMass(model_, data_, posture);
-    error = com_temp - com;
+  while (error_.norm() > tolerance && i++ < max_iterations){
+    solve(com, leftFoot, rightFoot, q0, posture_temp_);
+    com_temp_ = pinocchio::centerOfMass(model_, data_, posture_temp_);
+    error_ = com_temp_ - com;
     com_from_waist_ =
-        baseRotation.transpose() * (com_temp - posture.head(3) + 0.2 * error);
+        baseRotation_temp_.transpose() * (com_temp_ - posture_temp_.head(3) + 0.2 * error_);
   }
 }
 // @TODO: Use this function to initialize the posture reference
-// @TODO: Test this function
 // @TODO: after some iterations, it converges geometrically. So, we can write the exact value from the convergence.
 // by doing that, we can reduce the computation time and reduce the error. Or try An inner approximation.
 
@@ -406,12 +404,11 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               bool flatHorizontalGround) {
   // The external wrench is supposed to be expressed
   // in the frame of the root link.
-  Eigen::Matrix<double, 6, 1> tauMw =
-      pinocchio::rnea(model_, data_, posture, velocity, acceleration).head(6);
-  Eigen::Vector3d groundTorqueMo =
-      tauMw.tail(3) - externalWrench.tail(3) +
-      pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
-          (tauMw.head(3) - externalWrench.head(3));
+  rnea_torque_ = pinocchio::rnea(model_, data_, posture, velocity, acceleration);
+  Eigen::Matrix<double, 6, 1> tauMw = rnea_torque_.head(6);
+  Eigen::Vector3d groundTorqueMo = tauMw.tail(3) - externalWrench.tail(3) +
+                            pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
+                            (tauMw.head(3) - externalWrench.head(3));
 
   Eigen::Vector3d pressureTorqueMo;
   if (flatHorizontalGround) {

@@ -95,6 +95,12 @@ class BipedIG {
   Eigen::Vector2d cop_;
   Eigen::Vector3d dL_;
   Eigen::Vector2d n_;
+  Eigen::VectorXd rnea_torque_;
+
+  // variables used in the waist-com vector correction:
+  Eigen::Vector3d error_, com_temp_;
+  Eigen::VectorXd posture_temp_;
+  Eigen::Matrix3d baseRotation_temp_;
 
   // Private methods.
  private:
@@ -133,6 +139,7 @@ class BipedIG {
   const Eigen::Vector3d &getAMVariation() { return dL_; }
   const Eigen::Vector2d &getCoP() { return cop_; }
   const Eigen::Vector2d &getNL() { return n_; }
+  const Eigen::VectorXd &getJointTorques() { return rnea_torque_; }
 
   void checkCompatibility();  // TODO
 
