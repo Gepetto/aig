@@ -140,27 +140,35 @@ class BipedIG {
              const pinocchio::SE3 &leftFoot,
              const pinocchio::SE3 &rightFoot, 
              const Eigen::VectorXd &q0,
-             Eigen::VectorXd &posture);
+             Eigen::VectorXd &posture, 
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const Eigen::Vector3d &com,
              const Eigen::Isometry3d &leftFeet,
              const Eigen::Isometry3d &rightFeet,
              const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture);
+             Eigen::VectorXd &posture,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const Eigen::Vector3d &com, 
              const Eigen::Matrix3d &baseRotation,
              const pinocchio::SE3 &leftFoot, 
              const pinocchio::SE3 &rightFoot,
              const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture);
+             Eigen::VectorXd &posture,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const Eigen::Vector3d &com,
              const Eigen::Matrix3d &baseRotation,
              const Eigen::Isometry3d &leftFoot,
              const Eigen::Isometry3d &rightFoot,
              const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture);
+             Eigen::VectorXd &posture,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const pinocchio::SE3 &base, 
              const pinocchio::SE3 &leftFoot,
@@ -181,7 +189,9 @@ class BipedIG {
              Eigen::VectorXd &posture,
              Eigen::VectorXd &velocity, 
              Eigen::VectorXd &acceleration,
-             const double &dt);
+             const double &dt,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
             
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
@@ -190,7 +200,9 @@ class BipedIG {
              Eigen::VectorXd &posture,
              Eigen::VectorXd &velocity, 
              Eigen::VectorXd &acceleration,
-             const double &dt);
+             const double &dt,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
@@ -200,7 +212,9 @@ class BipedIG {
              Eigen::VectorXd &posture,
              Eigen::VectorXd &velocity, 
              Eigen::VectorXd &acceleration,
-             const double &dt);
+             const double &dt,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
@@ -210,7 +224,9 @@ class BipedIG {
              Eigen::VectorXd &posture,
              Eigen::VectorXd &velocity, 
              Eigen::VectorXd &acceleration,
-             const double &dt);
+             const double &dt,
+             const double &tolerance = 1e-10,
+             const int &max_iterations = 0);
 
   void solve(const std::array<pinocchio::SE3, 3> &bases,
              const std::array<pinocchio::SE3, 3> &leftFeet,
@@ -238,13 +254,15 @@ class BipedIG {
                            const pinocchio::SE3 &leftFoot,
                            const pinocchio::SE3 &rightFoot, 
                            const Eigen::VectorXd &q0, 
-                           const double &tolerance = 1e-10);
+                           const double &tolerance = 1e-10,
+                           const int &max_iterations = 20);
 
   void correctCoMfromWaist(const Eigen::Vector3d &com, 
                            const Eigen::Isometry3d &leftFoot,
                            const Eigen::Isometry3d &rightFoot, 
                            const Eigen::VectorXd &q0, 
-                           const double &tolerance = 1e-10);
+                           const double &tolerance = 1e-10,
+                           const int &max_iterations = 20);
 
   void computeDynamics(const Eigen::VectorXd &posture,
                        const Eigen::VectorXd &velocity,
