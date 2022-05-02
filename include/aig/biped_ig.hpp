@@ -255,13 +255,6 @@ class BipedIG {
                            const double &tolerance = 1e-10,
                            const int &max_iterations = 20);
 
-  void correctCoMfromWaist(const Eigen::Vector3d &com, 
-                           const Eigen::Isometry3d &leftFoot,
-                           const Eigen::Isometry3d &rightFoot, 
-                           const Eigen::VectorXd &q0, 
-                           const double &tolerance = 1e-10,
-                           const int &max_iterations = 20);
-
   void computeDynamics(const Eigen::VectorXd &posture,
                        const Eigen::VectorXd &velocity,
                        const Eigen::VectorXd &acceleration,
