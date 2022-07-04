@@ -193,13 +193,9 @@ void BipedIG::solve(const Eigen::Isometry3d &base,
   solve(root, LF, RF, q0, posture);
 }
 
-
-void BipedIG::solve(const Eigen::Vector3d &com, 
-                    const pinocchio::SE3 &leftFoot,
-                    const pinocchio::SE3 &rightFoot, 
-                    const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture,
-                    const double &tolerance,
+void BipedIG::solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+                    const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+                    Eigen::VectorXd &posture, const double &tolerance,
                     const int &max_iterations) {
   correctCoMfromWaist(com, leftFoot, rightFoot, q0, tolerance, max_iterations);
   pinocchio::SE3 base = computeBase(com, leftFoot, rightFoot);
@@ -209,10 +205,8 @@ void BipedIG::solve(const Eigen::Vector3d &com,
 void BipedIG::solve(const Eigen::Vector3d &com,
                     const Eigen::Isometry3d &leftFoot,
                     const Eigen::Isometry3d &rightFoot,
-                    const Eigen::VectorXd &q0, 
-                    Eigen::VectorXd &posture,
-                    const double &tolerance,
-                    const int &max_iterations) {
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    const double &tolerance, const int &max_iterations) {
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   solve(com, LF, RF, q0, posture, tolerance, max_iterations);
@@ -222,8 +216,7 @@ void BipedIG::solve(const Eigen::Vector3d &com,
                     const Eigen::Matrix3d &baseRotation,
                     const pinocchio::SE3 &leftFoot,
                     const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
-                    Eigen::VectorXd &posture,
-                    const double &tolerance,
+                    Eigen::VectorXd &posture, const double &tolerance,
                     const int &max_iterations) {
   correctCoMfromWaist(com, leftFoot, rightFoot, q0, tolerance, max_iterations);
   pinocchio::SE3 base = computeBase(com, baseRotation);
@@ -234,10 +227,8 @@ void BipedIG::solve(const Eigen::Vector3d &com,
                     const Eigen::Matrix3d &baseRotation,
                     const Eigen::Isometry3d &leftFoot,
                     const Eigen::Isometry3d &rightFoot,
-                    const Eigen::VectorXd &q0, 
-                    Eigen::VectorXd &posture,
-                    const double &tolerance,
-                    const int &max_iterations) {
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    const double &tolerance, const int &max_iterations) {
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   solve(com, baseRotation, LF, RF, q0, posture, tolerance, max_iterations);
@@ -286,12 +277,12 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<pinocchio::SE3, 3> &rightFeet,
                     const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
                     Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
-                    const double &dt,
-                    const double &tolerance,
+                    const double &dt, const double &tolerance,
                     const int &max_iterations) {
   Eigen::VectorXd q1, q3;
   solve(coms[0], leftFeet[0], rightFeet[0], q0, q1, tolerance, max_iterations);
-  solve(coms[1], leftFeet[1], rightFeet[1], q0, posture, tolerance, max_iterations);
+  solve(coms[1], leftFeet[1], rightFeet[1], q0, posture, tolerance,
+        max_iterations);
   solve(coms[2], leftFeet[2], rightFeet[2], q0, q3, tolerance, max_iterations);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
@@ -300,36 +291,35 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Isometry3d, 3> &leftFeet,
                     const std::array<Eigen::Isometry3d, 3> &rightFeet,
-                    const Eigen::VectorXd &q0, 
-                    Eigen::VectorXd &posture,
-                    Eigen::VectorXd &velocity, 
-                    Eigen::VectorXd &acceleration,
-                    const double &dt,
-                    const double &tolerance,
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+                    const double &dt, const double &tolerance,
                     const int &max_iterations) {
   Eigen::VectorXd q1, q3;
   solve(coms[0], leftFeet[0], rightFeet[0], q0, q1, tolerance, max_iterations);
-  solve(coms[1], leftFeet[1], rightFeet[1], q0, posture, tolerance, max_iterations);
+  solve(coms[1], leftFeet[1], rightFeet[1], q0, posture, tolerance,
+        max_iterations);
   solve(coms[2], leftFeet[2], rightFeet[2], q0, q3, tolerance, max_iterations);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
-}// @TODO: Include the parameter tolerance in each method solve. and incorporate the correctCoMfromWaist in the methods solve.
+}  // @TODO: Include the parameter tolerance in each method solve. and
+   // incorporate the correctCoMfromWaist in the methods solve.
 
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Matrix3d, 3> &baseRotations,
                     const std::array<pinocchio::SE3, 3> &leftFeet,
                     const std::array<pinocchio::SE3, 3> &rightFeet,
-                    const Eigen::VectorXd &q0, 
-                    Eigen::VectorXd &posture,
-                    Eigen::VectorXd &velocity, 
-                    Eigen::VectorXd &acceleration,
-                    const double &dt, 
-                    const double &tolerance,
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+                    const double &dt, const double &tolerance,
                     const int &max_iterations) {
   Eigen::VectorXd q1, q3;
-  solve(coms[0], baseRotations[0], leftFeet[0], rightFeet[0], q0, q1, tolerance, max_iterations);
-  solve(coms[1], baseRotations[1], leftFeet[1], rightFeet[1], q0, posture, tolerance, max_iterations);
-  solve(coms[2], baseRotations[2], leftFeet[2], rightFeet[2], q0, q3, tolerance, max_iterations);
+  solve(coms[0], baseRotations[0], leftFeet[0], rightFeet[0], q0, q1, tolerance,
+        max_iterations);
+  solve(coms[1], baseRotations[1], leftFeet[1], rightFeet[1], q0, posture,
+        tolerance, max_iterations);
+  solve(coms[2], baseRotations[2], leftFeet[2], rightFeet[2], q0, q3, tolerance,
+        max_iterations);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
 }
@@ -338,17 +328,17 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Matrix3d, 3> &baseRotations,
                     const std::array<Eigen::Isometry3d, 3> &leftFeet,
                     const std::array<Eigen::Isometry3d, 3> &rightFeet,
-                    const Eigen::VectorXd &q0, 
-                    Eigen::VectorXd &posture,
-                    Eigen::VectorXd &velocity, 
-                    Eigen::VectorXd &acceleration,
-                    const double &dt,
-                    const double &tolerance,
+                    const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+                    Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+                    const double &dt, const double &tolerance,
                     const int &max_iterations) {
   Eigen::VectorXd q1, q3;
-  solve(coms[0], baseRotations[0], leftFeet[0], rightFeet[0], q0, q1, tolerance, max_iterations);
-  solve(coms[1], baseRotations[1], leftFeet[1], rightFeet[1], q0, posture, tolerance, max_iterations);
-  solve(coms[2], baseRotations[2], leftFeet[2], rightFeet[2], q0, q3, tolerance, max_iterations);
+  solve(coms[0], baseRotations[0], leftFeet[0], rightFeet[0], q0, q1, tolerance,
+        max_iterations);
+  solve(coms[1], baseRotations[1], leftFeet[1], rightFeet[1], q0, posture,
+        tolerance, max_iterations);
+  solve(coms[2], baseRotations[2], leftFeet[2], rightFeet[2], q0, q3, tolerance,
+        max_iterations);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
 }
@@ -367,31 +357,32 @@ void BipedIG::set_com_from_waist(const Eigen::VectorXd &q) {
 
 void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
                                   const pinocchio::SE3 &leftFoot,
-                                  const pinocchio::SE3 &rightFoot, 
-                                  const Eigen::VectorXd &q0, 
+                                  const pinocchio::SE3 &rightFoot,
+                                  const Eigen::VectorXd &q0,
                                   const double &tolerance,
-                                  const int &max_iterations){
+                                  const int &max_iterations) {
   error_ << 1, 1, 1;
   baseRotation_temp_ = computeBase(com, leftFoot, rightFoot).rotation();
   int i = 0;
-  while (error_.norm() > tolerance && i++ < max_iterations){
+  while (error_.norm() > tolerance && i++ < max_iterations) {
     solve(com, leftFoot, rightFoot, q0, posture_temp_);
     com_temp_ = pinocchio::centerOfMass(model_, data_, posture_temp_);
     error_ = com_temp_ - com;
-    com_from_waist_ =
-        baseRotation_temp_.transpose() * (com_temp_ - posture_temp_.head(3) + 0.2 * error_);
+    com_from_waist_ = baseRotation_temp_.transpose() *
+                      (com_temp_ - posture_temp_.head(3) + 0.2 * error_);
   }
 }
 // @TODO: Use this function to initialize the posture reference
-// @TODO: after some iterations, it converges geometrically. So, we can write the exact value from the convergence.
-// by doing that, we can reduce the computation time and reduce the error. Or try An inner approximation.
+// @TODO: after some iterations, it converges geometrically. So, we can write
+// the exact value from the convergence. by doing that, we can reduce the
+// computation time and reduce the error. Or try An inner approximation.
 
-void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com, 
+void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
                                   const Eigen::Isometry3d &leftFoot,
-                                  const Eigen::Isometry3d &rightFoot, 
-                                  const Eigen::VectorXd &q0, 
+                                  const Eigen::Isometry3d &rightFoot,
+                                  const Eigen::VectorXd &q0,
                                   const double &tolerance,
-                                  const int &max_iterations){
+                                  const int &max_iterations) {
   pinocchio::SE3 LF(leftFoot.matrix());
   pinocchio::SE3 RF(rightFoot.matrix());
   correctCoMfromWaist(com, LF, RF, q0, tolerance, max_iterations);
@@ -404,11 +395,13 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               bool flatHorizontalGround) {
   // The external wrench is supposed to be expressed
   // in the frame of the root link.
-  rnea_torque_ = pinocchio::rnea(model_, data_, posture, velocity, acceleration);
+  rnea_torque_ =
+      pinocchio::rnea(model_, data_, posture, velocity, acceleration);
   Eigen::Matrix<double, 6, 1> tauMw = rnea_torque_.head(6);
-  Eigen::Vector3d groundTorqueMo = tauMw.tail(3) - externalWrench.tail(3) +
-                            pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
-                            (tauMw.head(3) - externalWrench.head(3));
+  Eigen::Vector3d groundTorqueMo =
+      tauMw.tail(3) - externalWrench.tail(3) +
+      pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
+          (tauMw.head(3) - externalWrench.head(3));
 
   Eigen::Vector3d pressureTorqueMo;
   if (flatHorizontalGround) {
