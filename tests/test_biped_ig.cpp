@@ -138,7 +138,7 @@ void test_solve(Mode mode) {
   Eigen::Vector3d com;
   pinocchio::SE3 base, lf, rf;
   generate_references(com, base, lf, rf, q_test, mode);
-  double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
+  double precision = mode == Mode::RANDOM ? 1.0 : 1e-4;
 
   // Compute inverse geometry and tests
   biped_ig.solve(com, lf, rf, q_test, q_ig_com);
