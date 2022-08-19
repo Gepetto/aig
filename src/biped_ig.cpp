@@ -4,15 +4,15 @@
  * @brief
  */
 
+#include "aig/biped_ig.hpp"
+
 #include <algorithm>
 #include <cctype>
 
-#include "aig/biped_ig.hpp"
-
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
-#include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
+#include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
@@ -22,7 +22,7 @@ BipedIGSettings makeSettingsFor(std::string robot_name) {
   BipedIGSettings robot_settings;
 
   std::transform(robot_name.begin(), robot_name.end(), robot_name.begin(),
-    [](unsigned char c){ return std::tolower(c); });
+                 [](unsigned char c) { return std::tolower(c); });
   if (robot_name == "talos") {
     // const std::string path_to_robots =
     // "/opt/pal/ferrum/share/talos_description";
@@ -427,7 +427,8 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
   n_ = cop_ - com_.head<2>() + acom_.head<2>() * com_.z() / gravity_;
   // Compute the angular momentum and derivative.
   L_ = pinocchio::computeCentroidalMomentum(model_, data_).angular();
-  dL_ = pinocchio::computeCentroidalMomentumTimeVariation(model_, data_).angular();
+  dL_ = pinocchio::computeCentroidalMomentumTimeVariation(model_, data_)
+            .angular();
 }
 
 void BipedIG::computeDynamics(const Eigen::VectorXd &posture,

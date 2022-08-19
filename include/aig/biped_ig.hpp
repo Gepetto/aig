@@ -140,7 +140,8 @@ class BipedIG {
   const Eigen::VectorXd &getQ0() { return q0_; }
   void setQ0(const Eigen::VectorXd q0) { q0_ = q0; }
 
-  /// @brief Get the Angular Momentum variation. Please call computeDynamics first.
+  /// @brief Get the Angular Momentum variation. Please call computeDynamics
+  /// first.
   const Eigen::Vector3d &getAMVariation() { return dL_; }
 
   /// @brief Get the Angular Momentum. Please call computeDynamics first.
