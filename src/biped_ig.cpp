@@ -448,7 +448,7 @@ BipedIG::computeNL(  // Deprecate, it is already computed in the computeDynamics
     const Eigen::Matrix<double, 6, 1> &externalWrench,
     bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
-                  flatHorizontalGround);  // it updates data_.com
+                  flatHorizontalGround);
   return n_;
 }
 
