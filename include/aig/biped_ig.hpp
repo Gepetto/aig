@@ -143,37 +143,25 @@ class BipedIG {
 
   void checkCompatibility();  // TODO
 
-  void solve(const Eigen::Vector3d &com, 
-             const pinocchio::SE3 &leftFoot,
-             const pinocchio::SE3 &rightFoot, 
-             const Eigen::VectorXd &q0,
-             Eigen::VectorXd &posture, 
-             const double &tolerance = 1e-10,
+  void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
+             const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
-  void solve(const Eigen::Vector3d &com,
-             const Eigen::Isometry3d &leftFeet,
-             const Eigen::Isometry3d &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             const double &tolerance = 1e-10,
-             const int &max_iterations = 0);
-
-  void solve(const Eigen::Vector3d &com, 
-             const Eigen::Matrix3d &baseRotation,
-             const pinocchio::SE3 &leftFoot, 
-             const pinocchio::SE3 &rightFoot,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             const double &tolerance = 1e-10,
+  void solve(const Eigen::Vector3d &com, const Eigen::Isometry3d &leftFeet,
+             const Eigen::Isometry3d &rightFeet, const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
   void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
+             const pinocchio::SE3 &leftFoot, const pinocchio::SE3 &rightFoot,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             const double &tolerance = 1e-10, const int &max_iterations = 0);
+
+  void solve(const Eigen::Vector3d &com, const Eigen::Matrix3d &baseRotation,
              const Eigen::Isometry3d &leftFoot,
-             const Eigen::Isometry3d &rightFoot,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             const double &tolerance = 1e-10,
+             const Eigen::Isometry3d &rightFoot, const Eigen::VectorXd &q0,
+             Eigen::VectorXd &posture, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
   void solve(const pinocchio::SE3 &base, const pinocchio::SE3 &leftFoot,
@@ -187,47 +175,35 @@ class BipedIG {
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
-             const double &dt,
-             const double &tolerance = 1e-10,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
-            
+
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
-             const double &dt,
-             const double &tolerance = 1e-10,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
              const std::array<pinocchio::SE3, 3> &leftFeet,
              const std::array<pinocchio::SE3, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
-             const double &dt,
-             const double &tolerance = 1e-10,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
   void solve(const std::array<Eigen::Vector3d, 3> &coms,
              const std::array<Eigen::Matrix3d, 3> &baseRotations,
              const std::array<Eigen::Isometry3d, 3> &leftFeet,
              const std::array<Eigen::Isometry3d, 3> &rightFeet,
-             const Eigen::VectorXd &q0, 
-             Eigen::VectorXd &posture,
-             Eigen::VectorXd &velocity, 
-             Eigen::VectorXd &acceleration,
-             const double &dt,
-             const double &tolerance = 1e-10,
+             const Eigen::VectorXd &q0, Eigen::VectorXd &posture,
+             Eigen::VectorXd &velocity, Eigen::VectorXd &acceleration,
+             const double &dt, const double &tolerance = 1e-10,
              const int &max_iterations = 0);
 
   void solve(const std::array<pinocchio::SE3, 3> &bases,
@@ -255,10 +231,10 @@ class BipedIG {
                            const double &tolerance = 1e-10,
                            const int &max_iterations = 20);
 
-  void correctCoMfromWaist(const Eigen::Vector3d &com, 
+  void correctCoMfromWaist(const Eigen::Vector3d &com,
                            const Eigen::Isometry3d &leftFoot,
-                           const Eigen::Isometry3d &rightFoot, 
-                           const Eigen::VectorXd &q0, 
+                           const Eigen::Isometry3d &rightFoot,
+                           const Eigen::VectorXd &q0,
                            const double &tolerance = 1e-10,
                            const int &max_iterations = 20);
 
