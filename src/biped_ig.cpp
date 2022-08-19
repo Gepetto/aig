@@ -4,11 +4,15 @@
  * @brief
  */
 
+#include <algorithm>
+#include <cctype>
+
 #include "aig/biped_ig.hpp"
 
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/rnea.hpp"
+#include "pinocchio/algorithm/centroidal.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
@@ -16,7 +20,10 @@ namespace aig {
 
 BipedIGSettings makeSettingsFor(std::string robot_name) {
   BipedIGSettings robot_settings;
-  if (robot_name == "talos" || robot_name == "Talos" || robot_name == "TALOS") {
+
+  std::transform(robot_name.begin(), robot_name.end(), robot_name.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+  if (robot_name == "talos") {
     // const std::string path_to_robots =
     // "/opt/pal/ferrum/share/talos_description";
     const std::string path_to_robots =
@@ -104,10 +111,10 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   q0_ = model_.referenceConfigurations["half_sitting"];
   set_com_from_waist(q0_);
 
-  configurateLegs();
+  configureLegs();
 }
 
-void BipedIG::configurateLegs() {
+void BipedIG::configureLegs() {
   LegIGSettings left_leg_settings, right_leg_settings;
   pinocchio::JointIndex left_hip_id =
       model_.getJointId(settings_.left_hip_joint_name);
@@ -402,25 +409,25 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
       tauMw.tail(3) - externalWrench.tail(3) +
       pinocchio::skew(Eigen::Vector3d(posture.head(3))) *
           (tauMw.head(3) - externalWrench.head(3));
-
   Eigen::Vector3d pressureTorqueMo;
   if (flatHorizontalGround) {
     pressureTorqueMo = groundTorqueMo;
   } else {
-    // TODO get the force distribution and remove the non pressure terms form
+    // TODO get the force distribution and remove the non pressure terms from
     // the CoP computation. for now, we assume a flat and horizontal ground.
   }
-
   cop_ = Eigen::Vector2d(-pressureTorqueMo(1) / (tauMw(2) - externalWrench(2)),
                          pressureTorqueMo(0) / (tauMw(2) - externalWrench(2)));
-  pinocchio::centerOfMass(model_, data_, posture);
 
-  Eigen::Vector2d ddcom(tauMw.head(2) / mass_);
-  n_ = cop_ - data_.com[0].head(2) + ddcom * data_.com[0].z() / gravity_;
-
-  dL_ = tauMw.tail(3) +
-        pinocchio::skew(Eigen::Vector3d(posture.head(3) - data_.com[0])) *
-            tauMw.tail(3);
+  // Compute the nonlinear effect of the centroidal dynamics:
+  pinocchio::centerOfMass(model_, data_, posture, velocity, acceleration);
+  com_ = data_.com[0];
+  vcom_ = data_.vcom[0];
+  acom_ = data_.acom[0];
+  n_ = cop_ - com_.head<2>() + acom_.head<2>() * com_.z() / gravity_;
+  // Compute the angular momentum and derivative.
+  L_ = pinocchio::computeCentroidalMomentum(model_, data_).angular();
+  dL_ = pinocchio::computeCentroidalMomentumTimeVariation(model_, data_).angular();
 }
 
 void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
@@ -441,9 +448,7 @@ BipedIG::computeNL(  // Deprecate, it is already computed in the computeDynamics
     bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
                   flatHorizontalGround);  // it updates data_.com
-  return n_;                              /*
-                                Eigen::Vector3d com(data_.com[0]), ddcom(data_.tau.head(3) / mass_);
-                                return cop_ - com.head(2) + ddcom.head(2) * com.z() / gravity_;*/
+  return n_;
 }
 
 Eigen::Vector2d
