@@ -369,6 +369,7 @@ void BipedIG::correctCoMfromWaist(const Eigen::Vector3d &com,
     com_temp_ = pinocchio::centerOfMass(model_, data_, posture_temp_);
     error_ = com_temp_ - com;
     com_from_waist_ += baseRotation_temp_.transpose() * (1.2*error_);
+    
   }
 }
 // @TODO: Use this function to initialize the posture reference
