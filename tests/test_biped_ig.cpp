@@ -216,4 +216,38 @@ BOOST_AUTO_TEST_CASE(test_solve_half_sitting_derivatives) {
   test_solve_derivatives(Mode::HALF_SITTING);
 }
 
+BOOST_AUTO_TEST_CASE(test_compute_dynamics) {
+  // create the solver
+  aig::BipedIGSettings settings = aig::unittests::bipeds;
+  aig::BipedIG biped_ig(settings);
+
+  // perform a forward kinematics on a configuration
+  Eigen::VectorXd q_test, q_ig_com, v_ig_com, a_ig_com;
+  Eigen::Vector3d com;
+  pinocchio::SE3 base, lf, rf;  //
+  generate_references(com, base, lf, rf, q_test, Mode::HALF_SITTING);
+
+  double dt = 1e-5;
+  // std::array<pinocchio::SE3, 3> bases{ {base, base, base} };
+  std::array<Eigen::Vector3d, 3> coms{{com, com, com}};
+  std::array<pinocchio::SE3, 3> lfs{{lf, lf, lf}};
+  std::array<pinocchio::SE3, 3> rfs{{rf, rf, rf}};
+
+  // Compute inverse geometry and tests
+  biped_ig.solve(coms, lfs, rfs, q_test, q_ig_com, v_ig_com, a_ig_com, dt);
+  BOOST_CHECK_EQUAL(q_test.size(), q_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, v_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, a_ig_com.size());
+  BOOST_CHECK(v_ig_com.isMuchSmallerThan(1));
+  BOOST_CHECK(a_ig_com.isMuchSmallerThan(1));
+
+  biped_ig.computeDynamics(q_ig_com, v_ig_com, a_ig_com);
+
+  BOOST_CHECK(biped_ig.getAM().isMuchSmallerThan(1));
+  BOOST_CHECK(biped_ig.getAMVariation().isMuchSmallerThan(1));
+  BOOST_CHECK(biped_ig.getNL().isMuchSmallerThan(1));
+  BOOST_CHECK(
+      (biped_ig.getCoM().head<2>() - biped_ig.getCoP()).isMuchSmallerThan(1));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

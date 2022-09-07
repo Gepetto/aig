@@ -64,15 +64,6 @@ if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 endif()
 
-# Add some checking executable
-# add_executable(checker src/checker.cpp src/postures.cpp)
-# target_include_directories(checker PUBLIC $<INSTALL_INTERFACE:include>)
-# target_link_libraries(checker PUBLIC pinocchio::pinocchio
-#                                      example-robot-data::example-robot-data)
-# add_executable(postures src/postures.cpp ${${PROJECT_NAME}_HEADERS})
-# target_link_libraries(postures PUBLIC pinocchio::pinocchio
-# example-robot-data::example-robot-data)
-
 if(BUILD_TESTING)
   # Unit-Tests dependencies
   set(${PROJECT_NAME}_CPP_TESTS

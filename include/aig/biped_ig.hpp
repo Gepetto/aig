@@ -92,8 +92,12 @@ class BipedIG {
   int rleg_idx_qs_;  // Indexes in the configuration vector.
   double mass_;
   double gravity_;
+  Eigen::Vector3d com_;
+  Eigen::Vector3d vcom_;
+  Eigen::Vector3d acom_;
   Eigen::Vector2d cop_;
   Eigen::Vector3d dL_;
+  Eigen::Vector3d L_;
   Eigen::Vector2d n_;
   Eigen::VectorXd rnea_torque_;
 
@@ -115,7 +119,7 @@ class BipedIG {
   pinocchio::SE3 computeBase(const Eigen::Vector3d &com,
                              const Eigen::Matrix3d &baseRotation);
 
-  void configurateLegs();
+  void configureLegs();
 
   // Public methods.
  public:
@@ -136,7 +140,15 @@ class BipedIG {
   const Eigen::VectorXd &getQ0() { return q0_; }
   void setQ0(const Eigen::VectorXd q0) { q0_ = q0; }
 
+  /// @brief Get the Angular Momentum variation. Please call computeDynamics
+  /// first.
   const Eigen::Vector3d &getAMVariation() { return dL_; }
+
+  /// @brief Get the Angular Momentum. Please call computeDynamics first.
+  const Eigen::Vector3d &getCoM() { return com_; }
+  const Eigen::Vector3d &getVCoM() { return vcom_; }
+  const Eigen::Vector3d &getACoM() { return acom_; }
+  const Eigen::Vector3d &getAM() { return L_; }
   const Eigen::Vector2d &getCoP() { return cop_; }
   const Eigen::Vector2d &getNL() { return n_; }
   const Eigen::VectorXd &getJointTorques() { return rnea_torque_; }
@@ -249,13 +261,13 @@ class BipedIG {
                        const Eigen::Matrix<double, 6, 1> &externalWrench,
                        bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,  // deprecate it
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             const Eigen::Matrix<double, 6, 1> &externalWrench,
                             bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,  // deprecate it
+  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
                             const Eigen::VectorXd &velocity,
                             const Eigen::VectorXd &acceleration,
                             bool flatHorizontalGround = true);
