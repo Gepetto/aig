@@ -2,6 +2,7 @@
 
 #include "aig/biped_ig.hpp"
 #include "aig/unittests/pyrene_settings.hpp"
+#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
@@ -12,7 +13,9 @@
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(test_biped_ig_talos_settings) {
-  aig::BipedIGSettings talos_settings = aig::makeSettingsFor("talos");
+  const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data";
+  aig::BipedIGSettings talos_settings =
+      aig::makeSettingsFor(path_to_robots, "talos");
   aig::BipedIG biped_ig(talos_settings);
   BOOST_CHECK_EQUAL(biped_ig.get_settings(), talos_settings);
 }

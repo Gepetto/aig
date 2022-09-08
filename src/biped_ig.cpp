@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cctype>
 
-#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
 #include "pinocchio/parsers/srdf.hpp"
@@ -17,16 +16,14 @@
 
 namespace aig {
 
-BipedIGSettings makeSettingsFor(std::string robot_name) {
+BipedIGSettings makeSettingsFor(const std::string &path_to_robots,
+                                const std::string &robot_name) {
   BipedIGSettings robot_settings;
-
-  std::transform(robot_name.begin(), robot_name.end(), robot_name.begin(),
+  std::string robot_name_lower = robot_name;
+  std::transform(robot_name_lower.begin(), robot_name_lower.end(),
+                 robot_name_lower.begin(),
                  [](unsigned char c) { return std::tolower(c); });
-  if (robot_name == "talos") {
-    // const std::string path_to_robots =
-    // "/opt/pal/ferrum/share/talos_description";
-    const std::string path_to_robots =
-        EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data";
+  if (robot_name_lower == "talos") {
     robot_settings.urdf_path = path_to_robots + "/robots/talos_reduced.urdf";
     robot_settings.srdf_path = path_to_robots + "/srdf/talos.srdf";
 
