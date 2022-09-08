@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(test_compute_dynamics) {
   BOOST_CHECK(v_ig_com.isMuchSmallerThan(1));
   BOOST_CHECK(a_ig_com.isMuchSmallerThan(1));
 
-  biped_ig.computeDynamics(q_ig_com, v_ig_com, a_ig_com);
+  biped_ig.computeNL(3.3, q_ig_com, v_ig_com, a_ig_com);
 
   BOOST_CHECK(biped_ig.getAM().isMuchSmallerThan(1));
   BOOST_CHECK(biped_ig.getAMVariation().isMuchSmallerThan(1));
