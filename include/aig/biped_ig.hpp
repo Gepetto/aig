@@ -261,14 +261,14 @@ class BipedIG {
                        const Eigen::Matrix<double, 6, 1> &externalWrench = Eigen::Matrix<double, 6, 1>::Zero(),
                        bool flatHorizontalGround = true);
 
-  void computeNL(const double &w,
-                 const Eigen::VectorXd &posture,
+  void computeNL(const double &w, const Eigen::VectorXd &posture,
                  const Eigen::VectorXd &velocity,
                  const Eigen::VectorXd &acceleration,
-                 const Eigen::Matrix<double, 6, 1> &externalWrench = Eigen::Matrix<double, 6, 1>::Zero(),
+                 const Eigen::Matrix<double, 6, 1> &externalWrench =
+                     Eigen::Matrix<double, 6, 1>::Zero(),
                  bool flatHorizontalGround = true);
 
-  void computeNL(const double& w);
+  void computeNL(const double &w);
 
   pinocchio::Model &get_model() { return model_; }
 };

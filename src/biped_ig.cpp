@@ -90,13 +90,12 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   // Build pinocchio cache.
   data_ = pinocchio::Data(model_);
 
-  
   gravity_ = model_.gravity981;
   mass_ = 0.0;
   for (size_t k = 0; k < model_.inertias.size(); ++k) {
     mass_ += model_.inertias[k].mass();
   }
-  weight_ = mass_*gravity_;
+  weight_ = mass_ * gravity_;
   S_ << 0, -1, 1, 0;
 
   // Extract the CoM to Waist level arm.
@@ -401,51 +400,50 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &velocity,
                               const Eigen::VectorXd &acceleration,
                               const Eigen::Matrix<double, 6, 1> &externalWrench,
-                              bool flatHorizontalGround){
-
+                              bool flatHorizontalGround) {
   // The external wrench is supposed to be expressed
   // in the frame of the Center of mass.
-  pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture, velocity, acceleration);
+  pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
+                                                    velocity, acceleration);
 
   com_ = data_.com[0];
   vcom_ = data_.vcom[0];
   m_acom_ = data_.dhg.linear();
   dL_ = data_.dhg.angular();
   L_ = data_.hg.angular();
-  
+
   groundForce_ = m_acom_ - weight_ - externalWrench.head<3>();
   groundCoMTorque_ = dL_ - externalWrench.tail<3>();
 
   if (flatHorizontalGround)
     nonCoPTorque_ = Eigen::Vector3d::Zero();
-  else{
+  else {
     // TODO get the force distribution and remove the non pressure terms from
     // the CoP computation. for now, we assume a flat and horizontal ground :
     nonCoPTorque_ = Eigen::Vector3d::Zero();
   }
 
-  cop_ = com_.head<2>() + (S_*groundCoMTorque_.head<2>()
-                            + nonCoPTorque_.head<2>() 
-                            - groundForce_.head<2>() * com_(2))
-                            /(groundForce_(2));
+  cop_ = com_.head<2>() +
+         (S_ * groundCoMTorque_.head<2>() + nonCoPTorque_.head<2>() -
+          groundForce_.head<2>() * com_(2)) /
+             (groundForce_(2));
 }
 
-void BipedIG::computeNL(const double &w, 
-                   const Eigen::VectorXd &posture, 
-                   const Eigen::VectorXd &velocity,
-                   const Eigen::VectorXd &acceleration,
-                   const Eigen::Matrix<double, 6, 1> &externalWrench,
-                   bool flatHorizontalGround) {
+void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
+                        const Eigen::VectorXd &velocity,
+                        const Eigen::VectorXd &acceleration,
+                        const Eigen::Matrix<double, 6, 1> &externalWrench,
+                        bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
                   flatHorizontalGround);
   computeNL(w);
 }
 
-void BipedIG::computeNL(const double &w){
+void BipedIG::computeNL(const double &w) {
   /** 
    * In this function form, computeDynamics is soposed to have been called before.
   */
-  n_ = m_acom_.head<2>()/(w*w*mass_) - com_.head<2>() + cop_;
+  n_ = m_acom_.head<2>() / (w * w * mass_) - com_.head<2>() + cop_;
 }
 
 }  // namespace aig
