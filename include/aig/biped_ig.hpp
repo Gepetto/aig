@@ -91,15 +91,15 @@ class BipedIG {
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
   double mass_;
-  double gravity_;
-  Eigen::Vector3d com_;
-  Eigen::Vector3d vcom_;
+  Eigen::Matrix2d S_;
+  Eigen::Vector3d gravity_;
+  // Eigen::Vector3d com_;
+  // Eigen::Vector3d vcom_;
   Eigen::Vector3d acom_;
   Eigen::Vector2d cop_;
   Eigen::Vector3d dL_;
   Eigen::Vector3d L_;
   Eigen::Vector2d n_;
-  Eigen::VectorXd rnea_torque_;
 
   // variables used in the waist-com vector correction:
   Eigen::Vector3d error_, com_temp_;
@@ -120,6 +120,10 @@ class BipedIG {
                              const Eigen::Matrix3d &baseRotation);
 
   void configureLegs();
+
+  // Internal computation variables
+  // on computeDynamics
+  Eigen::Vector3d groundForce_, groundCoMTorque_, nonCoPTorque_, weight_;
 
   // Public methods.
  public:
@@ -145,13 +149,12 @@ class BipedIG {
   const Eigen::Vector3d &getAMVariation() { return dL_; }
 
   /// @brief Get the Angular Momentum. Please call computeDynamics first.
-  const Eigen::Vector3d &getCoM() { return com_; }
-  const Eigen::Vector3d &getVCoM() { return vcom_; }
+  const Eigen::Vector3d &getCoM() { return data_.com[0]; }
+  const Eigen::Vector3d &getVCoM() { return data_.vcom[0]; }
   const Eigen::Vector3d &getACoM() { return acom_; }
   const Eigen::Vector3d &getAM() { return L_; }
   const Eigen::Vector2d &getCoP() { return cop_; }
   const Eigen::Vector2d &getNL() { return n_; }
-  const Eigen::VectorXd &getJointTorques() { return rnea_torque_; }
 
   void checkCompatibility();  // TODO
 
@@ -253,24 +256,18 @@ class BipedIG {
   void computeDynamics(const Eigen::VectorXd &posture,
                        const Eigen::VectorXd &velocity,
                        const Eigen::VectorXd &acceleration,
+                       const Eigen::Matrix<double, 6, 1> &externalWrench =
+                           Eigen::Matrix<double, 6, 1>::Zero(),
                        bool flatHorizontalGround = true);
 
-  void computeDynamics(const Eigen::VectorXd &posture,
-                       const Eigen::VectorXd &velocity,
-                       const Eigen::VectorXd &acceleration,
-                       const Eigen::Matrix<double, 6, 1> &externalWrench,
-                       bool flatHorizontalGround = true);
+  void computeNL(const double &w, const Eigen::VectorXd &posture,
+                 const Eigen::VectorXd &velocity,
+                 const Eigen::VectorXd &acceleration,
+                 const Eigen::Matrix<double, 6, 1> &externalWrench =
+                     Eigen::Matrix<double, 6, 1>::Zero(),
+                 bool flatHorizontalGround = true);
 
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
-                            const Eigen::VectorXd &velocity,
-                            const Eigen::VectorXd &acceleration,
-                            const Eigen::Matrix<double, 6, 1> &externalWrench,
-                            bool flatHorizontalGround = true);
-
-  Eigen::Vector2d computeNL(const Eigen::VectorXd &posture,
-                            const Eigen::VectorXd &velocity,
-                            const Eigen::VectorXd &acceleration,
-                            bool flatHorizontalGround = true);
+  void computeNL(const double &w);
 
   pinocchio::Model &get_model() { return model_; }
 };
