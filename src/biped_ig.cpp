@@ -12,7 +12,6 @@
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
-#include "pinocchio/algorithm/rnea.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
@@ -406,13 +405,11 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
   pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
                                                     velocity, acceleration);
 
-  com_ = data_.com[0];
-  vcom_ = data_.vcom[0];
-  m_acom_ = data_.dhg.linear();
+  acom_ = data_.dhg.linear()/mass_;
   dL_ = data_.dhg.angular();
   L_ = data_.hg.angular();
 
-  groundForce_ = m_acom_ - weight_ - externalWrench.head<3>();
+  groundForce_ = data_.dhg.linear() - weight_ - externalWrench.head<3>();
   groundCoMTorque_ = dL_ - externalWrench.tail<3>();
 
   if (flatHorizontalGround)
@@ -423,9 +420,9 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
     nonCoPTorque_ = Eigen::Vector3d::Zero();
   }
 
-  cop_ = com_.head<2>() +
+  cop_ = data_.com[0].head<2>() +
          (S_ * groundCoMTorque_.head<2>() + nonCoPTorque_.head<2>() -
-          groundForce_.head<2>() * com_(2)) /
+          groundForce_.head<2>() * data_.com[0](2)) /
              (groundForce_(2));
 }
 
@@ -441,10 +438,10 @@ void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
 
 void BipedIG::computeNL(const double &w) {
   /**
-   * In this function form, computeDynamics is soposed to have been called
+   * In this function form, computeDynamics is suposed to have been called
    * before.
    */
-  n_ = m_acom_.head<2>() / (w * w * mass_) - com_.head<2>() + cop_;
+  n_ = acom_.head<2>() / (w * w) - data_.com[0].head<2>() + cop_;
 }
 
 }  // namespace aig
