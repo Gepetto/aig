@@ -38,10 +38,10 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
                          aig::LegJoints& rl_q, const Mode& mode) {
   // Get the model and data
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
 
   // Generate a robot configuration.

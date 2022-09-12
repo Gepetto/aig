@@ -2,6 +2,7 @@
 
 #include "aig/biped_ig.hpp"
 #include "aig/unittests/pyrene_settings.hpp"
+#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
@@ -12,7 +13,9 @@
 BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(test_biped_ig_talos_settings) {
-  aig::BipedIGSettings talos_settings = aig::makeSettingsFor("talos");
+  const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data";
+  aig::BipedIGSettings talos_settings =
+      aig::makeSettingsFor(path_to_robots, "talos");
   aig::BipedIG biped_ig(talos_settings);
   BOOST_CHECK_EQUAL(biped_ig.get_settings(), talos_settings);
 }
@@ -35,11 +38,11 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_urdf_content) {
   aig::BipedIG biped_ig_1(settings);
 
   // read the urdf:
-  std::ifstream file(settings.urdf_path.c_str());
+  std::ifstream file(settings.urdf.c_str());
   std::stringstream buffer;
   buffer << file.rdbuf();
   // Save the urdf content into a string
-  settings.urdf_path = buffer.str();
+  settings.urdf = buffer.str();
   aig::BipedIG biped_ig_2(settings);
 
   // Check that both pinocchio model are equal.
@@ -51,11 +54,11 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_srdf_content) {
   aig::BipedIG biped_ig_1(settings);
 
   // read the urdf:
-  std::ifstream file(settings.srdf_path.c_str());
+  std::ifstream file(settings.srdf.c_str());
   std::stringstream buffer;
   buffer << file.rdbuf();
   // Save the urdf content into a string
-  settings.srdf_path = buffer.str();
+  settings.srdf = buffer.str();
   aig::BipedIG biped_ig_2(settings);
 
   // Check that both pinocchio model are equal.
@@ -84,10 +87,10 @@ void generate_references(Eigen::Vector3d& com, pinocchio::SE3& base,
                          Eigen::VectorXd& q, const Mode& mode) {
   // Get the model and data
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
 
   // Generate a robot configuration.
@@ -138,7 +141,7 @@ void test_solve(Mode mode) {
   Eigen::Vector3d com;
   pinocchio::SE3 base, lf, rf;
   generate_references(com, base, lf, rf, q_test, mode);
-  double precision = mode == Mode::RANDOM ? 1.0 : 1e-3;
+  double precision = mode == Mode::RANDOM ? 1.0 : 1e-4;
 
   // Compute inverse geometry and tests
   biped_ig.solve(com, lf, rf, q_test, q_ig_com);
@@ -214,6 +217,40 @@ void test_solve_derivatives(Mode mode) {
 
 BOOST_AUTO_TEST_CASE(test_solve_half_sitting_derivatives) {
   test_solve_derivatives(Mode::HALF_SITTING);
+}
+
+BOOST_AUTO_TEST_CASE(test_compute_dynamics) {
+  // create the solver
+  aig::BipedIGSettings settings = aig::unittests::bipeds;
+  aig::BipedIG biped_ig(settings);
+
+  // perform a forward kinematics on a configuration
+  Eigen::VectorXd q_test, q_ig_com, v_ig_com, a_ig_com;
+  Eigen::Vector3d com;
+  pinocchio::SE3 base, lf, rf;  //
+  generate_references(com, base, lf, rf, q_test, Mode::HALF_SITTING);
+
+  double dt = 1e-5;
+  // std::array<pinocchio::SE3, 3> bases{ {base, base, base} };
+  std::array<Eigen::Vector3d, 3> coms{{com, com, com}};
+  std::array<pinocchio::SE3, 3> lfs{{lf, lf, lf}};
+  std::array<pinocchio::SE3, 3> rfs{{rf, rf, rf}};
+
+  // Compute inverse geometry and tests
+  biped_ig.solve(coms, lfs, rfs, q_test, q_ig_com, v_ig_com, a_ig_com, dt);
+  BOOST_CHECK_EQUAL(q_test.size(), q_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, v_ig_com.size());
+  BOOST_CHECK_EQUAL(q_test.size() - 1, a_ig_com.size());
+  BOOST_CHECK(v_ig_com.isMuchSmallerThan(1));
+  BOOST_CHECK(a_ig_com.isMuchSmallerThan(1));
+
+  biped_ig.computeNL(3.3, q_ig_com, v_ig_com, a_ig_com);
+
+  BOOST_CHECK(biped_ig.getAM().isMuchSmallerThan(1));
+  BOOST_CHECK(biped_ig.getAMVariation().isMuchSmallerThan(1));
+  BOOST_CHECK(biped_ig.getNL().isMuchSmallerThan(1));
+  BOOST_CHECK(
+      (biped_ig.getCoM().head<2>() - biped_ig.getCoP()).isMuchSmallerThan(1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
