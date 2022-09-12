@@ -25,8 +25,8 @@ BipedIGSettings makeSettingsFor(const std::string &path_to_robots,
                  robot_name_lower.begin(),
                  [](unsigned char c) { return std::tolower(c); });
   if (robot_name_lower == "talos") {
-    robot_settings.urdf_path = path_to_robots + "/robots/talos_reduced.urdf";
-    robot_settings.srdf_path = path_to_robots + "/srdf/talos.srdf";
+    robot_settings.urdf = path_to_robots + "/robots/talos_reduced.urdf";
+    robot_settings.srdf = path_to_robots + "/srdf/talos.srdf";
 
     robot_settings.left_hip_joint_name = "leg_left_1_joint";
     robot_settings.right_hip_joint_name = "leg_right_1_joint";
@@ -65,24 +65,23 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   bool urdf_file_exists = false;
   bool srdf_file_exists = false;
   {
-    std::ifstream f(settings_.urdf_path.c_str());
+    std::ifstream f(settings_.urdf.c_str());
     urdf_file_exists = f.good();
   }
   {
-    std::ifstream f(settings_.srdf_path.c_str());
+    std::ifstream f(settings_.srdf.c_str());
     srdf_file_exists = f.good();
   }
 
   // Build the robot model.
   if (urdf_file_exists) {
-    pinocchio::urdf::buildModel(settings_.urdf_path,
+    pinocchio::urdf::buildModel(settings_.urdf,
                                 pinocchio::JointModelFreeFlyer(), model_);
-  } else if (settings_.urdf_path != "") {
+  } else if (settings_.urdf != "") {
     pinocchio::urdf::buildModelFromXML(
-        settings_.urdf_path, pinocchio::JointModelFreeFlyer(), model_);
+        settings_.urdf, pinocchio::JointModelFreeFlyer(), model_);
   } else {
-    throw std::runtime_error(
-        "BipedIG::BipedIG(): settings_.urdf_path is empty");
+    throw std::runtime_error("BipedIG::BipedIG(): settings_.urdf is empty");
   }
   // Build pinocchio cache.
   data_ = pinocchio::Data(model_);
@@ -95,15 +94,13 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
 
   // Extract the CoM to Waist level arm.
   if (srdf_file_exists) {
-    pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf_path,
-                                                 false);
-  } else if (settings_.srdf_path != "") {
+    pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf, false);
+  } else if (settings_.srdf != "") {
     std::stringstream buffer;
-    buffer << settings_.srdf_path;
+    buffer << settings_.srdf;
     pinocchio::srdf::loadReferenceConfigurationsFromXML(model_, buffer, false);
   } else {
-    throw std::runtime_error(
-        "BipedIG::BipedIG(): settings_.srdf_path is empty");
+    throw std::runtime_error("BipedIG::BipedIG(): settings_.srdf is empty");
   }
   q0_ = model_.referenceConfigurations["half_sitting"];
   set_com_from_waist(q0_);

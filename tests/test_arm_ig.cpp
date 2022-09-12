@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(test_leg_ig_constructor) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   BOOST_CHECK_EQUAL(model.name, "talos");
 }

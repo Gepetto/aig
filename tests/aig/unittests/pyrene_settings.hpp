@@ -20,9 +20,9 @@
 namespace aig {
 namespace unittests {
 const std::string path_to_robots = EXAMPLE_ROBOT_DATA_MODEL_DIR;
-const std::string urdf_path =
+const std::string urdf =
     path_to_robots + "/talos_data/robots/talos_reduced_corrected.urdf";
-const std::string srdf_path = path_to_robots + "/talos_data/srdf/talos.srdf";
+const std::string srdf = path_to_robots + "/talos_data/srdf/talos.srdf";
 
 const std::string left_hip_joint_name = "leg_left_1_joint";
 const std::string right_hip_joint_name = "leg_right_1_joint";
@@ -60,8 +60,8 @@ aig::BipedIGSettings bipeds = {
     right_knee_joint_name,  /* right_knee_joint_name */
     right_ankle_joint_name, /* right_ankle_joint_name */
     right_foot_frame_name,  /* right_foot_frame_name */
-    urdf_path,              /* urdf_path */
-    srdf_path               /* srdf_path */
+    urdf,                   /* urdf paths */
+    srdf                    /* srdf paths */
 };
 
 }  // namespace unittests
