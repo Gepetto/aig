@@ -440,9 +440,10 @@ void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
 }
 
 void BipedIG::computeNL(const double &w) {
-  /** 
-   * In this function form, computeDynamics is soposed to have been called before.
-  */
+  /**
+   * In this function form, computeDynamics is soposed to have been called
+   * before.
+   */
   n_ = m_acom_.head<2>() / (w * w * mass_) - com_.head<2>() + cop_;
 }
 
