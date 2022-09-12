@@ -35,7 +35,15 @@ struct BipedIGSettings {
   std::string right_knee_joint_name = "";
   std::string right_ankle_joint_name = "";
   std::string right_foot_frame_name = "";
+  /**
+   * @brief This must contain either a valid path to the urdf file or the
+   * content of this file in a string.
+   */
   std::string urdf = "";
+  /**
+   * @brief This must contain either a valid path to the srdf file or the
+   * content of this file in a string.
+   */
   std::string srdf = "";
 
   friend std::ostream &operator<<(std::ostream &out,
