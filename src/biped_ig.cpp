@@ -405,7 +405,7 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
   pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
                                                     velocity, acceleration);
 
-  acom_ = data_.dhg.linear()/mass_;
+  acom_ = data_.dhg.linear() / mass_;
   dL_ = data_.dhg.angular();
   L_ = data_.hg.angular();
 
