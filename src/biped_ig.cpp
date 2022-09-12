@@ -428,17 +428,6 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                             + nonCoPTorque_.head<2>() 
                             - groundForce_.head<2>() * com_(2))
                             /(groundForce_(2));
-
-}
-
-void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
-                              const Eigen::VectorXd &velocity,
-                              const Eigen::VectorXd &acceleration,
-                              bool flatHorizontalGround) {
-  Eigen::Matrix<double, 6, 1> externalWrench =
-      Eigen::Matrix<double, 6, 1>::Zero();
-  computeDynamics(posture, velocity, acceleration, externalWrench,
-                  flatHorizontalGround);
 }
 
 void BipedIG::computeNL(const double &w, 
@@ -453,6 +442,9 @@ void BipedIG::computeNL(const double &w,
 }
 
 void BipedIG::computeNL(const double &w){
+  /** 
+   * In this function form, computeDynamics is soposed to have been called before.
+  */
   n_ = m_acom_.head<2>()/(w*w*mass_) - com_.head<2>() + cop_;
 }
 

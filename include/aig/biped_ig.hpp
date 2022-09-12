@@ -258,12 +258,7 @@ class BipedIG {
   void computeDynamics(const Eigen::VectorXd &posture,
                        const Eigen::VectorXd &velocity,
                        const Eigen::VectorXd &acceleration,
-                       bool flatHorizontalGround = true);
-
-  void computeDynamics(const Eigen::VectorXd &posture,
-                       const Eigen::VectorXd &velocity,
-                       const Eigen::VectorXd &acceleration,
-                       const Eigen::Matrix<double, 6, 1> &externalWrench,
+                       const Eigen::Matrix<double, 6, 1> &externalWrench = Eigen::Matrix<double, 6, 1>::Zero(),
                        bool flatHorizontalGround = true);
 
   void computeNL(const double &w,
