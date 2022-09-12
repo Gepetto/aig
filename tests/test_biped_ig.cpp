@@ -38,11 +38,11 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_urdf_content) {
   aig::BipedIG biped_ig_1(settings);
 
   // read the urdf:
-  std::ifstream file(settings.urdf_path.c_str());
+  std::ifstream file(settings.urdf.c_str());
   std::stringstream buffer;
   buffer << file.rdbuf();
   // Save the urdf content into a string
-  settings.urdf_path = buffer.str();
+  settings.urdf = buffer.str();
   aig::BipedIG biped_ig_2(settings);
 
   // Check that both pinocchio model are equal.
@@ -54,11 +54,11 @@ BOOST_AUTO_TEST_CASE(test_biped_ig_init_constructor_srdf_content) {
   aig::BipedIG biped_ig_1(settings);
 
   // read the urdf:
-  std::ifstream file(settings.srdf_path.c_str());
+  std::ifstream file(settings.srdf.c_str());
   std::stringstream buffer;
   buffer << file.rdbuf();
   // Save the urdf content into a string
-  settings.srdf_path = buffer.str();
+  settings.srdf = buffer.str();
   aig::BipedIG biped_ig_2(settings);
 
   // Check that both pinocchio model are equal.
@@ -87,10 +87,10 @@ void generate_references(Eigen::Vector3d& com, pinocchio::SE3& base,
                          Eigen::VectorXd& q, const Mode& mode) {
   // Get the model and data
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   pinocchio::Data data = pinocchio::Data(model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
 
   // Generate a robot configuration.

@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(BOOST_TEST_MODULE)
 
 BOOST_AUTO_TEST_CASE(test_load_talos_model) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   BOOST_CHECK_EQUAL(model.name, "talos");
 }
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(test_load_talos_model_from_xml) {
   pinocchio::Model model;
 
   // Read file as XML
-  std::ifstream file(aig::unittests::urdf_path.c_str());
+  std::ifstream file(aig::unittests::urdf.c_str());
   std::stringstream buffer;
   buffer << file.rdbuf();
   pinocchio::urdf::buildModelFromXML(buffer.str(),
@@ -30,10 +30,10 @@ BOOST_AUTO_TEST_CASE(test_load_talos_model_from_xml) {
 
 BOOST_AUTO_TEST_CASE(test_get_reference_config_from_xml) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
   // creating the srdf file stream
-  std::ifstream srdf_file(aig::unittests::srdf_path.c_str());
+  std::ifstream srdf_file(aig::unittests::srdf.c_str());
 
   // Load the srdf
   std::stringstream buffer;
@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(test_get_reference_config_from_xml) {
 
 BOOST_AUTO_TEST_CASE(test_get_reference_config) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
   BOOST_CHECK_EQUAL(q.size(), model.nq);
@@ -55,9 +55,9 @@ BOOST_AUTO_TEST_CASE(test_get_reference_config) {
 
 BOOST_AUTO_TEST_CASE(test_compute_joint_placement) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
 
@@ -68,9 +68,9 @@ BOOST_AUTO_TEST_CASE(test_compute_joint_placement) {
 
 BOOST_AUTO_TEST_CASE(test_compute_com) {
   pinocchio::Model model;
-  pinocchio::urdf::buildModel(aig::unittests::urdf_path,
+  pinocchio::urdf::buildModel(aig::unittests::urdf,
                               pinocchio::JointModelFreeFlyer(), model);
-  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf_path,
+  pinocchio::srdf::loadReferenceConfigurations(model, aig::unittests::srdf,
                                                false);
   Eigen::VectorXd q = model.referenceConfigurations["half_sitting"];
   pinocchio::Data data(model);

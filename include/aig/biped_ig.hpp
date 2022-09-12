@@ -35,8 +35,8 @@ struct BipedIGSettings {
   std::string right_knee_joint_name = "";
   std::string right_ankle_joint_name = "";
   std::string right_foot_frame_name = "";
-  std::string urdf_path = "";
-  std::string srdf_path = "";
+  std::string urdf = "";
+  std::string srdf = "";
 
   friend std::ostream &operator<<(std::ostream &out,
                                   const BipedIGSettings &obj) {
@@ -49,8 +49,8 @@ struct BipedIGSettings {
     out << "    right_knee_joint_name: " << obj.right_knee_joint_name << "\n";
     out << "    right_ankle_joint_name: " << obj.right_ankle_joint_name << "\n";
     out << "    right_foot_frame_name: " << obj.right_foot_frame_name << "\n";
-    out << "    urdf_path: " << obj.urdf_path << "\n";
-    out << "    srdf_path: " << obj.srdf_path << std::endl;
+    out << "    urdf: " << obj.urdf << "\n";
+    out << "    srdf: " << obj.srdf << std::endl;
     return out;
   }
 
@@ -65,8 +65,8 @@ struct BipedIGSettings {
     test &= lhs.right_knee_joint_name == rhs.right_knee_joint_name;
     test &= lhs.right_ankle_joint_name == rhs.right_ankle_joint_name;
     test &= lhs.right_foot_frame_name == rhs.right_foot_frame_name;
-    test &= lhs.urdf_path == rhs.urdf_path;
-    test &= lhs.srdf_path == rhs.srdf_path;
+    test &= lhs.urdf == rhs.urdf;
+    test &= lhs.srdf == rhs.srdf;
     return test;
   }
 };
