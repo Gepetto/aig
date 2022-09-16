@@ -50,11 +50,13 @@ set(${PROJECT_NAME}_HEADERS
     include/${PROJECT_NAME}/arm_ig.hpp #
     include/${PROJECT_NAME}/leg_ig.hpp #
     include/${PROJECT_NAME}/biped_ig.hpp #
+    include/${PROJECT_NAME}/c_dynamics.hpp #
 )
 set(${PROJECT_NAME}_SOURCES
     src/arm_ig.cpp #
     src/leg_ig.cpp #
     src/biped_ig.cpp #
+    src/c_dynamics.cpp #
 )
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
