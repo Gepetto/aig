@@ -9,11 +9,11 @@
 #include <algorithm>
 #include <cctype>
 
+#include "aig/c_dynamics.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
-#include "aig/c_dynamics.hpp"
 
 namespace aig {
 
@@ -112,7 +112,6 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   dyno::DynoSettings dyn_settings;
   dyn_settings.urdf = settings_.urdf;
   dynamics_ = dyno::Dyno(dyn_settings);
-
 }
 
 void BipedIG::configureLegs() {
@@ -402,8 +401,8 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &acceleration,
                               const Eigen::Matrix<double, 6, 1> &externalWrench,
                               bool flatHorizontalGround) {
-
-  dynamics_.computeDynamics(posture, velocity, acceleration, externalWrench, flatHorizontalGround);
+  dynamics_.computeDynamics(posture, velocity, acceleration, externalWrench,
+                            flatHorizontalGround);
   acom_ = dynamics_.getACoM();
   dL_ = dynamics_.getAMVariation();
   L_ = dynamics_.getAM();
@@ -417,7 +416,8 @@ void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
                         const Eigen::VectorXd &acceleration,
                         const Eigen::Matrix<double, 6, 1> &externalWrench,
                         bool flatHorizontalGround) {
-  dynamics_.computeNL(w, posture, velocity, acceleration, externalWrench, flatHorizontalGround);
+  dynamics_.computeNL(w, posture, velocity, acceleration, externalWrench,
+                      flatHorizontalGround);
   n_ = dynamics_.getNL();
 }
 
