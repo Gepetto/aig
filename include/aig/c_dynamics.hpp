@@ -34,8 +34,8 @@ struct Contact6DSettings {
 
   friend std::ostream &operator<<(std::ostream &out,
                                   const Contact6DSettings &obj) {
-    
-    out << "Contact6D " << ":\n";
+    out << "Contact6D "
+        << ":\n";
     out << "    mu: " << obj.active << "\n";
     out << "    mu: " << obj.mu << "\n";
     out << "    gu: " << obj.gu << "\n";
@@ -60,42 +60,42 @@ struct Contact6DSettings {
   }
 };
 
-class Contact6D{
-  private:
-    Contact6DSettings settings_;
+class Contact6D {
+ private:
+  Contact6DSettings settings_;
 
-  public:
-    //matrices
-    Eigen::Matrix<double, 5, 6> unilaterality_A_;
-    Eigen::Matrix<double, 5, 1> unilaterality_b_;
-    Eigen::Matrix<double, 6, 6> friction_A_;
-    Eigen::Matrix<double, 6, 1> friction_b_;
-    Eigen::DiagonalMatrix<double, 6> regularization_A_;
-    Eigen::Matrix<double, 6, 1> regularization_b_;
-    Eigen::Matrix<double, 6, 6> newton_euler_A_;
+ public:
+  // matrices
+  Eigen::Matrix<double, 5, 6> unilaterality_A_;
+  Eigen::Matrix<double, 5, 1> unilaterality_b_;
+  Eigen::Matrix<double, 6, 6> friction_A_;
+  Eigen::Matrix<double, 6, 1> friction_b_;
+  Eigen::DiagonalMatrix<double, 6> regularization_A_;
+  Eigen::Matrix<double, 6, 1> regularization_b_;
+  Eigen::Matrix<double, 6, 6> newton_euler_A_;
 
-  
-    Contact6D();
-    Contact6D(const Contact6DSettings &settings);
-    void initialize(const Contact6DSettings &settings);
+  Contact6D();
+  Contact6D(const Contact6DSettings &settings);
+  void initialize(const Contact6DSettings &settings);
 
-    ~Contact6D();
-    
-    //setters
-    void active(const bool &active);
-    void setMu(const double &mu);
-    void setGu(const double &gu);
-    void setForceWeights(const Eigen::Vector3d &force_weights);
-    void setTorqueWeights(const Eigen::Vector3d &torque_weights);
-    void setSurfaceHalfWidth(const double &half_width);
-    void setSurfaceHalfLength(const double &half_length);
-    void updateNewtonEuler(const Eigen::Vector3d &CoM, 
-                           const pinocchio::SE3 &oMf);   //Check oMf, maybe we actually need fMo.
+  ~Contact6D();
 
-    Eigen::Matrix<double, 6, 1> contactForce;
+  // setters
+  void active(const bool &active);
+  void setMu(const double &mu);
+  void setGu(const double &gu);
+  void setForceWeights(const Eigen::Vector3d &force_weights);
+  void setTorqueWeights(const Eigen::Vector3d &torque_weights);
+  void setSurfaceHalfWidth(const double &half_width);
+  void setSurfaceHalfLength(const double &half_length);
+  void updateNewtonEuler(
+      const Eigen::Vector3d &CoM,
+      const pinocchio::SE3 &oMf);  // Check oMf, maybe we actually need fMo.
 
-    //getters
-    const Contact6DSettings &getSettings(){return settings_; }
+  Eigen::Matrix<double, 6, 1> contactForce;
+
+  // getters
+  const Contact6DSettings &getSettings() { return settings_; }
 };
 
 struct DynoSettings {
@@ -129,10 +129,10 @@ class Dyno {
 
   // Lists of contacts
   // std::vector< std::shared_ptr<Contact6D> > known_contact6ds_;
-  std::map< std::string, std::shared_ptr< Contact6D > > known_contact6ds_;
-  std::vector< std::string > active_contact6ds_;
+  std::map<std::string, std::shared_ptr<Contact6D> > known_contact6ds_;
+  std::vector<std::string> active_contact6ds_;
 
-  //QP Matrices
+  // QP Matrices
   Eigen::MatrixXd unilaterality_A_;
   Eigen::VectorXd unilaterality_b_;
   Eigen::MatrixXd friction_A_;
@@ -142,8 +142,9 @@ class Dyno {
   Eigen::Matrix<double, 6, -1> newton_euler_A_;
   Eigen::Matrix<double, 6, 1> newton_euler_b_;
 
-  size_t uni_cols_, uni_rows_, fri_cols_, fri_rows_, reg_cols_, reg_rows_, ne_cols_;
-  
+  size_t uni_cols_, uni_rows_, fri_cols_, fri_rows_, reg_cols_, reg_rows_,
+      ne_cols_;
+
   // Internal variables:
   Eigen::Vector3d groundCoMForce_, groundCoMTorque_, nonCoPTorque_, weight_;
   Eigen::Vector3d acom_;
