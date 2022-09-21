@@ -22,8 +22,6 @@
 
 namespace dyno {
 
-enum contact { surface, point };
-
 struct Contact6DSettings {
  public:
   double mu, gu;
@@ -63,17 +61,21 @@ struct Contact6DSettings {
 class Contact6D {
  private:
   Contact6DSettings settings_;
+  Eigen::Matrix<double, 6, 6> oAf_;
 
- public:
   // matrices
   Eigen::Matrix<double, 5, 6> unilaterality_A_;
   Eigen::Matrix<double, 5, 1> unilaterality_b_;
   Eigen::Matrix<double, 6, 6> friction_A_;
   Eigen::Matrix<double, 6, 1> friction_b_;
-  Eigen::DiagonalMatrix<double, 6> regularization_A_;
+  Eigen::Matrix<double, 6, 1> regularization_A_;
   Eigen::Matrix<double, 6, 1> regularization_b_;
   Eigen::Matrix<double, 6, 6> newton_euler_A_;
+  size_t frameID_;
+  Eigen::Matrix<double, 6, 1> contactForce_;
 
+ public:
+  
   Contact6D();
   Contact6D(const Contact6DSettings &settings);
   void initialize(const Contact6DSettings &settings);
@@ -88,14 +90,27 @@ class Contact6D {
   void setTorqueWeights(const Eigen::Vector3d &torque_weights);
   void setSurfaceHalfWidth(const double &half_width);
   void setSurfaceHalfLength(const double &half_length);
-  void updateNewtonEuler(
-      const Eigen::Vector3d &CoM,
-      const pinocchio::SE3 &oMf);  // Check oMf, maybe we actually need fMo.
-
-  Eigen::Matrix<double, 6, 1> contactForce;
+  void updateNewtonEuler(const Eigen::Vector3d &CoM, const pinocchio::SE3 &oMf);
+  void setFrameID(const size_t frameID){frameID_ = frameID; }
+  void applyForce(const Eigen::Matrix<double, 6, 1> &force){contactForce_ << force; }
 
   // getters
   const Contact6DSettings &getSettings() { return settings_; }
+  const Eigen::Matrix<double, 6, 6> &toWorldForces() { return oAf_; }
+  size_t uni_rows() const { return unilaterality_A_.rows(); }
+  size_t fri_rows() const { return friction_A_.rows(); }
+  size_t cols() const {return newton_euler_A_.cols(); }
+  const size_t &getFrameID() const {return frameID_; }
+
+  const Eigen::Matrix<double, 5, 6> &uni_A(){return unilaterality_A_; }
+  const Eigen::Matrix<double, 5, 1> &uni_b(){return unilaterality_b_; }
+  const Eigen::Matrix<double, 6, 6> &fri_A(){return friction_A_; }
+  const Eigen::Matrix<double, 6, 1> &fri_b(){return friction_b_; }
+  const Eigen::Matrix<double, 6, 1> &reg_A(){return regularization_A_; }
+  const Eigen::Matrix<double, 6, 1> &reg_b(){return regularization_b_; }
+  const Eigen::Matrix<double, 6, 6> &NE_A(){return newton_euler_A_; }
+
+  const Eigen::Matrix<double, 6, 1> appliedForce(){return contactForce_; }
 };
 
 struct DynoSettings {
@@ -137,13 +152,21 @@ class Dyno {
   Eigen::VectorXd unilaterality_b_;
   Eigen::MatrixXd friction_A_;
   Eigen::VectorXd friction_b_;
-  Eigen::DiagonalMatrix<double, -1> regularization_A_;
+  Eigen::VectorXd regularization_A_;
   Eigen::VectorXd regularization_b_;
   Eigen::Matrix<double, 6, -1> newton_euler_A_;
   Eigen::Matrix<double, 6, 1> newton_euler_b_;
 
-  size_t uni_cols_, uni_rows_, fri_cols_, fri_rows_, reg_cols_, reg_rows_,
-      ne_cols_;
+  Eigen::MatrixXd G_, CI_, CE_;
+  Eigen::VectorXd g0_, ci0_, ce0_;
+  Eigen::VectorXd F_;
+  Eigen::VectorXi ActiveSet_;
+  int activeSetSize_;
+  // Eigen::QuadProgStatus status;
+
+  size_t cols_, uni_rows_, fri_rows_;
+  //active sizes:
+  size_t uni_i_, fri_i_, j_;
 
   // Internal variables:
   Eigen::Vector3d groundCoMForce_, groundCoMTorque_, nonCoPTorque_, weight_;
@@ -156,7 +179,11 @@ class Dyno {
   void addSizes(const std::shared_ptr<Contact6D> &contact);
   void removeSizes(const std::shared_ptr<Contact6D> &contact);
   void resizeMatrices();
-  void buildMatrices();
+  void buildMatrices(const Eigen::Vector3d &groundCoMForce,
+                     const Eigen::Vector3d &groundCoMTorque,
+                     const Eigen::Vector3d &CoM);
+  void solveQP();
+  void distribute();
 
  public:
   Dyno();
@@ -201,6 +228,9 @@ class Dyno {
   const Eigen::Vector2d &getNL() { return n_; }
   const Eigen::Vector3d &getGroundCoMForce() { return groundCoMForce_; }
   const Eigen::Vector3d &getGroundCoMTorque() { return groundCoMTorque_; }
+  const std::vector<std::string> &getActiveContacts() {return active_contact6ds_; }
+  const std::shared_ptr<Contact6D> &getContact(std::string name) {return known_contact6ds_[name]; }
+
 };
 
 }  // namespace dyno
