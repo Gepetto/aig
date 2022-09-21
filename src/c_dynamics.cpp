@@ -29,7 +29,7 @@ void Contact6D::initialize(const Contact6DSettings &settings) {
   double gu = settings_.gu;
 
   // Make matrices
-  regularization_A_.diagonal() << settings_.weights;
+  regularization_A_ << settings_.weights;
   regularization_b_ << Eigen::Matrix<double, 6, 1>::Zero();
 
   unilaterality_A_ << Eigen::Matrix<double, 5, 6>::Zero();
@@ -49,25 +49,24 @@ void Contact6D::initialize(const Contact6DSettings &settings) {
   newton_euler_A_.block<3, 3>(0, 0) << Eigen::Matrix3d::Identity();
   newton_euler_A_.block<3, 3>(3, 3) << Eigen::Matrix3d::Identity();
 
-  // Note: newton_euler is not complete, it needs to be updated
-  // with the com and contact position each time.
+  // Note: newton_euler must be updated before using it
 
-  contactForce = Eigen::Matrix<double, 6, 1>::Zero();
+  contactForce_ = Eigen::Matrix<double, 6, 1>::Zero();
 }
 
 void Contact6D::active(const bool &active) {
   settings_.active = active;
-  if (!active) contactForce.setZero();
+  if (!active) contactForce_.setZero();
 }
 
 void Contact6D::setForceWeights(const Eigen::Vector3d &force_weights) {
   settings_.weights.head<3>() = force_weights;
-  regularization_A_.diagonal().head<3>() = force_weights;
+  regularization_A_.head<3>() = force_weights;
 }
 
 void Contact6D::setTorqueWeights(const Eigen::Vector3d &torque_weights) {
   settings_.weights.tail<3>() = torque_weights;
-  regularization_A_.diagonal().tail<3>() = torque_weights;
+  regularization_A_.tail<3>() = torque_weights;
 }
 
 void Contact6D::setSurfaceHalfWidth(const double &half_width) {
@@ -95,6 +94,7 @@ void Contact6D::setGu(const double &gu) {
 void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
                                   const pinocchio::SE3 &oMf) {
   newton_euler_A_.block<3, 3>(3, 0) << pinocchio::skew(oMf.translation() - CoM);
+  oAf_ = oMf.toActionMatrixInverse().transpose();
 }
 
 Dyno::Dyno() {}
@@ -132,13 +132,9 @@ void Dyno::initialize(const DynoSettings settings) {
   S_ << 0, -1, 1, 0;
 
   // matrix_sizes
-  uni_cols_ = 0;
   uni_rows_ = 0;
-  fri_cols_ = 0;
   fri_rows_ = 0;
-  reg_cols_ = 0;
-  reg_rows_ = 0;
-  ne_cols_ = 0;
+  cols_ = 0;
   newton_euler_b_.resize(6);
 }
 
@@ -196,6 +192,8 @@ void Dyno::computeNL(const double &w) {
 
 void Dyno::addContact6d(const std::shared_ptr<Contact6D> &contact,
                         const std::string &name) {
+  contact->setFrameID(model_.getFrameId(contact->getSettings().frame_name));
+
   known_contact6ds_.insert(
       std::pair<std::string, std::shared_ptr<Contact6D>>(name, contact));
 
@@ -211,37 +209,30 @@ void Dyno::removeContact6d(const std::string &name) {
 }
 
 void Dyno::addSizes(const std::shared_ptr<Contact6D> &contact) {
-  uni_rows_ += contact->unilaterality_A_.rows();
-  uni_cols_ += contact->unilaterality_A_.cols();
-  fri_rows_ += contact->friction_A_.rows();
-  fri_cols_ += contact->friction_A_.cols();
-  reg_rows_ += contact->regularization_A_.rows();
-  ne_cols_ += contact->newton_euler_A_.cols();
+  uni_rows_ += contact->uni_rows();
+  fri_rows_ += contact->fri_rows();
+  cols_ += contact->cols();
 
   resizeMatrices();
 }
 
-void Dyno::removeSizes(const std::shared_ptr<Contact6D>
-                           &contact) {  // @todo: These matrices are public to
-                                        // write this function, change it.
-  uni_rows_ -= contact->unilaterality_A_.rows();
-  uni_cols_ -= contact->unilaterality_A_.cols();
-  fri_rows_ -= contact->friction_A_.rows();
-  fri_cols_ -= contact->friction_A_.cols();
-  reg_rows_ -= contact->regularization_A_.rows();
-  ne_cols_ -= contact->newton_euler_A_.cols();
+void Dyno::removeSizes(const std::shared_ptr<Contact6D> &contact) {  
+
+  uni_rows_ -= contact->uni_rows();
+  fri_rows_ -= contact->fri_rows();
+  cols_ -= contact->cols();
 
   resizeMatrices();
 }
 
 void Dyno::resizeMatrices() {
-  unilaterality_A_.resize(uni_rows_, uni_cols_);
+  unilaterality_A_.resize(uni_rows_, cols_);
   unilaterality_b_.resize(uni_rows_);
-  friction_A_.resize(fri_rows_, fri_cols_);
+  friction_A_.resize(fri_rows_, cols_);
   friction_b_.resize(fri_rows_);
-  regularization_A_.resize(reg_rows_);
-  regularization_b_.resize(reg_rows_);
-  newton_euler_A_.resize(6, ne_cols_);
+  regularization_A_.resize(cols_);
+  regularization_b_.resize(cols_);
+  newton_euler_A_.resize(6, cols_);
 }
 
 void Dyno::activateContact6d(const std::string &name) {
@@ -259,40 +250,71 @@ void Dyno::deactivateContact6d(const std::string &name) {
   }
 }
 
-// const Eigen::Vector3d &groundCoMForce,
-// const Eigen::Vector3d &groundCoMTorque,
-// const Eigen::Vector3d &CoM
-void Dyno::buildMatrices() {
-  size_t uni_i = 0, fri_i = 0, reg_i = 0, j = 0, uni_r, fri_r, reg_r, cols;
+void Dyno::buildMatrices(const Eigen::Vector3d &groundCoMForce,
+                         const Eigen::Vector3d &groundCoMTorque,
+                         const Eigen::Vector3d &CoM) {
 
+  size_t uni_r, fri_r, cols;
+
+  uni_i_ = 0; fri_i_ = 0; j_ = 0;
   for (std::string name : active_contact6ds_) {
     std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
-    //@Todo: update the newton_euler cross product
 
-    uni_r = contact->unilaterality_A_.rows();
-    fri_r = contact->friction_A_.rows();
-    reg_r = contact->regularization_A_.rows();
-    cols = contact->newton_euler_A_.cols();
+    uni_r = contact->uni_rows();
+    fri_r = contact->fri_rows();
+    cols = contact->cols();
 
-    unilaterality_A_.block(uni_i, j, uni_r, cols) << contact->unilaterality_A_;
-    unilaterality_b_.segment(uni_i, uni_r) << contact->unilaterality_b_;
-    friction_A_.block(fri_i, j, fri_r, cols) << contact->friction_A_;
-    friction_b_.segment(fri_i, fri_r) << contact->friction_b_;
-    regularization_A_.diagonal().segment(reg_i, reg_r)
-        << contact->regularization_A_
-               .diagonal();  // @TODO : use a vector instead, we can transform
-                             // it in matrix at the last moment.
-    regularization_b_.segment(reg_i, reg_r) << contact->regularization_b_;
-    newton_euler_A_.block(0, j, 6, cols)
-        << contact->newton_euler_A_;  //@Todo: make and include here the adjoint
-                                      //matrix.
+    contact->updateNewtonEuler(CoM, data_.oMf[contact->getFrameID()]);
 
-    uni_i += uni_r;
-    fri_i += fri_r;
-    reg_i += reg_r;
-    j += cols;
+    unilaterality_A_.block(uni_i_, j_, uni_r, cols) << contact->uni_A();
+    friction_A_.block(fri_i_, j_, fri_r, cols) << contact->fri_A();
+    regularization_A_.segment(j_, cols) << contact->reg_A();
+    newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A() * contact->toWorldForces();  
+
+    unilaterality_b_.segment(uni_i_, uni_r) << contact->uni_b();
+    friction_b_.segment(fri_i_, fri_r) << contact->fri_b();
+    regularization_b_.segment(j_, cols) << contact->reg_b();
+
+    uni_i_ += uni_r; fri_i_ += fri_r; j_ += cols;
   }
-  newton_euler_b_ << groundCoMForce_, groundCoMTorque_;
+  newton_euler_b_ << groundCoMForce, groundCoMTorque;
+
+}
+
+void Dyno::solveQP(){
+
+  G_.resize(j_, j_);
+  CI_.resize(uni_i_ + fri_i_, j_);
+  CE_.resize(6, j_);
+
+  G_ << (regularization_A_.cwiseSqrt()).diagonal().block(0, 0, j_, j_);
+  CI_ << -unilaterality_A_.transpose().block(0,0, uni_i_, j_), -friction_A_.transpose().block(0,0, fri_i_, j_);
+  CE_ << newton_euler_A_.transpose().block(0,0,6,j_);
+
+  F_.resize(j_);
+  F_.setZero(); // replace it by the QP solver
+
+}
+
+void Dyno::distribute(){
+
+  int i = 0;
+  long n;
+  for (std::string name : active_contact6ds_) {
+    std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
+
+    n  = contact->cols();
+    contact->applyForce(F_.segment(i, n));
+  }
+}
+
+void Dyno::distributeForce(const Eigen::Vector3d &groundCoMForce,
+                       const Eigen::Vector3d &groundCoMTorque,
+                       const Eigen::Vector3d &CoM){
+  
+  buildMatrices(groundCoMForce, groundCoMTorque, CoM);
+  solveQP();
+  distribute();
 }
 
 }  // namespace dyno
