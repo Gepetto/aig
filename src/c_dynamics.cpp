@@ -15,7 +15,7 @@
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
-namespace dyno {
+namespace aig {
 
 Contact6D::Contact6D() {}
 Contact6D::Contact6D(const Contact6DSettings &settings) {
@@ -316,4 +316,4 @@ void Dyno::distributeForce(const Eigen::Vector3d &groundCoMForce,
   distribute();
 }
 
-}  // namespace dyno
+}  // namespace aig

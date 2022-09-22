@@ -1,0 +1,26 @@
+set(${PY_NAME}_SOURCES contact_6d.cpp
+)
+
+add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
+target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
+target_include_directories(${PY_NAME}_py SYSTEM PRIVATE ${PYTHON_INCLUDE_DIR})
+set_target_properties(
+  ${PY_NAME}_py
+  PROPERTIES INSTALL_RPATH "$ORIGIN/../../.."
+             LIBRARY_OUTPUT_DIRECTORY ${PY_NAME}
+             OUTPUT_NAME ${PY_NAME}_cpp
+             PREFIX ""
+             SUFFIX ${PYTHON_EXT_SUFFIX})
+install(TARGETS ${PY_NAME} DESTINATION ${${PY_NAME}_INSTALL_DIR})
+
+# Install the scripts
+install(
+  DIRECTORY ${PROJECT_NAME}
+  DESTINATION
+    lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/)
+
+# # Install the compiled scripts
+# set(${PY_NAME}_PYTHON __init__.py)
+# foreach(python_file ${${PY_NAME}_PYTHON})
+#   python_install_on_site(${PY_NAME} ${python_file})
+# endforeach()
