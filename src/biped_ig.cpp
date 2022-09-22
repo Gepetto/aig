@@ -109,9 +109,9 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
 
   configureLegs();
 
-  dyno::DynoSettings dyn_settings;
+  aig::DynoSettings dyn_settings;
   dyn_settings.urdf = settings_.urdf;
-  dynamics_ = dyno::Dyno(dyn_settings);
+  dynamics_ = aig::Dyno(dyn_settings);
 }
 
 void BipedIG::configureLegs() {
@@ -128,7 +128,6 @@ void BipedIG::configureLegs() {
       model_.getJointId(settings_.right_knee_joint_name);
   pinocchio::JointIndex right_ankle_id =
       model_.getJointId(settings_.right_ankle_joint_name);
-
   pinocchio::FrameIndex leftSoleID =
       model_.getFrameId(settings_.left_foot_frame_name);
   pinocchio::FrameIndex rightSoleID =

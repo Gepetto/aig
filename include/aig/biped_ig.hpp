@@ -116,7 +116,7 @@ class BipedIG {
   Eigen::VectorXd posture_temp_;
   Eigen::Matrix3d baseRotation_temp_;
 
-  dyno::Dyno dynamics_;
+  aig::Dyno dynamics_;
 
   // Private methods.
  private:

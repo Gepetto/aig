@@ -20,7 +20,7 @@
 #include <memory>
 // clang-format on
 
-namespace dyno {
+namespace aig {
 
 struct Contact6DSettings {
  public:
@@ -101,7 +101,7 @@ class Contact6D {
   size_t uni_rows() const { return unilaterality_A_.rows(); }
   size_t fri_rows() const { return friction_A_.rows(); }
   size_t cols() const { return newton_euler_A_.cols(); }
-  const size_t &getFrameID() const { return frameID_; }
+  size_t getFrameID() const { return frameID_; }
 
   const Eigen::Matrix<double, 5, 6> &uni_A() { return unilaterality_A_; }
   const Eigen::Matrix<double, 5, 1> &uni_b() { return unilaterality_b_; }
@@ -111,7 +111,7 @@ class Contact6D {
   const Eigen::Matrix<double, 6, 1> &reg_b() { return regularization_b_; }
   const Eigen::Matrix<double, 6, 6> &NE_A() { return newton_euler_A_; }
 
-  const Eigen::Matrix<double, 6, 1> appliedForce() { return contactForce_; }
+  const Eigen::Matrix<double, 6, 1> &appliedForce() { return contactForce_; }
 };
 
 struct DynoSettings {
@@ -237,6 +237,6 @@ class Dyno {
   }
 };
 
-}  // namespace dyno
+}  // namespace aig
 
 #endif  // CENTROIDAL_DYNAMICS
