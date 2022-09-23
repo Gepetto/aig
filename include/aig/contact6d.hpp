@@ -38,15 +38,12 @@ struct Contact6DSettings {
     return out.str();
   }
 
-  std::ostream& operator<< (std::ostream& out)
-  {
+  std::ostream &operator<<(std::ostream &out) {
     out << this->to_string();
     return out;
   }
 
-  bool operator!=(const Contact6DSettings &rhs){
-    return !(*this == rhs);
-  }
+  bool operator!=(const Contact6DSettings &rhs) { return !(*this == rhs); }
 
   bool operator==(const Contact6DSettings &rhs) {
     bool test = true;

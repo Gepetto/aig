@@ -31,13 +31,15 @@ struct DynaCoMSettings {
    */
   std::string urdf = "";
 
-  friend std::ostream &operator<<(std::ostream &out, const DynaCoMSettings &obj) {
+  friend std::ostream &operator<<(std::ostream &out,
+                                  const DynaCoMSettings &obj) {
     out << "DynaCoMSettings:\n";
     out << "    urdf: " << obj.urdf << std::endl;
     return out;
   }
 
-  friend bool operator==(const DynaCoMSettings &lhs, const DynaCoMSettings &rhs) {
+  friend bool operator==(const DynaCoMSettings &lhs,
+                         const DynaCoMSettings &rhs) {
     bool test = true;
     test &= lhs.urdf == rhs.urdf;
     return test;
@@ -54,7 +56,7 @@ class DynaCoM {
 
   // Lists of contacts
   // std::vector< std::shared_ptr<Contact6D> > known_contact6ds_;
-  std::map<std::string, std::shared_ptr<Contact6D> > known_contact6ds_;
+  std::map<std::string, std::shared_ptr<Contact6D>> known_contact6ds_;
   std::vector<std::string> active_contact6ds_;
 
   // QP Matrices
@@ -119,8 +121,7 @@ class DynaCoM {
   void computeNL(const double &w);
 
   void addContact6d(const std::shared_ptr<Contact6D> &contact,
-                    const std::string &name,
-                    const bool active = true);
+                    const std::string &name, const bool active = true);
   void removeContact6d(const std::string &name);
 
   void activateContact6d(const std::string &name);

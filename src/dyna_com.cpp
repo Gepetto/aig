@@ -4,12 +4,12 @@
  * @brief
  */
 
-#include "aig/contact6d.hpp"
 #include "aig/dyna_com.hpp"
 
 #include <algorithm>
 #include <cctype>
 
+#include "aig/contact6d.hpp"
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
@@ -59,10 +59,10 @@ void DynaCoM::initialize(const DynaCoMSettings settings) {
 }
 
 void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
-                           const Eigen::VectorXd &velocity,
-                           const Eigen::VectorXd &acceleration,
-                           const Eigen::Matrix<double, 6, 1> &externalWrench,
-                           bool flatHorizontalGround) {
+                              const Eigen::VectorXd &velocity,
+                              const Eigen::VectorXd &acceleration,
+                              const Eigen::Matrix<double, 6, 1> &externalWrench,
+                              bool flatHorizontalGround) {
   // The external wrench is supposed to be expressed
   // in the frame of the Center of mass.
   pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
@@ -90,10 +90,10 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
 }
 
 void DynaCoM::computeNL(const double &w, const Eigen::VectorXd &posture,
-                     const Eigen::VectorXd &velocity,
-                     const Eigen::VectorXd &acceleration,
-                     const Eigen::Matrix<double, 6, 1> &externalWrench,
-                     bool flatHorizontalGround) {
+                        const Eigen::VectorXd &velocity,
+                        const Eigen::VectorXd &acceleration,
+                        const Eigen::Matrix<double, 6, 1> &externalWrench,
+                        bool flatHorizontalGround) {
   computeDynamics(posture, velocity, acceleration, externalWrench,
                   flatHorizontalGround);
   computeNL(w);
@@ -111,8 +111,7 @@ void DynaCoM::computeNL(const double &w) {
 // //////////////////////////////////////////////////////////////////
 
 void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
-                           const std::string &name,
-                           const bool active) {
+                           const std::string &name, const bool active) {
   contact->setFrameID(model_.getFrameId(contact->getSettings().frame_name));
 
   known_contact6ds_.insert(
@@ -123,9 +122,8 @@ void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
 }
 
 void DynaCoM::removeContact6d(const std::string &name) {
-
   knownID_ = known_contact6ds_.find(name);
-  if (knownID_ != known_contact6ds_.end()){
+  if (knownID_ != known_contact6ds_.end()) {
     removeSizes(known_contact6ds_[name]);
     deactivateContact6d(name);
     known_contact6ds_.erase(name);
@@ -159,36 +157,37 @@ void DynaCoM::resizeMatrices() {
 }
 
 void DynaCoM::activateContact6d(const std::string &name) {
-  activeID_ = std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
+  activeID_ =
+      std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
   knownID_ = known_contact6ds_.find(name);
-  
+
   if (activeID_ == active_contact6ds_.end()) {
-    if (knownID_ != known_contact6ds_.end()){
+    if (knownID_ != known_contact6ds_.end()) {
       active_contact6ds_.push_back(name);
-      std::cout<<"activated contact "<<name<<std::endl;
-      return ;
+      std::cout << "activated contact " << name << std::endl;
+      return;
     } else {
-      std::cout<<"no contact called "<<name<< " was defined"<<std::endl;
-      return ;
+      std::cout << "no contact called " << name << " was defined" << std::endl;
+      return;
     }
   }
-  std::cout<<name<<" was already active"<<std::endl;
+  std::cout << name << " was already active" << std::endl;
 }
 
 void DynaCoM::deactivateContact6d(const std::string &name) {
-
-  activeID_ = std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
-  if (activeID_ != active_contact6ds_.end()){
+  activeID_ =
+      std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
+  if (activeID_ != active_contact6ds_.end()) {
     active_contact6ds_.erase(activeID_);
-    std::cout<<"deactivated contact "<<name<<std::endl;
-    return ;
+    std::cout << "deactivated contact " << name << std::endl;
+    return;
   }
-  std::cout<<name<<" was not active"<<std::endl;
+  std::cout << name << " was not active" << std::endl;
 }
 
 void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
-                         const Eigen::Vector3d &groundCoMTorque,
-                         const Eigen::Vector3d &CoM) {
+                            const Eigen::Vector3d &groundCoMTorque,
+                            const Eigen::Vector3d &CoM) {
   size_t uni_r, fri_r, cols;
 
   uni_i_ = 0;
@@ -246,8 +245,8 @@ void DynaCoM::distribute() {
 }
 
 void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
-                           const Eigen::Vector3d &groundCoMTorque,
-                           const Eigen::Vector3d &CoM) {
+                              const Eigen::Vector3d &groundCoMTorque,
+                              const Eigen::Vector3d &CoM) {
   buildMatrices(groundCoMForce, groundCoMTorque, CoM);
   solveQP();
   distribute();
