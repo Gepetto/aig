@@ -10,6 +10,8 @@ BOOST_PYTHON_MODULE(aig) {
   // Enabling eigenpy support, i.e. numpy/eigen compatibility.
   eigenpy::enableEigenPy();
   ENABLE_SPECIFIC_MATRIX_TYPE(eMatrix61);
+  ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::MatrixXd);
+  ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::VectorXd);
   aig::python::exposeContact6D();
   aig::python::exposeDynaCoM();
 }

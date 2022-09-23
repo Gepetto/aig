@@ -38,4 +38,12 @@ d.removeContact6d("U")
 
 d.addContact6d(contact, "G")
 d.activateContact6d("G")
-d.deactivateContact6d("G")
+d.addContact6d(contact, "A")
+d.addContact6d(contact, "C")
+
+
+# d.deactivateContact6d("G")
+
+d.distributeForce(
+    np.array([1, 2, 1]), np.array([0.2, 0.2, 0.1]), np.array([99, 77, 55])
+)
