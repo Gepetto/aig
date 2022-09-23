@@ -1,1 +1,6 @@
-from .aig import Contact6DSettings
+from .aig import (
+  Contact6D,
+  Contact6DSettings,
+  DynaCoMSettings,
+  DynaCoM
+)

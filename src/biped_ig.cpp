@@ -9,7 +9,8 @@
 #include <algorithm>
 #include <cctype>
 
-#include "aig/c_dynamics.hpp"
+#include "aig/dyna_com.hpp"
+#include "aig/contact6d.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
 #include "pinocchio/parsers/srdf.hpp"
@@ -109,9 +110,9 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
 
   configureLegs();
 
-  aig::DynoSettings dyn_settings;
+  aig::DynaCoMSettings dyn_settings;
   dyn_settings.urdf = settings_.urdf;
-  dynamics_ = aig::Dyno(dyn_settings);
+  dynamics_ = aig::DynaCoM(dyn_settings);
 }
 
 void BipedIG::configureLegs() {

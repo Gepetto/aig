@@ -66,13 +66,16 @@ set(${PROJECT_NAME}_HEADERS
     include/${PROJECT_NAME}/arm_ig.hpp #
     include/${PROJECT_NAME}/leg_ig.hpp #
     include/${PROJECT_NAME}/biped_ig.hpp #
-    include/${PROJECT_NAME}/c_dynamics.hpp #
+    include/${PROJECT_NAME}/dyna_com.hpp #
+    include/${PROJECT_NAME}/python.hpp #
+    include/${PROJECT_NAME}/contact6d.hpp #
 )
 set(${PROJECT_NAME}_SOURCES
     src/arm_ig.cpp #
     src/leg_ig.cpp #
     src/biped_ig.cpp #
-    src/c_dynamics.cpp #
+    src/dyna_com.cpp #
+    src/contac6d.cpp #
 )
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
@@ -91,6 +94,8 @@ endif()
 if(BUILD_PYTHON_INTERFACE)
   set(${PY_NAME}_SOURCES
     python/contact_6d.cpp
+    python/aig_modules.cpp
+    python/dyna_com.cpp
   )
   add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
   target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
