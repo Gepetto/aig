@@ -82,4 +82,4 @@ void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
   newton_euler_A_.block<3, 3>(3, 0) << pinocchio::skew(oMf.translation() - CoM);
   oAf_ = oMf.toActionMatrixInverse().transpose();
 }
-}
+}  // namespace aig
