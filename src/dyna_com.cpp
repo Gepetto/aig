@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cctype>
 
-
 #include "aig/contact6d.hpp"
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
@@ -193,7 +192,9 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
                             const Eigen::Vector3d &CoM) {
   size_t uni_r, fri_r, cols;
 
-  uni_i_ = 0; fri_i_ = 0; j_ = 0;
+  uni_i_ = 0;
+  fri_i_ = 0;
+  j_ = 0;
   for (std::string name : active_contact6ds_) {
     std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
 
@@ -206,7 +207,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     unilaterality_A_.block(uni_i_, j_, uni_r, cols) << contact->uni_A();
     friction_A_.block(fri_i_, j_, fri_r, cols) << contact->fri_A();
     regularization_A_.segment(j_, cols) << contact->reg_A();
-    newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A() * contact->toWorldForces();
+    newton_euler_A_.block(0, j_, 6, cols)
+        << contact->NE_A() * contact->toWorldForces();
 
     unilaterality_b_.segment(uni_i_, uni_r) << contact->uni_b();
     friction_b_.segment(fri_i_, fri_r) << contact->fri_b();
@@ -255,16 +257,16 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
                               const Eigen::Vector3d &groundCoMTorque,
                               const Eigen::Vector3d &CoM) {
   /**
-   * 
-   *  Make sure that the data of the dynaCoM 
-   * class has been updated to the correct robot 
+   *
+   *  Make sure that the data of the dynaCoM
+   * class has been updated to the correct robot
    * posture before executing this distribution.
-   * 
+   *
    * */
   buildMatrices(groundCoMForce, groundCoMTorque, CoM);
   solveQP();
   distribute();
-  std::cout<<"Distributed"<<std::endl;
+  std::cout << "Distributed" << std::endl;
 }
 
 }  // namespace aig
