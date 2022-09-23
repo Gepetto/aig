@@ -4,7 +4,8 @@
  * @brief
  */
 
-#include "aig/c_dynamics.hpp"
+#include "aig/contact6d.hpp"
+#include "aig/dyna_com.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -12,95 +13,14 @@
 #include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
-#include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
 
 namespace aig {
 
-Contact6D::Contact6D() {}
-Contact6D::Contact6D(const Contact6DSettings &settings) {
-  initialize(settings);
-}
-void Contact6D::initialize(const Contact6DSettings &settings) {
-  settings_ = settings;
-  double hl = settings_.half_length;
-  double hw = settings_.half_width;
-  double mu = settings_.mu;
-  double gu = settings_.gu;
+DynaCoM::DynaCoM() {}
+DynaCoM::DynaCoM(const DynaCoMSettings settings) { initialize(settings); }
 
-  // Make matrices
-  regularization_A_ << settings_.weights;
-  regularization_b_ << Eigen::Matrix<double, 6, 1>::Zero();
-
-  unilaterality_A_ << Eigen::Matrix<double, 5, 6>::Zero();
-  unilaterality_A_.block<5, 1>(0, 2) << -1, -hl, -hw, -hl, -hw;
-  unilaterality_A_.block<2, 2>(1, 3) << 0, -1, 1, 0;
-  unilaterality_A_.block<2, 2>(3, 3) << 0, -1, 1, 0;
-  unilaterality_b_ << Eigen::Matrix<double, 6, 1>::Zero();
-
-  friction_A_ << Eigen::Matrix<double, 6, 6>::Zero();
-  friction_A_.block<6, 1>(0, 2) << -mu, -mu, -mu, -mu, -gu, -gu;
-  friction_A_.block<2, 2>(0, 0) << Eigen::Matrix2d::Identity();
-  friction_A_.block<2, 2>(2, 0) << -Eigen::Matrix2d::Identity();
-  friction_A_.block<2, 1>(4, 5) << 1, -1;
-  friction_b_ << Eigen::Matrix<double, 6, 1>::Zero();
-
-  newton_euler_A_ << Eigen::Matrix<double, 6, 6>::Zero();
-  newton_euler_A_.block<3, 3>(0, 0) << Eigen::Matrix3d::Identity();
-  newton_euler_A_.block<3, 3>(3, 3) << Eigen::Matrix3d::Identity();
-
-  // Note: newton_euler must be updated before using it
-
-  contactForce_ = Eigen::Matrix<double, 6, 1>::Zero();
-}
-
-void Contact6D::active(const bool &active) {
-  settings_.active = active;
-  if (!active) contactForce_.setZero();
-}
-
-void Contact6D::setForceWeights(const Eigen::Vector3d &force_weights) {
-  settings_.weights.head<3>() = force_weights;
-  regularization_A_.head<3>() = force_weights;
-}
-
-void Contact6D::setTorqueWeights(const Eigen::Vector3d &torque_weights) {
-  settings_.weights.tail<3>() = torque_weights;
-  regularization_A_.tail<3>() = torque_weights;
-}
-
-void Contact6D::setSurfaceHalfWidth(const double &half_width) {
-  settings_.half_width = half_width;
-  unilaterality_A_(2, 2) = -half_width;
-  unilaterality_A_(4, 2) = -half_width;
-}
-
-void Contact6D::setSurfaceHalfLength(const double &half_length) {
-  settings_.half_length = half_length;
-  unilaterality_A_(1, 2) = -half_length;
-  unilaterality_A_(3, 2) = -half_length;
-}
-
-void Contact6D::setMu(const double &mu) {
-  settings_.mu = mu;
-  friction_A_.block<4, 1>(0, 2) << -mu, -mu, -mu, -mu;
-}
-
-void Contact6D::setGu(const double &gu) {
-  settings_.gu = gu;
-  friction_A_.block<2, 1>(4, 2) << -gu, -gu;
-}
-
-void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
-                                  const pinocchio::SE3 &oMf) {
-  newton_euler_A_.block<3, 3>(3, 0) << pinocchio::skew(oMf.translation() - CoM);
-  oAf_ = oMf.toActionMatrixInverse().transpose();
-}
-
-Dyno::Dyno() {}
-Dyno::Dyno(const DynoSettings settings) { initialize(settings); }
-
-void Dyno::initialize(const DynoSettings settings) {
+void DynaCoM::initialize(const DynaCoMSettings settings) {
   // Copy the settings internally.
   settings_ = settings;
 
@@ -119,7 +39,7 @@ void Dyno::initialize(const DynoSettings settings) {
     pinocchio::urdf::buildModelFromXML(
         settings_.urdf, pinocchio::JointModelFreeFlyer(), model_);
   } else {
-    throw std::runtime_error("Dyno::Dyno(): settings_.urdf is empty");
+    throw std::runtime_error("DynaCoM::DynaCoM(): settings_.urdf is empty");
   }
   // Build pinocchio cache.
   data_ = pinocchio::Data(model_);
@@ -138,7 +58,7 @@ void Dyno::initialize(const DynoSettings settings) {
   newton_euler_b_.resize(6);
 }
 
-void Dyno::computeDynamics(const Eigen::VectorXd &posture,
+void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
                            const Eigen::VectorXd &velocity,
                            const Eigen::VectorXd &acceleration,
                            const Eigen::Matrix<double, 6, 1> &externalWrench,
@@ -169,7 +89,7 @@ void Dyno::computeDynamics(const Eigen::VectorXd &posture,
              (groundCoMForce_(2));
 }
 
-void Dyno::computeNL(const double &w, const Eigen::VectorXd &posture,
+void DynaCoM::computeNL(const double &w, const Eigen::VectorXd &posture,
                      const Eigen::VectorXd &velocity,
                      const Eigen::VectorXd &acceleration,
                      const Eigen::Matrix<double, 6, 1> &externalWrench,
@@ -179,7 +99,7 @@ void Dyno::computeNL(const double &w, const Eigen::VectorXd &posture,
   computeNL(w);
 }
 
-void Dyno::computeNL(const double &w) {
+void DynaCoM::computeNL(const double &w) {
   /**
    * In this function form, computeDynamics is suposed to have been called
    * before.
@@ -190,25 +110,29 @@ void Dyno::computeNL(const double &w) {
 // Contact management
 // //////////////////////////////////////////////////////////////////
 
-void Dyno::addContact6d(const std::shared_ptr<Contact6D> &contact,
-                        const std::string &name) {
+void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
+                           const std::string &name,
+                           const bool active) {
   contact->setFrameID(model_.getFrameId(contact->getSettings().frame_name));
 
   known_contact6ds_.insert(
       std::pair<std::string, std::shared_ptr<Contact6D>>(name, contact));
 
   addSizes(known_contact6ds_[name]);
-  if (known_contact6ds_[name]->getSettings().active) activateContact6d(name);
+  if (active) activateContact6d(name);
 }
 
-void Dyno::removeContact6d(const std::string &name) {
-  removeSizes(known_contact6ds_[name]);
-  if (known_contact6ds_[name]->getSettings().active) deactivateContact6d(name);
+void DynaCoM::removeContact6d(const std::string &name) {
 
-  known_contact6ds_.erase(name);
+  knownID_ = known_contact6ds_.find(name);
+  if (knownID_ != known_contact6ds_.end()){
+    removeSizes(known_contact6ds_[name]);
+    deactivateContact6d(name);
+    known_contact6ds_.erase(name);
+  }
 }
 
-void Dyno::addSizes(const std::shared_ptr<Contact6D> &contact) {
+void DynaCoM::addSizes(const std::shared_ptr<Contact6D> &contact) {
   uni_rows_ += contact->uni_rows();
   fri_rows_ += contact->fri_rows();
   cols_ += contact->cols();
@@ -216,7 +140,7 @@ void Dyno::addSizes(const std::shared_ptr<Contact6D> &contact) {
   resizeMatrices();
 }
 
-void Dyno::removeSizes(const std::shared_ptr<Contact6D> &contact) {
+void DynaCoM::removeSizes(const std::shared_ptr<Contact6D> &contact) {
   uni_rows_ -= contact->uni_rows();
   fri_rows_ -= contact->fri_rows();
   cols_ -= contact->cols();
@@ -224,7 +148,7 @@ void Dyno::removeSizes(const std::shared_ptr<Contact6D> &contact) {
   resizeMatrices();
 }
 
-void Dyno::resizeMatrices() {
+void DynaCoM::resizeMatrices() {
   unilaterality_A_.resize(uni_rows_, cols_);
   unilaterality_b_.resize(uni_rows_);
   friction_A_.resize(fri_rows_, cols_);
@@ -234,22 +158,35 @@ void Dyno::resizeMatrices() {
   newton_euler_A_.resize(6, cols_);
 }
 
-void Dyno::activateContact6d(const std::string &name) {
-  known_contact6ds_[name]->active(true);
-
-  active_contact6ds_.push_back(name);
-}
-
-void Dyno::deactivateContact6d(const std::string &name) {
-  known_contact6ds_[name]->active(false);
-
-  for (auto it = active_contact6ds_.begin(); it != active_contact6ds_.end();
-       it++) {
-    if (*it == name) active_contact6ds_.erase(it);
+void DynaCoM::activateContact6d(const std::string &name) {
+  activeID_ = std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
+  knownID_ = known_contact6ds_.find(name);
+  
+  if (activeID_ == active_contact6ds_.end()) {
+    if (knownID_ != known_contact6ds_.end()){
+      active_contact6ds_.push_back(name);
+      std::cout<<"activated contact "<<name<<std::endl;
+      return ;
+    } else {
+      std::cout<<"no contact called "<<name<< " was defined"<<std::endl;
+      return ;
+    }
   }
+  std::cout<<name<<" was already active"<<std::endl;
 }
 
-void Dyno::buildMatrices(const Eigen::Vector3d &groundCoMForce,
+void DynaCoM::deactivateContact6d(const std::string &name) {
+
+  activeID_ = std::find(active_contact6ds_.begin(), active_contact6ds_.end(), name);
+  if (activeID_ != active_contact6ds_.end()){
+    active_contact6ds_.erase(activeID_);
+    std::cout<<"deactivated contact "<<name<<std::endl;
+    return ;
+  }
+  std::cout<<name<<" was not active"<<std::endl;
+}
+
+void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
                          const Eigen::Vector3d &groundCoMTorque,
                          const Eigen::Vector3d &CoM) {
   size_t uni_r, fri_r, cols;
@@ -283,7 +220,7 @@ void Dyno::buildMatrices(const Eigen::Vector3d &groundCoMForce,
   newton_euler_b_ << groundCoMForce, groundCoMTorque;
 }
 
-void Dyno::solveQP() {
+void DynaCoM::solveQP() {
   G_.resize(j_, j_);
   CI_.resize(uni_i_ + fri_i_, j_);
   CE_.resize(6, j_);
@@ -297,7 +234,7 @@ void Dyno::solveQP() {
   F_.setZero();  // replace it by the QP solver
 }
 
-void Dyno::distribute() {
+void DynaCoM::distribute() {
   int i = 0;
   long n;
   for (std::string name : active_contact6ds_) {
@@ -308,7 +245,7 @@ void Dyno::distribute() {
   }
 }
 
-void Dyno::distributeForce(const Eigen::Vector3d &groundCoMForce,
+void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
                            const Eigen::Vector3d &groundCoMTorque,
                            const Eigen::Vector3d &CoM) {
   buildMatrices(groundCoMForce, groundCoMTorque, CoM);

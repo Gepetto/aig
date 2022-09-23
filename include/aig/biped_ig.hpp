@@ -18,7 +18,7 @@
 #include "pinocchio/spatial/se3.hpp"
 #include "aig/arm_ig.hpp"
 #include "aig/leg_ig.hpp"
-#include "aig/c_dynamics.hpp"
+#include "aig/dyna_com.hpp"
 // clang-format on
 
 namespace aig {
@@ -116,7 +116,7 @@ class BipedIG {
   Eigen::VectorXd posture_temp_;
   Eigen::Matrix3d baseRotation_temp_;
 
-  aig::Dyno dynamics_;
+  aig::DynaCoM dynamics_;
 
   // Private methods.
  private:
