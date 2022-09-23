@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <cctype>
 
-#include "aig/dyna_com.hpp"
 #include "aig/contact6d.hpp"
+#include "aig/dyna_com.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/centroidal.hpp"
 #include "pinocchio/parsers/srdf.hpp"
