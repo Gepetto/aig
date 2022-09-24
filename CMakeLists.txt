@@ -49,7 +49,7 @@ project(${PROJECT_NAME} ${PROJECT_ARGS})
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
-find_package(Eigen3 REQUIRED)
+add_project_dependency(proxsuite REQUIRED)
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
   find_package(example-robot-data REQUIRED)
@@ -81,7 +81,7 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio)
+target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio proxsuite::proxsuite)
 
 if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
