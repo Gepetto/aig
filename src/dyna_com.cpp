@@ -8,14 +8,14 @@
 
 #include <algorithm>
 #include <cctype>
+#include <example-robot-data/path.hpp>
+#include <pinocchio/algorithm/center-of-mass.hpp>
+#include <pinocchio/algorithm/centroidal.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <proxsuite/proxqp/dense/dense.hpp>
+#include <proxsuite/proxqp/utils/random_qp_problems.hpp>
 
 #include "aig/contact6d.hpp"
-#include "example-robot-data/path.hpp"
-#include "pinocchio/algorithm/center-of-mass.hpp"
-#include "pinocchio/algorithm/centroidal.hpp"
-#include "pinocchio/parsers/urdf.hpp"
-// #include "proxsuite/proxqp/dense/dense.hpp"
-// #include <proxsuite/proxqp/utils/random_qp_problems.hpp>
 
 namespace aig {
 
