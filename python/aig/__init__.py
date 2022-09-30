@@ -1,1 +1,1 @@
-from .aig import Contact6D, Contact6DSettings, DynaCoMSettings, DynaCoM
+from .aig import Contact6D, Contact6DSettings, DynaCoMSettings, DynaCoM  # noqa: F401

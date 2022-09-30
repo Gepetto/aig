@@ -7,6 +7,8 @@ Created on Thu Sep 22 16:28:36 2022
 """
 import aig
 import numpy as np
+from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
+
 
 settings = aig.Contact6DSettings()
 settings.frame_name = "leg_left_sole_fix_joint"
@@ -28,7 +30,9 @@ print("reg_b: \n", contact.reg_b())
 print("NE_A: \n", contact.NE_A())
 
 dynSettings = aig.DynaCoMSettings()
-dynSettings.urdf = "/local/users/nvilla/workspace/install/share/example-robot-data/robots/talos_data/robots/talos_reduced.urdf"
+dynSettings.urdf = (
+    EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data/robots/talos_reduced.urdf"
+)
 
 d = aig.DynaCoM()
 d.initialize(dynSettings)
