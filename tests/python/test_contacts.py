@@ -12,11 +12,11 @@ from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
 
 settings = aig.Contact6DSettings()
 settings.frame_name = "leg_left_sole_fix_joint"
-settings.mu = 7
-settings.gu = 9
-settings.weights = np.array([1, 2, 3, 4, 5, 6])
-settings.half_length = 0.5
-settings.half_width = 0.3
+settings.mu = 1
+settings.gu = 1
+settings.weights = np.array([1, 1, 1, 1, 1, 1])
+settings.half_length = 0.00005
+settings.half_width = 0.00005
 
 contact = aig.Contact6D()
 contact.initialize(settings)
@@ -38,16 +38,12 @@ d = aig.DynaCoM()
 d.initialize(dynSettings)
 d.addContact6d(contact, "U")
 
-d.removeContact6d("U")
+# d.removeContact6d("U")
 
 d.addContact6d(contact, "G")
 d.activateContact6d("G")
-d.addContact6d(contact, "A")
-d.addContact6d(contact, "C")
 
 
-# d.deactivateContact6d("G")
+d.deactivateContact6d("G")
 
-d.distributeForce(
-    np.array([1, 2, 1]), np.array([0.2, 0.2, 0.1]), np.array([99, 77, 55])
-)
+d.distributeForce(np.array([0, 0, 1]), np.array([0, 0, 0]), np.array([0, 0, 1]))
