@@ -5,7 +5,7 @@
  */
 
 #include "aig/dyna_com.hpp"
-#include "aig/contact6d.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <example-robot-data/path.hpp>
@@ -13,6 +13,8 @@
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <proxsuite/proxqp/dense/dense.hpp>
+
+#include "aig/contact6d.hpp"
 // #include <proxsuite/proxqp/dense/wrapper.hpp>
 // #include <proxsuite/proxqp/utils/random_qp_problems.hpp>
 
@@ -201,7 +203,7 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     fri_r = contact->fri_rows();
     cols = contact->cols();
 
-    // set to zero the non-block-diagonal elements of uni_A and fri_A. 
+    // set to zero the non-block-diagonal elements of uni_A and fri_A.
 
     contact->updateNewtonEuler(CoM, data_.oMf[contact->getFrameID()]);
 
@@ -233,30 +235,30 @@ void DynaCoM::solveQP() {
   g_.setZero();
   H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
   C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
-             friction_A_.block(0, 0, fri_i_, j_);
+      friction_A_.block(0, 0, fri_i_, j_);
   u_.setZero();
   A_ << newton_euler_A_.block(0, 0, 6, j_);
   b_ << newton_euler_b_;
-  //Initialization of QP solver
-  std::cout<<"matrix C:\n "<<C_<<std::endl;
-  std::cout<<"matrix A:\n "<<A_<<std::endl;
-  std::cout<<"matrix H:\n "<<H_<<std::endl;
-  
+  // Initialization of QP solver
+  std::cout << "matrix C:\n " << C_ << std::endl;
+  std::cout << "matrix A:\n " << A_ << std::endl;
+  std::cout << "matrix H:\n " << H_ << std::endl;
+
   // std::cout<<"In solveQP, matrices made, starting proxQP"<<std::endl;
   proxsuite::proxqp::dense::isize dim = j_;
   proxsuite::proxqp::dense::isize n_eq(6);
   proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
   proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  qp.init(H_, g_, A_, b_, std::nullopt,std::nullopt,std::nullopt);//, C_, u_, -100*u_
+  qp.init(H_, g_, A_, b_, std::nullopt, std::nullopt,
+          std::nullopt);  //, C_, u_, -100*u_
   qp.solve();
 
   F_.resize(j_);
-  F_<< qp.results.x;
-  std::cout<<"results.x: "<<qp.results.x <<std::endl;
-  std::cout<<"results.y: "<<qp.results.y <<std::endl;
-  std::cout<<"results.z: "<<qp.results.z <<std::endl;
-  
+  F_ << qp.results.x;
+  std::cout << "results.x: " << qp.results.x << std::endl;
+  std::cout << "results.y: " << qp.results.y << std::endl;
+  std::cout << "results.z: " << qp.results.z << std::endl;
 
   // F_.setZero();  // replace it by the QP solver
 }
