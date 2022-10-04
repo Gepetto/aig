@@ -69,8 +69,9 @@ class DynaCoM {
   Eigen::Matrix<double, 6, -1> newton_euler_A_;
   Eigen::Matrix<double, 6, 1> newton_euler_b_;
 
-  Eigen::MatrixXd G_, CI_, CE_;
-  Eigen::VectorXd g0_, ci0_, ce0_;
+  Eigen::MatrixXd H_, C_, A_;
+  Eigen::VectorXd g_, u_;
+  Eigen::Matrix<double, 6, 1> b_;
   Eigen::VectorXd F_;
   Eigen::VectorXi ActiveSet_;
   int activeSetSize_;

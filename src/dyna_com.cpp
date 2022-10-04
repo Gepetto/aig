@@ -5,7 +5,7 @@
  */
 
 #include "aig/dyna_com.hpp"
-
+#include "aig/contact6d.hpp"
 #include <algorithm>
 #include <cctype>
 #include <example-robot-data/path.hpp>
@@ -13,9 +13,8 @@
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 #include <proxsuite/proxqp/dense/dense.hpp>
-#include <proxsuite/proxqp/utils/random_qp_problems.hpp>
-
-#include "aig/contact6d.hpp"
+// #include <proxsuite/proxqp/dense/wrapper.hpp>
+// #include <proxsuite/proxqp/utils/random_qp_problems.hpp>
 
 namespace aig {
 
@@ -202,6 +201,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     fri_r = contact->fri_rows();
     cols = contact->cols();
 
+    // set to zero the non-block-diagonal elements of uni_A and fri_A. 
+
     contact->updateNewtonEuler(CoM, data_.oMf[contact->getFrameID()]);
 
     unilaterality_A_.block(uni_i_, j_, uni_r, cols) << contact->uni_A();
@@ -222,24 +223,42 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
 }
 
 void DynaCoM::solveQP() {
-  G_.resize(j_, j_);
-  CI_.resize(uni_i_ + fri_i_, j_);
-  CE_.resize(6, j_);
+  H_.resize(j_, j_);
+  g_.resize(j_);
+  C_.resize(uni_i_ + fri_i_, j_);
+  u_.resize(uni_i_ + fri_i_);
+  A_.resize(6, j_);
 
-  G_ << (regularization_A_.cwiseSqrt()).diagonal().block(0, 0, j_, j_);
-  CI_ << -unilaterality_A_.transpose().block(0, 0, uni_i_, j_),
-      -friction_A_.transpose().block(0, 0, fri_i_, j_);
-  CE_ << newton_euler_A_.transpose().block(0, 0, 6, j_);
+  H_.setZero();
+  g_.setZero();
+  H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
+  C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
+             friction_A_.block(0, 0, fri_i_, j_);
+  u_.setZero();
+  A_ << newton_euler_A_.block(0, 0, 6, j_);
+  b_ << newton_euler_b_;
+  //Initialization of QP solver
+  std::cout<<"matrix C:\n "<<C_<<std::endl;
+  std::cout<<"matrix A:\n "<<A_<<std::endl;
+  std::cout<<"matrix H:\n "<<H_<<std::endl;
+  
+  // std::cout<<"In solveQP, matrices made, starting proxQP"<<std::endl;
+  proxsuite::proxqp::dense::isize dim = j_;
+  proxsuite::proxqp::dense::isize n_eq(6);
+  proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
+  proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  // proxsuite::proxqp::dense::isize dim = 10;
-  // proxsuite::proxqp::dense::isize n_eq(0);
-  // proxsuite::proxqp::dense::isize n_in(0);
-  // proxsuite::proxqp::dense::QP<double> Qp(dim, n_eq, n_in);
-
-  // Qp.init();
+  qp.init(H_, g_, A_, b_, std::nullopt,std::nullopt,std::nullopt);//, C_, u_, -100*u_
+  qp.solve();
 
   F_.resize(j_);
-  F_.setZero();  // replace it by the QP solver
+  F_<< qp.results.x;
+  std::cout<<"results.x: "<<qp.results.x <<std::endl;
+  std::cout<<"results.y: "<<qp.results.y <<std::endl;
+  std::cout<<"results.z: "<<qp.results.z <<std::endl;
+  
+
+  // F_.setZero();  // replace it by the QP solver
 }
 
 void DynaCoM::distribute() {
@@ -264,8 +283,11 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
    *
    * */
   buildMatrices(groundCoMForce, groundCoMTorque, CoM);
+  // std::cout<<"it is at least building the matrices"<<std::endl;
   solveQP();
+  // std::cout<<"it is actually solving the QP"<<std::endl;
   distribute();
+  // std::cout<<"it even distribute the forces"<<std::endl;
   std::cout << "Distributed" << std::endl;
 }
 
