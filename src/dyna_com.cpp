@@ -218,7 +218,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     regularization_A_.segment(j_, cols) << contact->reg_A();
     regularization_b_.segment(j_, cols) << contact->reg_b();
 
-    newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A() * contact->toWorldForces();
+    newton_euler_A_.block(0, j_, 6, cols)
+        << contact->NE_A() * contact->toWorldForces();
 
     uni_i_ += uni_r;
     fri_i_ += fri_r;
@@ -239,7 +240,7 @@ void DynaCoM::solveQP() {
   g_.setZero();
   H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
   C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
-        friction_A_.block(0, 0, fri_i_, j_);
+      friction_A_.block(0, 0, fri_i_, j_);
 
   u_.setZero();
   l_.setConstant(-99999);
@@ -266,7 +267,7 @@ void DynaCoM::solveQP() {
   // std::cout << "results.y: " << qp.results.y << std::endl;
   // std::cout << "results.z: " << qp.results.z << std::endl;
 
-////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////
   // Eigen::Matrix2d H = Eigen::Matrix2d::Identity();
   // Eigen::Vector2d g = Eigen::Vector2d::Zero();
 
