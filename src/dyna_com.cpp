@@ -203,19 +203,22 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     fri_r = contact->fri_rows();
     cols = contact->cols();
 
-    // set to zero the non-block-diagonal elements of uni_A and fri_A.
-
     contact->updateNewtonEuler(CoM, data_.oMf[contact->getFrameID()]);
 
     unilaterality_A_.block(uni_i_, j_, uni_r, cols) << contact->uni_A();
-    friction_A_.block(fri_i_, j_, fri_r, cols) << contact->fri_A();
-    regularization_A_.segment(j_, cols) << contact->reg_A();
-    newton_euler_A_.block(0, j_, 6, cols)
-        << contact->NE_A() * contact->toWorldForces();
-
+    unilaterality_A_.block(0, j_, uni_i_, cols).setZero();
+    unilaterality_A_.block(uni_i_, 0, uni_r, j_).setZero();
     unilaterality_b_.segment(uni_i_, uni_r) << contact->uni_b();
+
+    friction_A_.block(fri_i_, j_, fri_r, cols) << contact->fri_A();
+    friction_A_.block(0, j_, fri_i_, cols).setZero();
+    friction_A_.block(fri_i_, 0, fri_r, j_).setZero();
     friction_b_.segment(fri_i_, fri_r) << contact->fri_b();
+
+    regularization_A_.segment(j_, cols) << contact->reg_A();
     regularization_b_.segment(j_, cols) << contact->reg_b();
+
+    newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A() * contact->toWorldForces();
 
     uni_i_ += uni_r;
     fri_i_ += fri_r;
@@ -229,20 +232,24 @@ void DynaCoM::solveQP() {
   g_.resize(j_);
   C_.resize(uni_i_ + fri_i_, j_);
   u_.resize(uni_i_ + fri_i_);
+  l_.resize(uni_i_ + fri_i_);
   A_.resize(6, j_);
 
   H_.setZero();
   g_.setZero();
   H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
   C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
-      friction_A_.block(0, 0, fri_i_, j_);
+        friction_A_.block(0, 0, fri_i_, j_);
+
   u_.setZero();
+  l_.setConstant(-99999);
   A_ << newton_euler_A_.block(0, 0, 6, j_);
   b_ << newton_euler_b_;
   // Initialization of QP solver
-  std::cout << "matrix C:\n " << C_ << std::endl;
-  std::cout << "matrix A:\n " << A_ << std::endl;
-  std::cout << "matrix H:\n " << H_ << std::endl;
+  // std::cout << "matrix H:\n " << H_ << std::endl;
+  // std::cout << "matrix A:\n " << A_ << std::endl;
+  // std::cout << "matrix b:\n " << b_ << std::endl;
+  // std::cout << "matrix C:\n " << C_ << std::endl;
 
   // std::cout<<"In solveQP, matrices made, starting proxQP"<<std::endl;
   proxsuite::proxqp::dense::isize dim = j_;
@@ -250,27 +257,55 @@ void DynaCoM::solveQP() {
   proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
   proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  qp.init(H_, g_, A_, b_, std::nullopt, std::nullopt,
-          std::nullopt);  //, C_, u_, -100*u_
+  qp.init(H_, g_, A_, b_, C_, u_, l_);  // std::nullopt
   qp.solve();
 
   F_.resize(j_);
   F_ << qp.results.x;
-  std::cout << "results.x: " << qp.results.x << std::endl;
-  std::cout << "results.y: " << qp.results.y << std::endl;
-  std::cout << "results.z: " << qp.results.z << std::endl;
+  // std::cout << "results.x: " << qp.results.x << std::endl;
+  // std::cout << "results.y: " << qp.results.y << std::endl;
+  // std::cout << "results.z: " << qp.results.z << std::endl;
 
-  // F_.setZero();  // replace it by the QP solver
+////////////////////////////////////////////////////////////////
+  // Eigen::Matrix2d H = Eigen::Matrix2d::Identity();
+  // Eigen::Vector2d g = Eigen::Vector2d::Zero();
+
+  // Eigen::Matrix2d C = -Eigen::Matrix2d::Identity();
+  // Eigen::Vector2d u = Eigen::Vector2d::Zero();
+  // Eigen::Vector2d l = Eigen::Vector2d::Constant(-10);
+
+  // Eigen::Matrix2d A = Eigen::Matrix2d::Identity();
+  // Eigen::Vector2d b;
+  // b << 0, 1;
+
+  // std::cout << "matrix H:\n " << H << std::endl;
+  // std::cout << "matrix A:\n " << A << std::endl;
+  // std::cout << "matrix b:\n " << b << std::endl;
+  // std::cout << "matrix C:\n " << C << std::endl;
+  // std::cout << "matrix u:\n " << u << std::endl;
+
+  // proxsuite::proxqp::dense::isize dim = 2;
+  // proxsuite::proxqp::dense::isize n_eq(2);
+  // proxsuite::proxqp::dense::isize n_in(2);
+  // proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
+
+  // qp.init(H, g, A, b, C, u, l); //std::nullopt
+  // qp.solve();
+
+  // std::cout << "results.x: " << qp.results.x << std::endl;
+  // std::cout << "results.y: " << qp.results.y << std::endl;
+  // std::cout << "results.z: " << qp.results.z << std::endl;
+  // std::cout << "nada " << std::endl;
 }
 
 void DynaCoM::distribute() {
-  int i = 0;
-  long n;
+  Eigen::Index n, i = 0;
   for (std::string name : active_contact6ds_) {
     std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
 
     n = contact->cols();
     contact->applyForce(F_.segment(i, n));
+    i += n;
   }
 }
 
