@@ -35,8 +35,8 @@ void exposeDynaCoM() {
   bp::class_<DynaCoM, boost::noncopyable>("DynaCoM", bp::init<>())
       .def("initialize", &DynaCoM::initialize, bp::args("self", "settings"))
       .def("computeDynamics", &DynaCoM::computeDynamics,
-           bp::args("self", "posture", "velocity", "aceleration", "extWrench",
-                    "flatHorizontalGround"))
+           (bp::arg("self"), bp::arg("posture"), bp::arg("velocity"), bp::arg("aceleration"), 
+           bp::arg("extWrench"), bp::arg("flatHorizontalGround")= true))
       .def<void (DynaCoM::*)(const double &, const Eigen::VectorXd &,
                              const Eigen::VectorXd &, const Eigen::VectorXd &,
                              const Eigen::Matrix<double, 6, 1> &,
@@ -87,7 +87,14 @@ void exposeDynaCoM() {
            bp::args("self"))
       .def("allForces", &DynaCoM::allForces,
            bp::return_value_policy<bp::reference_existing_object>(),
-           bp::args("self"));
+           bp::args("self"))
+      .def("model", &DynaCoM::getModel,
+           bp::return_value_policy<bp::reference_existing_object>(),
+           bp::args("self"))
+      .def("data", &DynaCoM::getData, 
+           bp::return_value_policy<bp::reference_existing_object>(), 
+           bp::args("self"))
+      ;
 }
 }  // namespace python
 }  // namespace aig
