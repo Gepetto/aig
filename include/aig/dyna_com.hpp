@@ -22,9 +22,10 @@
 // clang-format on
 
 // @TODO: Separate the DynaCom in a new repository.
-// @TODO: add abstract class contact and new implementation of it contactPoint. 
+// @TODO: add abstract class contact and new implementation of it contactPoint.
 // @TODO: implement method copy of contacts to be able to duplicate them easily.
-// @TODO: In the getters uni_A, fria_A, uni_b, fri_b return only the active block.
+// @TODO: In the getters uni_A, fria_A, uni_b, fri_b return only the active
+// block.
 // @TODO: change internaly the system of names by ids.
 
 namespace aig {
@@ -156,8 +157,8 @@ class DynaCoM {
     return known_contact6ds_[name];
   }
   const DynaCoMSettings &getSettings() { return settings_; }
-  const pinocchio::Model &getModel() {return model_;}
-  const pinocchio::Data &getData() {return data_;}
+  const pinocchio::Model &getModel() { return model_; }
+  const pinocchio::Data &getData() { return data_; }
 
   const Eigen::MatrixXd &uni_A() { return unilaterality_A_; }
   const Eigen::VectorXd &uni_b() { return unilaterality_b_; }
