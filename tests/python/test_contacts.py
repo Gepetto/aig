@@ -33,7 +33,7 @@ class TestDynaCoM(unittest.TestCase):
         settingsR.frame_name = "leg_right_sole_fix_joint"
         settingsR.mu = 0.3
         settingsR.gu = 0.4
-        settingsR.weights = np.array([1, 1, 3, 1, 1, 1])
+        settingsR.weights = np.array([1, 1, 1, 1, 1, 1])
         settingsR.half_length = 0.1
         settingsR.half_width = 0.05
 
@@ -59,7 +59,7 @@ class TestDynaCoM(unittest.TestCase):
         v0 = np.zeros(d.model().nv)
         d.computeDynamics(q0, v0, v0, np.zeros(6), True)
         pin.computeAllTerms(d.model(), d.data(), q0, v0)
-        pin.updateFramePlacements(d.model(), d.data())
+        # pin.updateFramePlacements(d.model(), d.data())
 
         d.addContact6d(leftSole, "left_sole")
         d.addContact6d(rightSole, "right_sole")
@@ -104,37 +104,47 @@ class TestDynaCoM(unittest.TestCase):
 
         self.assertTrue((Adj2 @ W2l == W2o_correct).all())
 
-    def test_distributor(self):
-
-        # single contact
+    def test_distribution_on_single_contact(self):
 
         self.dyn.deactivateContact6d("right_sole")
+        pin.updateFramePlacements(self.dyn.model(), self.dyn.data())
         data = self.dyn.data()
-        oMf = data.oMf[self.dyn.getContact("left_sole").get_frame_id()]
-        com = oMf.translation
+        oMs = data.oMf[self.dyn.getContact("left_sole").get_frame_id()]
+        com = oMs.translation + np.array([0, -0.2, 1])
 
-        correct_lW = np.array([0, 0, 1, 0, 0, 0])  # chosen to not produce CoM torque
-        oW = oMf.toActionMatrixInverse().T @ correct_lW
+        cMo = pin.SE3(np.eye(3), -com)
+        cXs = (cMo.act(oMs)).toActionMatrixInverse().T
 
-        self.dyn.distributeForce(oW[:3], oW[3:], com)
+        sMs = pin.SE3(oMs.rotation.T, np.zeros(3))
+        correct_lW = sMs.toActionMatrixInverse().T @ np.array([0, 0, 10000, 0, 0, 0])
+
+        cW = cXs @ correct_lW
+        self.assertTrue((cW - np.array([0, 0, 10000, 2000, 0, 0]) < 1e-3).all())
+
+        self.dyn.distributeForce(cW[:3], cW[3:], com)
 
         lW = self.dyn.getContact("left_sole").appliedForce()
         self.assertTrue((np.abs(lW - correct_lW) < 1e-4).all())
 
-        # double contact
+    def test_distribution_on_double_contact(self):
 
-        self.dyn.activateContact6d("right_sole")
-        oWd = np.array([0, 0, 10, 0, 0, 0])
+        com = np.array([0, 0, 2])
+        cW = np.array([0, 0, 1, 0.1, 0, 0])
 
-        self.dyn.distributeForce(oWd[:3], oWd[3:], com)
+        self.dyn.distributeForce(cW[:3], cW[3:], com)
+        self.assertTrue(
+            (
+                self.dyn.getContact("left_sole").appliedForce()[:3]
+                + self.dyn.getContact("right_sole").appliedForce()[:3]
+                - cW[:3]
+                < 1e-4
+            ).all()
+        )
 
-        lSW = self.dyn.getContact("left_sole").appliedForce()
-        rSW = self.dyn.getContact("right_sole").appliedForce()
-
-        print(lSW)
-        print(rSW)
-        self.assertTrue((np.abs(lSW[:3] + rSW[:3] - oWd[:3]) < 0.1).all())
-        self.assertTrue(lSW[2] / 4 > rSW[2])
+        self.assertTrue(
+            self.dyn.getContact("left_sole").appliedForce()[2] / 3
+            > self.dyn.getContact("right_sole").appliedForce()[2]
+        )
 
 
 if __name__ == "__main__":

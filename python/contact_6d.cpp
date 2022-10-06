@@ -82,9 +82,8 @@ void exposeContact6D() {
       .def("fri_rows", &Contact6D::fri_rows, bp::args("self"))
       .def("cols", &Contact6D::cols, bp::args("self"))
       .def("get_frame_id", &Contact6D::getFrameID, bp::args("self"))
-      .def("toWorldForces", &Contact6D::toWorldForces,
-           bp::return_value_policy<bp::reference_existing_object>(),
-           bp::args("self"))
+      .def("toWorldForces", &Contact6D::toWorldForces, bp::args("self"))
+      .def("toCoMForces", &Contact6D::toCoMForces, bp::args("self"))
       .def("set_frame_id", &Contact6D::setFrameID, bp::args("self"))
       .def("applyForce", &Contact6D::applyForce, bp::args("self", "force"))
       .def("appliedForce", &Contact6D::appliedForce,

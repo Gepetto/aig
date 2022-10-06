@@ -60,7 +60,7 @@ struct Contact6DSettings {
 class Contact6D {
  private:
   Contact6DSettings settings_;
-  Eigen::Matrix<double, 6, 6> oAf_;
+  pinocchio::SE3 oMs_, cMo_;
 
   // matrices
   Eigen::Matrix<double, 5, 6> unilaterality_A_;
@@ -95,7 +95,8 @@ class Contact6D {
 
   // getters
   const Contact6DSettings &getSettings() { return settings_; }
-  const Eigen::Matrix<double, 6, 6> &toWorldForces() { return oAf_; }
+  const Eigen::Matrix<double, 6, 6> toWorldForces() { return oMs_.toActionMatrixInverse().transpose(); }
+  const Eigen::Matrix<double, 6, 6> toCoMForces() { return oMs_.act(cMo_).toActionMatrixInverse().transpose(); }
   size_t uni_rows() const { return unilaterality_A_.rows(); }
   size_t fri_rows() const { return friction_A_.rows(); }
   size_t cols() const { return newton_euler_A_.cols(); }
