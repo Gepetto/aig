@@ -11,8 +11,8 @@
 #include <example-robot-data/path.hpp>
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/centroidal.hpp>
-#include <pinocchio/parsers/urdf.hpp>
 #include <pinocchio/algorithm/frames.hpp>
+#include <pinocchio/parsers/urdf.hpp>
 #include <proxsuite/proxqp/dense/dense.hpp>
 
 #include "aig/contact6d.hpp"
@@ -215,7 +215,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     regularization_A_.segment(j_, cols) << contact->reg_A();
     regularization_b_.segment(j_, cols) << contact->reg_b();
 
-    contact->updateNewtonEuler(CoM, pinocchio::updateFramePlacement(model_, data_, contact->getFrameID()));
+    contact->updateNewtonEuler(CoM, pinocchio::updateFramePlacement(
+                                        model_, data_, contact->getFrameID()));
     newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A();
 
     uni_i_ += uni_r;
