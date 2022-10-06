@@ -78,8 +78,15 @@ void Contact6D::setGu(const double &gu) {
 }
 
 void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
-                                  const pinocchio::SE3 &oMf) {
-  newton_euler_A_.block<3, 3>(3, 0) << pinocchio::skew(oMf.translation() - CoM);
-  oAf_ = oMf.toActionMatrixInverse().transpose();
+                                  const pinocchio::SE3 &oMs) {
+  /**
+   * @brief Assuming that the orientation of the world frame is the identity.
+   * 
+   */
+  
+  oMs_ = oMs;
+  cMo_ = pinocchio::SE3(Eigen::Matrix3d::Identity(), -CoM);
+
+  newton_euler_A_ << (cMo_.act(oMs_)).toActionMatrixInverse().transpose();
 }
 }  // namespace aig

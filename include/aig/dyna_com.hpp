@@ -60,6 +60,7 @@ class DynaCoM {
   pinocchio::Model model_;
   pinocchio::Data data_;
   double mass_;
+  double inf_ = std::numeric_limits<double>::infinity();
 
   // Lists of contacts
   // std::vector< std::shared_ptr<Contact6D> > known_contact6ds_;

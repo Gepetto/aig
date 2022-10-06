@@ -12,11 +12,10 @@
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/algorithm/frames.hpp>
 #include <proxsuite/proxqp/dense/dense.hpp>
 
 #include "aig/contact6d.hpp"
-// #include <proxsuite/proxqp/dense/wrapper.hpp>
-// #include <proxsuite/proxqp/utils/random_qp_problems.hpp>
 
 namespace aig {
 
@@ -203,8 +202,6 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     fri_r = contact->fri_rows();
     cols = contact->cols();
 
-    contact->updateNewtonEuler(CoM, data_.oMf[contact->getFrameID()]);
-
     unilaterality_A_.block(uni_i_, j_, uni_r, cols) << contact->uni_A();
     unilaterality_A_.block(0, j_, uni_i_, cols).setZero();
     unilaterality_A_.block(uni_i_, 0, uni_r, j_).setZero();
@@ -218,8 +215,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
     regularization_A_.segment(j_, cols) << contact->reg_A();
     regularization_b_.segment(j_, cols) << contact->reg_b();
 
-    newton_euler_A_.block(0, j_, 6, cols)
-        << contact->NE_A() * contact->toWorldForces();
+    contact->updateNewtonEuler(CoM, pinocchio::updateFramePlacement(model_, data_, contact->getFrameID()));
+    newton_euler_A_.block(0, j_, 6, cols) << contact->NE_A();
 
     uni_i_ += uni_r;
     fri_i_ += fri_r;
@@ -243,7 +240,7 @@ void DynaCoM::solveQP() {
       friction_A_.block(0, 0, fri_i_, j_);
 
   u_.setZero();
-  l_.setConstant(-99999);
+  l_.setConstant(-inf_);
   A_ << newton_euler_A_.block(0, 0, 6, j_);
   b_ << newton_euler_b_;
   // Initialization of QP solver
