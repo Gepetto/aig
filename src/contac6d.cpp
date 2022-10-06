@@ -81,9 +81,9 @@ void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
                                   const pinocchio::SE3 &oMs) {
   /**
    * @brief Assuming that the orientation of the world frame is the identity.
-   * 
+   *
    */
-  
+
   oMs_ = oMs;
   cMo_ = pinocchio::SE3(Eigen::Matrix3d::Identity(), -CoM);
 
