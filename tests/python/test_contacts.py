@@ -86,17 +86,55 @@ class TestDynaCoM(unittest.TestCase):
             (leftSole.get_settings()["weights"][3:] == np.array([3, 3, 3])).all()
         )
 
+    def test_adjoint(self):
+
+        H1 = pin.SE3(np.eye(3), np.array([0, 1, 0]))
+        Adj1 = H1.toActionMatrixInverse().T
+
+        W1l = np.array([0, 0, 1, 0, 0, 0])
+        W1o_correct = np.array([0, 0, 1, 1, 0, 0])
+
+        self.assertTrue((Adj1 @ W1l == W1o_correct).all())
+
+        H2 = pin.SE3(pin.utils.rotate("y", 0.3), np.array([0, 1, 0]))
+        Adj2 = H2.toActionMatrixInverse().T
+
+        W2l = np.array([0, 0, 0, 1, 0, 0])
+        W2o_correct = np.hstack([0, 0, 0, H2.rotation @ [1, 0, 0]])
+
+        self.assertTrue((Adj2 @ W2l == W2o_correct).all())
+
     def test_distributor(self):
 
-        self.dyn.distributeForce(
-            np.array([0, 0, 0]), np.array([1, 0, 0]), self.dyn.data().com[0]
-        )
-        leftSole = self.dyn.getContact("left_sole")
-        rightSole = self.dyn.getContact("right_sole")
+        # single contact
 
-        print(leftSole.appliedForce()[:])
-        print(rightSole.appliedForce()[:])
-        print(leftSole.appliedForce()[:] + rightSole.appliedForce()[:])
+        self.dyn.deactivateContact6d("right_sole")
+        data = self.dyn.data()
+        oMf = data.oMf[self.dyn.getContact("left_sole").get_frame_id()]
+        com = oMf.translation
+
+        correct_lW = np.array([0, 0, 1, 0, 0, 0])  # chosen to not produce CoM torque
+        oW = oMf.toActionMatrixInverse().T @ correct_lW
+
+        self.dyn.distributeForce(oW[:3], oW[3:], com)
+
+        lW = self.dyn.getContact("left_sole").appliedForce()
+        self.assertTrue((np.abs(lW - correct_lW) < 1e-4).all())
+
+        # double contact
+
+        self.dyn.activateContact6d("right_sole")
+        oWd = np.array([0, 0, 10, 0, 0, 0])
+
+        self.dyn.distributeForce(oWd[:3], oWd[3:], com)
+
+        lSW = self.dyn.getContact("left_sole").appliedForce()
+        rSW = self.dyn.getContact("right_sole").appliedForce()
+
+        print(lSW)
+        print(rSW)
+        self.assertTrue((np.abs(lSW[:3] + rSW[:3] - oWd[:3]) < 0.1).all())
+        self.assertTrue(lSW[2] / 4 > rSW[2])
 
 
 if __name__ == "__main__":
