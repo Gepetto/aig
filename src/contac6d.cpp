@@ -80,6 +80,6 @@ void Contact6D::setGu(const double &gu) {
 void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
                                   const pinocchio::SE3 &oMf) {
   newton_euler_A_.block<3, 3>(3, 0) << pinocchio::skew(oMf.translation() - CoM);
-  oAf_ = oMf.toActionMatrix().transpose();
+  oAf_ = oMf.toActionMatrixInverse().transpose();
 }
 }  // namespace aig
