@@ -128,7 +128,7 @@ struct ContactPointSettings {
     out << "Contact6D "
         << ":\n";
     out << "    mu: " << this->mu << "\n";
-    out << "    weights: " << this->weights.transpose() <<  std::endl;
+    out << "    weights: " << this->weights.transpose() << std::endl;
 
     return out.str();
   }
@@ -149,7 +149,7 @@ struct ContactPointSettings {
   bool operator!=(const ContactPointSettings &rhs) { return !(*this == rhs); }
 };
 
-class ContactPoint{
+class ContactPoint {
  private:
   ContactPointSettings settings_;
   pinocchio::SE3 oMs_, cMo_;
@@ -203,7 +203,6 @@ class ContactPoint{
   const Eigen::Matrix<double, 6, 3> &NE_A() { return newton_euler_A_; }
 
   const Eigen::Matrix<double, 3, 1> &appliedForce() { return contactForce_; }
-
 };
 
 }  // namespace aig
