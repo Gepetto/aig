@@ -86,6 +86,25 @@ class TestDynaCoM(unittest.TestCase):
             (leftSole.get_settings()["weights"][3:] == np.array([3, 3, 3])).all()
         )
 
+        self.assertTrue(
+            self.dyn.getActiveContacts().tolist() == ["left_sole", "right_sole"]
+        )
+        self.dyn.deactivateContact6d("left_sole")
+        self.assertTrue("left_sole" not in self.dyn.getActiveContacts().tolist())
+
+        self.dyn.deactivateContact6d("right_sole")
+        self.assertTrue(not self.dyn.getActiveContacts().tolist())
+
+        self.dyn.activateContact6d("left_sole")
+        self.assertTrue("left_sole" in self.dyn.getActiveContacts().tolist())
+
+        self.dyn.activateContact6d("right_sole")
+        self.assertTrue(
+            self.dyn.getActiveContacts().tolist() == ["left_sole", "right_sole"]
+        )
+        self.dyn.removeContact6d("right_sole")
+        self.assertTrue("right_sole" not in self.dyn.getActiveContacts().tolist())
+
     def test_adjoint(self):
 
         H1 = pin.SE3(np.eye(3), np.array([0, 1, 0]))
