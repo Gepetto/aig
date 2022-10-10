@@ -157,7 +157,7 @@ class BipedIG {
   void setQ0(const Eigen::VectorXd q0) { q0_ = q0; }
 
   /// @brief Get the Angular Momentum variation. Please call computeDynamics
-  /// first.
+  /// first. Deprecate it, AIG is not made for dynamics
   const Eigen::Vector3d &getAMVariation() { return dL_; }
 
   /// @brief Get the Angular Momentum. Please call computeDynamics first.
@@ -282,6 +282,8 @@ class BipedIG {
   void computeNL(const double &w);
 
   pinocchio::Model &get_model() { return model_; }
+  pinocchio::Data &get_data() { return data_; }
+  Eigen::Vector3d &get_com_from_waist() { return com_from_waist_; }
 };
 }  // namespace aig
 #endif  // AIG_BIPED_IG
