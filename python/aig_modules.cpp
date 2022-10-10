@@ -12,6 +12,8 @@ BOOST_PYTHON_MODULE(aig) {
   ENABLE_SPECIFIC_MATRIX_TYPE(eMatrix61);
   ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::MatrixXd);
   ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::VectorXd);
+  // ENABLE_SPECIFIC_MATRIX_TYPE(Eigen::Isometry3d);
   aig::python::exposeContact6D();
   aig::python::exposeDynaCoM();
+  aig::python::exposeBiped_IG();
 }

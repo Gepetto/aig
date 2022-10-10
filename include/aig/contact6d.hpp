@@ -117,6 +117,7 @@ class Contact6D {
   const Eigen::Matrix<double, 6, 1> &appliedForce() { return contactForce_; }
 };
 
+///// Start of future contact point. ////////////
 struct ContactPointSettings {
  public:
   double mu;

@@ -1,10 +1,11 @@
 #include "aig/dyna_com.hpp"
 
+#include <pinocchio/multibody/fwd.hpp>  
+// Must be included first!
 #include <boost/python.hpp>
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <eigenpy/eigenpy.hpp>
-#include <pinocchio/multibody/fwd.hpp>  // Must be included first!
 
 #include "aig/contact6d.hpp"
 #include "aig/python.hpp"

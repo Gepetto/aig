@@ -96,6 +96,7 @@ if(BUILD_PYTHON_INTERFACE)
     python/contact_6d.cpp
     python/aig_modules.cpp
     python/dyna_com.cpp
+    python/biped_ig.cpp
   )
   add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
   target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
