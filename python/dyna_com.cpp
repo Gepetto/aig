@@ -1,6 +1,6 @@
 #include "aig/dyna_com.hpp"
 
-#include <pinocchio/multibody/fwd.hpp>  
+#include <pinocchio/multibody/fwd.hpp>
 // Must be included first!
 #include <boost/python.hpp>
 #include <boost/python/return_internal_reference.hpp>
