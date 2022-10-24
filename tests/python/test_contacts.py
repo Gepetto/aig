@@ -17,7 +17,7 @@ unittest.util._MAX_LENGTH = 2000
 class TestDynaCoM(unittest.TestCase):
     def setUp(self):
 
-        ## CONTACTS ##
+        # CONTACTS ##
         settingsL = aig.Contact6DSettings()
         settingsL.frame_name = "leg_left_sole_fix_joint"
         settingsL.mu = 0.3
@@ -40,7 +40,7 @@ class TestDynaCoM(unittest.TestCase):
         rightSole = aig.Contact6D()
         rightSole.initialize(settingsR)
 
-        ### DYNAMICS ###
+        # DYNAMICS ###
         dynSettings = aig.DynaCoMSettings()
         dynSettings.urdf = (
             EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data/robots/talos_reduced.urdf"
