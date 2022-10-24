@@ -14,6 +14,130 @@ namespace aig {
 namespace python {
 namespace bp = boost::python;
 
+bp::tuple solve(BipedIG &self, const Eigen::Vector3d &com, 
+                               const pinocchio::SE3 &LF,
+                               const pinocchio::SE3 &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos;
+  self.solve(com, LF, RF, q0, pos, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const Eigen::Vector3d &com, 
+                               const Eigen::Isometry3d &LF,
+                               const Eigen::Isometry3d &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos;
+  self.solve(com, LF, RF, q0, pos, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const Eigen::Vector3d &com, 
+                               const Eigen::Matrix3d &baseRotation,
+                               const pinocchio::SE3 &LF,
+                               const pinocchio::SE3 &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos;
+  self.solve(com, baseRotation, LF, RF, q0, pos, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const Eigen::Vector3d &com, 
+                               const Eigen::Matrix3d &baseRotation,
+                               const Eigen::Isometry3d &LF,
+                               const Eigen::Isometry3d &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos;
+  self.solve(com, baseRotation, LF, RF, q0, pos, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const pinocchio::SE3 &base, 
+                               const pinocchio::SE3 &LF,
+                               const pinocchio::SE3 &RF, 
+                               const Eigen::VectorXd &q0){
+  Eigen::VectorXd pos;
+  self.solve(base, LF, RF, q0, pos);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const Eigen::Isometry3d &base, 
+                               const Eigen::Isometry3d &LF,
+                               const Eigen::Isometry3d &RF, 
+                               const Eigen::VectorXd &q0){
+  Eigen::VectorXd pos;
+  self.solve(base, LF, RF, q0, pos);
+  return bp::tuple(pos);
+}
+
+bp::tuple solve(BipedIG &self, const std::array<Eigen::Vector3d, 3> &com, 
+                               const std::array<pinocchio::SE3, 3> &LF,
+                               const std::array<pinocchio::SE3, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(com, LF, RF, q0, pos, vel, acc, dt, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const std::array<Eigen::Vector3d, 3> &com, 
+                               const std::array<Eigen::Isometry3d, 3> &LF,
+                               const std::array<Eigen::Isometry3d, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(com, LF, RF, q0, pos, vel, acc, dt, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const std::array<Eigen::Vector3d, 3> &com, 
+                               const std::array<Eigen::Matrix3d, 3> &baseRotation,
+                               const std::array<pinocchio::SE3, 3> &LF,
+                               const std::array<pinocchio::SE3, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt,
+                               const double &tolerance= 1e-10, 
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(com, baseRotation, LF, RF, q0, pos, vel, acc, dt, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const std::array<Eigen::Vector3d, 3> &com, 
+                               const std::array<Eigen::Matrix3d, 3> &baseRotation,
+                               const std::array<Eigen::Isometry3d, 3> &LF,
+                               const std::array<Eigen::Isometry3d, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt,
+                               const double &tolerance= 1e-10,
+                               const int &max_iterations=0){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(com, baseRotation, LF, RF, q0, pos, vel, acc, dt, tolerance, max_iterations);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const std::array<pinocchio::SE3, 3> &base, 
+                               const std::array<pinocchio::SE3, 3> &LF,
+                               const std::array<pinocchio::SE3, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(base, LF, RF, q0, pos, vel, acc, dt);
+  return bp::tuple(pos);
+}
+bp::tuple solve(BipedIG &self, const std::array<Eigen::Isometry3d, 3> &base, 
+                               const std::array<Eigen::Isometry3d, 3> &LF,
+                               const std::array<Eigen::Isometry3d, 3> &RF, 
+                               const Eigen::VectorXd &q0,
+                               const double &dt){
+  Eigen::VectorXd pos, vel, acc;
+  self.solve(base, LF, RF, q0, pos, vel, acc, dt);
+  return bp::tuple(pos);
+}
+
 void exposeBiped_IG() {
   bp::class_<BipedIGSettings>("BipedIGSettings")
       .def_readwrite("left_hip_joint_name",
@@ -47,108 +171,96 @@ void exposeBiped_IG() {
            bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("setQ0", &BipedIG::setQ0, bp::args("self", "q0"))
-      .def<void (BipedIG::*)(const Eigen::Vector3d &, const pinocchio::SE3 &,
+      .def<bp::tuple (BipedIG &, const Eigen::Vector3d &, const pinocchio::SE3 &,
                              const pinocchio::SE3 &, const Eigen::VectorXd &,
-                             Eigen::VectorXd &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "com", "leftFoot", "rightFoot", "q0", "posture"),
-           bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const Eigen::Vector3d &, const Eigen::Isometry3d &,
-                             const Eigen::Isometry3d &, const Eigen::VectorXd &,
-                             Eigen::VectorXd &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "com", "leftFoot", "rightFoot", "q0", "posture"),
-           bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const Eigen::Vector3d &, const Eigen::Matrix3d &,
-                             const pinocchio::SE3 &, const pinocchio::SE3 &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
                              const double &, const int &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "com", "baseRotation", "leftFoot", "rightFoot",
-                    "q0", "posture"),
+          "solve", &solve,
+          (bp::args("self", "com", "leftFoot", "rightFoot", "q0"),
+           bp::arg("tolerance") = 1e-10, bp::arg("max_iterations")=0))
+      .def<bp::tuple (BipedIG &,const Eigen::Vector3d &, const Eigen::Isometry3d &,
+                                const Eigen::Isometry3d &, const Eigen::VectorXd &,
+                                const double &, const int &)>(
+          "solve", &solve,
+          (bp::args("self", "com", "leftFoot", "rightFoot", "q0"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const Eigen::Vector3d &, const Eigen::Matrix3d &,
-                             const Eigen::Isometry3d &,
-                             const Eigen::Isometry3d &, const Eigen::VectorXd &,
-                             Eigen::VectorXd &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
+      .def<bp::tuple (BipedIG &, const Eigen::Vector3d &, const Eigen::Matrix3d &,
+                             const pinocchio::SE3 &, const pinocchio::SE3 &,
+                             const Eigen::VectorXd &, const double &, const int &)>(
+          "solve", &solve,
           (bp::args("self", "com", "baseRotation", "leftFoot", "rightFoot",
-                    "q0", "posture"),
+                    "q0"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const pinocchio::SE3 &, const pinocchio::SE3 &,
-                             const pinocchio::SE3 &, const Eigen::VectorXd &,
-                             Eigen::VectorXd &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "base", "leftFoot", "rightFoot", "q0", "posture")))
-      .def<void (BipedIG::*)(const Eigen::Isometry3d &,
+      .def<bp::tuple (BipedIG &, const Eigen::Vector3d &, 
+                                 const Eigen::Matrix3d &,
+                                 const Eigen::Isometry3d &,
+                                 const Eigen::Isometry3d &, const Eigen::VectorXd &,
+                                   const double &, const int &)>(
+          "solve", &solve,
+          (bp::args("self", "com", "baseRotation", "leftFoot", "rightFoot",
+                    "q0"),
+           bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
+      .def<bp::tuple (BipedIG &, const pinocchio::SE3 &, const pinocchio::SE3 &,
+                             const pinocchio::SE3 &, const Eigen::VectorXd &)>(
+          "solve", &solve,
+          (bp::args("self", "base", "leftFoot", "rightFoot", "q0")))
+      .def<bp::tuple (BipedIG &, const Eigen::Isometry3d &,
                              const Eigen::Isometry3d &,
-                             const Eigen::Isometry3d &, const Eigen::VectorXd &,
-                             Eigen::VectorXd &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "base", "leftFoot", "rightFoot", "q0", "posture")))
-      .def<void (BipedIG::*)(const std::array<Eigen::Vector3d, 3> &,
+                             const Eigen::Isometry3d &, const Eigen::VectorXd &)>(
+          "solve", &solve,
+          (bp::args("self", "base", "leftFoot", "rightFoot", "q0")))
+      .def<bp::tuple (BipedIG &, const std::array<Eigen::Vector3d, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "coms", "leftFeet", "rightFeet", "q0", "posture",
-                    "velocity", "acceleration", "dt"),
+          "solve", &solve,
+          (bp::args("self", "coms", "leftFeet", "rightFeet", "q0", "dt"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const std::array<Eigen::Vector3d, 3> &,
+      .def<bp::tuple (BipedIG &, const std::array<Eigen::Vector3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "coms", "leftFeet", "rightFeet", "q0", "posture",
-                    "velocity", "acceleration", "dt"),
+          "solve", &solve,
+          (bp::args("self", "coms", "leftFeet", "rightFeet", "q0", "dt"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const std::array<Eigen::Vector3d, 3> &,
+      .def<bp::tuple (BipedIG &, const std::array<Eigen::Vector3d, 3> &,
                              const std::array<Eigen::Matrix3d, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
+          "solve", &solve,
           (bp::args("self", "coms",
                     "baseRotations"
                     "leftFeet",
-                    "rightFeet", "q0", "posture", "velocity", "acceleration",
+                    "rightFeet", "q0",
                     "dt"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const std::array<Eigen::Vector3d, 3> &,
+      .def<bp::tuple (BipedIG &, const std::array<Eigen::Vector3d, 3> &,
                              const std::array<Eigen::Matrix3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &, const double &, const int &)>(
-          "solve", &BipedIG::solve,
+          "solve", &solve,
           (bp::args("self", "coms", "baseRotations", "leftFeet", "rightFeet",
-                    "q0", "posture", "velocity", "acceleration", "dt"),
+                    "q0", "dt"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<void (BipedIG::*)(const std::array<pinocchio::SE3, 3> &,
+      .def<bp::tuple (BipedIG &, const std::array<pinocchio::SE3, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
                              const std::array<pinocchio::SE3, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "bases", "leftFeet", "rightFeet", "q0", "posture",
-                    "velocity", "acceleration", "dt")))
-      .def<void (BipedIG::*)(const std::array<Eigen::Isometry3d, 3> &,
+          "solve", &solve,
+          (bp::args("self", "bases", "leftFeet", "rightFeet", "q0", "dt")))
+      .def<bp::tuple (BipedIG &, const std::array<Eigen::Isometry3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
                              const std::array<Eigen::Isometry3d, 3> &,
-                             const Eigen::VectorXd &, Eigen::VectorXd &,
-                             Eigen::VectorXd &, Eigen::VectorXd &,
+                             const Eigen::VectorXd &,
                              const double &)>(
-          "solve", &BipedIG::solve,
-          (bp::args("self", "bases", "leftFeet", "rightFeet", "q0", "posture",
-                    "velocity", "acceleration", "dt")))
+          "solve", &solve,
+          (bp::args("self", "bases", "leftFeet", "rightFeet", "q0", "dt")))
       .def<void (BipedIG::*)(const Eigen::Vector3d &)>(
           "set_com_from_waist", &BipedIG::set_com_from_waist,
           bp::args("self", "com_from_waist"))
