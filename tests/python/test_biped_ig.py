@@ -30,7 +30,7 @@ print(biped.get_com_from_waist())
 biped.correctCoMfromWaist(com, LF, RF, q0)
 print(biped.get_com_from_waist())
 
-biped.solve(com, LF, RF, q0, posture)
+print(biped.solve(com, LF, RF, q0))
 
 ##TODO:
 #### the lvalue `posture` in the function `solve` is not working.
