@@ -8,10 +8,11 @@ Created on Fri Oct  7 15:13:50 2022
 import aig
 import numpy as np
 from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
-import unittest
+
+# import unittest
 import pinocchio as pin
 
-unittest.util._MAX_LENGTH = 2000
+# unittest.util._MAX_LENGTH = 2000
 
 
 settings = aig.BipedIGSettings.makeSettingsFor(
@@ -31,10 +32,3 @@ biped.correctCoMfromWaist(com, LF, RF, q0)
 print(biped.get_com_from_waist())
 
 print(biped.solve(com, LF, RF, q0))
-
-##TODO:
-#### the lvalue `posture` in the function `solve` is not working.
-##   Noone in internet seems to have this problem. Ask about it.
-
-# class TestDynaCoM(unittest.TestCase):
-#     def setUp(self):
