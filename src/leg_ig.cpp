@@ -48,9 +48,12 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   c5_ = 0.5 * (c_ * c_ - a_ * a_ - b_ * b_) / (a_ * b_);
 
   // Compute q5 (the knee).
-  if (c5_ > 1.0 - epsilon_) q5_ = 0.0;
-  else if (c5_ < -1.0 + epsilon_) q5_ = M_PI;
-  else q5_ = acos(c5_);
+  if (c5_ > 1.0 - epsilon_)
+    q5_ = 0.0;
+  else if (c5_ < -1.0 + epsilon_)
+    q5_ = M_PI;
+  else
+    q5_ = acos(c5_);
 
   // Compute the orientation of the ankle.
   sign_hip_from_ankle_z = hip_from_ankle_(2) > 0 ? 1.0 : -1.0;
@@ -60,8 +63,10 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
 
   q7_ = atan2(hip_from_ankle_(1), hip_from_ankle_(2));
 
-  if (q7_ > M_PI_2) q7_ -= M_PI;  
-  else if (q7_ < -M_PI_2) q7_ += M_PI;
+  if (q7_ > M_PI_2)
+    q7_ -= M_PI;
+  else if (q7_ < -M_PI_2)
+    q7_ += M_PI;
 
   Rext_ = base.rotation().transpose() * endEffector.rotation();
   Rint_ = Eigen::AngleAxisd(-q7_, Eigen::Vector3d(1, 0, 0)) *
