@@ -62,7 +62,7 @@ class LegIG {
   Eigen::Vector3d hip_, ankle_, hip_from_ankle_;
   double epsilon_, c5_;
   double q2_, q3_, q4_, q5_, q6_, q7_;
-  double opp_sign_hip_from_waist_y_, sign_hip_from_ankle_z;
+  double sign_hip_from_ankle_z;
   double a_, b_, c_;
   Eigen::Matrix3d Rint_, Rext_, R_;
   LegJoints output_;
