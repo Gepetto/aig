@@ -126,6 +126,7 @@ class TestBipedIG(unittest.TestCase):
             t0 = time()
             posture = self.biped.solve(CoM, LF, RF, self.q0, e, i)
             t1 = time()
+            # print(t1 - t0)
             if visualize:
                 v.display(posture)
                 sleep(1)

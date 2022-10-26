@@ -65,8 +65,21 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &acceleration,
                               const Eigen::Matrix<double, 6, 1> &externalWrench,
                               bool flatHorizontalGround) {
-  // The external wrench is supposed to be expressed
+
+  /**
+   * @brief The external wrench is supposed to be expressed
   // in the frame of the Center of mass.
+   * 
+   * TODO: In the case when flatHorizontalGround = True, still, we could
+   * remove the assumption of horizontal ground by including the lateral force
+   * produced by the lateral components of the groundNormalReaction.
+   * 
+   * For this we should know what is the direction normal to the ground. Then, we 
+   * could change the flag name by `bool flatGround`. The normal direction can be
+   * obtained from the feet frames (both are the same in a flatGround)
+   * 
+   */
+
   pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
                                                     velocity, acceleration);
 
@@ -78,17 +91,19 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
   groundCoMTorque_ = dL_ - externalWrench.tail<3>();
 
   if (flatHorizontalGround)
-    nonCoPTorque_ = Eigen::Vector3d::Zero();
-  else {
-    // TODO get the force distribution and remove the non pressure terms from
-    // the CoP computation. for now, we assume a flat and horizontal ground :
-    nonCoPTorque_ = Eigen::Vector3d::Zero();
-  }
+    cop_ = data_.com[0].head<2>() + (S_ * groundCoMTorque_.head<2>() -
+              groundCoMForce_.head<2>() * data_.com[0](2)) /(groundCoMForce_(2));
 
-  cop_ = data_.com[0].head<2>() +
-         (S_ * groundCoMTorque_.head<2>() + nonCoPTorque_.head<2>() -
-          groundCoMForce_.head<2>() * data_.com[0](2)) /
-             (groundCoMForce_(2));
+  else {
+    distributeForce(groundCoMForce_, groundCoMTorque_, data_.com[0]);
+
+    CoPTorque_ = Eigen::Vector3d::Zero(); 
+    for (std::string name : active_contact6ds_){
+      std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
+      CoPTorque_ += (contact->toWorldForces() * contact->appliedForce()).segment<3>(3);
+    }
+    cop_ = S_ * CoPTorque_.head<2>()/groundCoMForce_(2);
+  }
 }
 
 void DynaCoM::computeNL(const double &w, const Eigen::VectorXd &posture,
@@ -256,45 +271,13 @@ void DynaCoM::solveQP() {
   proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
   proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  qp.init(H_, g_, A_, b_, C_, u_, l_);  // std::nullopt
+  qp.init(H_, g_, A_, b_, C_, l_, u_);//,std::nullopt,std::nullopt,std::nullopt
   qp.solve();
 
   F_.resize(j_);
   F_ << qp.results.x;
-  // std::cout << "results.x: " << qp.results.x << std::endl;
-  // std::cout << "results.y: " << qp.results.y << std::endl;
-  // std::cout << "results.z: " << qp.results.z << std::endl;
-
-  ////////////////////////////////////////////////////////////////
-  // Eigen::Matrix2d H = Eigen::Matrix2d::Identity();
-  // Eigen::Vector2d g = Eigen::Vector2d::Zero();
-
-  // Eigen::Matrix2d C = -Eigen::Matrix2d::Identity();
-  // Eigen::Vector2d u = Eigen::Vector2d::Zero();
-  // Eigen::Vector2d l = Eigen::Vector2d::Constant(-10);
-
-  // Eigen::Matrix2d A = Eigen::Matrix2d::Identity();
-  // Eigen::Vector2d b;
-  // b << 0, 1;
-
-  // std::cout << "matrix H:\n " << H << std::endl;
-  // std::cout << "matrix A:\n " << A << std::endl;
-  // std::cout << "matrix b:\n " << b << std::endl;
-  // std::cout << "matrix C:\n " << C << std::endl;
-  // std::cout << "matrix u:\n " << u << std::endl;
-
-  // proxsuite::proxqp::dense::isize dim = 2;
-  // proxsuite::proxqp::dense::isize n_eq(2);
-  // proxsuite::proxqp::dense::isize n_in(2);
-  // proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
-
-  // qp.init(H, g, A, b, C, u, l); //std::nullopt
-  // qp.solve();
-
-  // std::cout << "results.x: " << qp.results.x << std::endl;
-  // std::cout << "results.y: " << qp.results.y << std::endl;
-  // std::cout << "results.z: " << qp.results.z << std::endl;
-  // std::cout << "nada " << std::endl;
+  // Check results
+  // std::cout << "solution:\n " << F_ << std::endl;
 }
 
 void DynaCoM::distribute() {
