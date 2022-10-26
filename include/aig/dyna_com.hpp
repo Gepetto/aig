@@ -90,7 +90,7 @@ class DynaCoM {
   size_t uni_i_, fri_i_, j_;
 
   // Internal variables:
-  Eigen::Vector3d groundCoMForce_, groundCoMTorque_, nonCoPTorque_, weight_;
+  Eigen::Vector3d groundCoMForce_, groundCoMTorque_, CoPTorque_, weight_;
   Eigen::Vector3d acom_;
   Eigen::Vector2d cop_;
   Eigen::Vector3d dL_;
