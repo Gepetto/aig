@@ -95,7 +95,14 @@ void exposeDynaCoM() {
            bp::args("self"))
       .def("data", &DynaCoM::getData,
            bp::return_value_policy<bp::reference_existing_object>(),
-           bp::args("self"));
+           bp::args("self"))
+      .def("getCoM", &DynaCoM::getCoM, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getVCoM", &DynaCoM::getVCoM, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getACoM", &DynaCoM::getACoM, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getAM", &DynaCoM::getAM, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getCoP", &DynaCoM::getCoP, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getNL", &DynaCoM::getNL, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      ;
 }
 }  // namespace python
 }  // namespace aig
