@@ -14,7 +14,7 @@ from time import sleep
 
 unittest.util._MAX_LENGTH = 2000
 
-debug = False
+debug = True
 
 
 class TestDynaCoM(unittest.TestCase):
@@ -168,6 +168,29 @@ class TestDynaCoM(unittest.TestCase):
             > self.dyn.getContact("right_sole").appliedForce()[2]
         )
 
+    def test_dynamic_computation(self):
+        e = 1e-12
+        q0 = self.dyn.model().referenceConfigurations["half_sitting"]
+        v0 = np.zeros(self.dyn.model().nv)
+        self.dyn.computeDynamics(q0, v0, v0, np.zeros(6), True)
+
+        com_flat = self.dyn.getCoM()
+        cop_flat = self.dyn.getCoP()
+
+        self.assertTrue((com_flat[:2] - cop_flat[:2] < e).all())
+
+        self.dyn.computeDynamics(q0, v0, v0, np.zeros(6), False)
+
+        com_noflat = self.dyn.getCoM()
+        cop_noflat = self.dyn.getCoP()
+
+        self.assertTrue((com_noflat[:2] - cop_noflat[:2] < e).all())
+        self.assertTrue((com_flat[:2] - com_noflat[:2] < e).all())
+        self.assertTrue((cop_flat[:2] - cop_noflat[:2] < e).all())
+
+        # self.dyn.deactivateContact6d("right_sole")
+        # self.dyn.computeDynamics(q0, v0, v0, np.zeros(6), False)
+
 
 if __name__ == "__main__":
     unittest.main()
@@ -229,3 +252,16 @@ if __name__ == "__main__":
         CoM = pin.centerOfMass(d.model(), d.data(), q0)
 
         d.distributeForce(groundCoMwrench[:3], groundCoMwrench[3:], CoM)
+
+        q = q0.copy()
+        q[0] += 99999999
+        q[2] += 9999999
+        d.computeDynamics(
+            q,
+            np.zeros(d.model().nv),
+            np.zeros(d.model().nv),
+            np.zeros(6),
+            False,
+        )
+
+        print(d.getCoM()[:2], d.getCoP(), d.getCoM()[:2] - d.getCoP())

@@ -99,6 +99,10 @@ class DynaCoM {
   std::vector<std::string>::iterator activeID_;
   std::map<std::string, std::shared_ptr<aig::Contact6D>>::iterator knownID_;
 
+  // for the CoP wrench
+  pinocchio::SE3 oMso_, soMs_;
+  Eigen::Matrix<double, 6, 6> Sz_, oXso_, soXs_;
+
   void addSizes(const std::shared_ptr<Contact6D> &contact);
   void removeSizes(const std::shared_ptr<Contact6D> &contact);
   void resizeMatrices();
@@ -107,6 +111,8 @@ class DynaCoM {
                      const Eigen::Vector3d &CoM);
   void solveQP();
   void distribute();
+
+  const Eigen::Matrix<double, 6, 6> toWorldCoPWrench(pinocchio::SE3 pose);
 
  public:
   DynaCoM();

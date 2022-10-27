@@ -52,12 +52,36 @@ void DynaCoM::initialize(const DynaCoMSettings settings) {
   }
   weight_ = mass_ * model_.gravity981;
   S_ << 0, -1, 1, 0;
+  Sz_.setZero();
+  Sz_.diagonal().segment<4>(2) << 1, 1, 1, 1;
 
   // matrix_sizes
   uni_rows_ = 0;
   fri_rows_ = 0;
   cols_ = 0;
   newton_euler_b_.resize(6);
+}
+
+const Eigen::Matrix<double, 6, 6> DynaCoM::toWorldCoPWrench(pinocchio::SE3 pose){
+
+  /** 
+   * To compute any CoP, we need some surface. We compute the full 
+   * robot CoP considering always a horizontal surface. So, just 
+   * the vertical forces produce pressure on such surface.
+   * This method generates the adjoint matrix needed to transform
+   * local forces in some frame pose to a world wrench composed by 
+   * the vertical force and the torque. Lateral forces are discarted
+   * because they do not contribute on this CoP. 
+   * Still, notice that the lateral forces have an effect that is 
+   * accounted in the non-linear effects.
+  */
+
+  soMs_ = pinocchio::SE3(pose.rotation(), Eigen::Vector3d::Zero());
+  soXs_ = soMs_.toActionMatrixInverse().transpose();
+  oMso_ = pinocchio::SE3(Eigen::Matrix3d::Identity(), pose.translation());
+  oXso_ = oMso_.toActionMatrixInverse().transpose();
+
+  return oXso_ * Sz_ * soXs_;
 }
 
 void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
@@ -74,10 +98,8 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
    * produced by the lateral components of the groundNormalReaction.
    *
    * For this we should know what is the direction normal to the ground. Then,
-  we
-   * could change the flag name by `bool flatGround`. The normal direction can
-  be
-   * obtained from the feet frames (both are the same in a flatGround)
+   * we could change the flag name by `bool flatGround`. The normal direction 
+   * can be obtained from the feet frames (both are the same in a flatGround)
    *
    */
 
@@ -99,12 +121,17 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
 
   else {
     distributeForce(groundCoMForce_, groundCoMTorque_, data_.com[0]);
+    // @TODO: IT could happen that the expected groundCoMwrench is not feasible
+    // in such case we should get the clossest possible and recompute the 
+    //centroidal motion accordingly. So, groundCoMForce_(2) in following should
+    //be updated.
 
     CoPTorque_ = Eigen::Vector3d::Zero();
     for (std::string name : active_contact6ds_) {
       std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
-      CoPTorque_ +=
-          (contact->toWorldForces() * contact->appliedForce()).segment<3>(3);
+      CoPTorque_ += 
+          (toWorldCoPWrench(contact->getPose())* contact->appliedForce()).segment<3>(3);
+          // (contact->toWorldForces() * contact->appliedForce()).segment<3>(3);
     }
     cop_ = S_ * CoPTorque_.head<2>() / groundCoMForce_(2);
   }
@@ -134,6 +161,7 @@ void DynaCoM::computeNL(const double &w) {
 void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
                            const std::string &name, const bool active) {
   contact->setFrameID(model_.getFrameId(contact->getSettings().frame_name));
+  contact->setPose(data_.oMf[contact->getFrameID()]);
 
   known_contact6ds_.insert(
       std::pair<std::string, std::shared_ptr<Contact6D>>(name, contact));
