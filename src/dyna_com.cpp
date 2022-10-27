@@ -65,19 +65,20 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &acceleration,
                               const Eigen::Matrix<double, 6, 1> &externalWrench,
                               bool flatHorizontalGround) {
-
   /**
    * @brief The external wrench is supposed to be expressed
   // in the frame of the Center of mass.
-   * 
+   *
    * TODO: In the case when flatHorizontalGround = True, still, we could
    * remove the assumption of horizontal ground by including the lateral force
    * produced by the lateral components of the groundNormalReaction.
-   * 
-   * For this we should know what is the direction normal to the ground. Then, we 
-   * could change the flag name by `bool flatGround`. The normal direction can be
+   *
+   * For this we should know what is the direction normal to the ground. Then,
+  we
+   * could change the flag name by `bool flatGround`. The normal direction can
+  be
    * obtained from the feet frames (both are the same in a flatGround)
-   * 
+   *
    */
 
   pinocchio::computeCentroidalMomentumTimeVariation(model_, data_, posture,
@@ -91,18 +92,21 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
   groundCoMTorque_ = dL_ - externalWrench.tail<3>();
 
   if (flatHorizontalGround)
-    cop_ = data_.com[0].head<2>() + (S_ * groundCoMTorque_.head<2>() -
-              groundCoMForce_.head<2>() * data_.com[0](2)) /(groundCoMForce_(2));
+    cop_ =
+        data_.com[0].head<2>() + (S_ * groundCoMTorque_.head<2>() -
+                                  groundCoMForce_.head<2>() * data_.com[0](2)) /
+                                     (groundCoMForce_(2));
 
   else {
     distributeForce(groundCoMForce_, groundCoMTorque_, data_.com[0]);
 
-    CoPTorque_ = Eigen::Vector3d::Zero(); 
-    for (std::string name : active_contact6ds_){
+    CoPTorque_ = Eigen::Vector3d::Zero();
+    for (std::string name : active_contact6ds_) {
       std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
-      CoPTorque_ += (contact->toWorldForces() * contact->appliedForce()).segment<3>(3);
+      CoPTorque_ +=
+          (contact->toWorldForces() * contact->appliedForce()).segment<3>(3);
     }
-    cop_ = S_ * CoPTorque_.head<2>()/groundCoMForce_(2);
+    cop_ = S_ * CoPTorque_.head<2>() / groundCoMForce_(2);
   }
 }
 
@@ -271,7 +275,8 @@ void DynaCoM::solveQP() {
   proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
   proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  qp.init(H_, g_, A_, b_, C_, l_, u_);//,std::nullopt,std::nullopt,std::nullopt
+  qp.init(H_, g_, A_, b_, C_, l_,
+          u_);  //,std::nullopt,std::nullopt,std::nullopt
   qp.solve();
 
   F_.resize(j_);
