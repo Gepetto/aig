@@ -92,7 +92,7 @@ class Contact6D {
   void applyForce(const Eigen::Matrix<double, 6, 1> &force) {
     contactForce_ << force;
   }
-  void setPose(pinocchio::SE3 &pose) {oMs_ = pose; }
+  void setPose(pinocchio::SE3 &pose) { oMs_ = pose; }
 
   // getters
   const Contact6DSettings &getSettings() { return settings_; }
@@ -123,7 +123,7 @@ class Contact6D {
 /**
  * Still missing the definition of the abstract class Contact which will be
  * the ansester of ContactPoint and Contact6D. Similar for the settings.
-*/
+ */
 struct ContactPointSettings {
  public:
   double mu;
