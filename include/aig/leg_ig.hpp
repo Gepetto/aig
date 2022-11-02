@@ -26,12 +26,31 @@ typedef Eigen::Matrix<double, 6, 1> LegJoints;
  */
 struct LegIGSettings {
  public:
-  Eigen::Vector3d hip_from_waist = Eigen::Vector3d::Zero();
-  Eigen::Vector3d knee_from_hip = Eigen::Vector3d::Zero();
-  Eigen::Vector3d ankle_from_knee = Eigen::Vector3d::Zero();
-  Eigen::Vector3d ankle_from_foot = Eigen::Vector3d::Zero();
+  Eigen::Vector3d hip_from_waist;
+  Eigen::Vector3d knee_from_hip;
+  Eigen::Vector3d ankle_from_knee;
+  Eigen::Vector3d ankle_from_foot;
 
-  friend std::ostream &operator<<(std::ostream &out, const LegIGSettings &obj) {
+  LegIGSettings()
+    : hip_from_waist(Eigen::Vector3d::Zero())
+    , knee_from_hip(Eigen::Vector3d::Zero())
+    , ankle_from_knee(Eigen::Vector3d::Zero())
+    , ankle_from_foot(Eigen::Vector3d::Zero())
+  {
+  }
+
+
+  LegIGSettings(const Eigen::Vector3d &_hip_from_waist, const Eigen::Vector3d &_knee_from_hip,
+                const Eigen::Vector3d &_ankle_from_knee, const Eigen::Vector3d &_ankle_from_foot)
+    : hip_from_waist(_hip_from_waist)
+    , knee_from_hip(_knee_from_hip)
+    , ankle_from_knee(_ankle_from_knee)
+    , ankle_from_foot(_ankle_from_foot)
+  {
+  }
+
+  friend std::ostream &operator<<(std::ostream &out, const LegIGSettings &obj)
+  {
     out << "LegIGSettings:\n"
         << "    hip_from_waist: " << obj.hip_from_waist.transpose() << "\n"
         << "    knee_from_hip: " << obj.knee_from_hip.transpose() << "\n"
