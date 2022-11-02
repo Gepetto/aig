@@ -13,7 +13,6 @@
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/parsers/urdf.hpp>
-#include <proxsuite/proxqp/dense/dense.hpp>
 
 #include "aig/contact6d.hpp"
 
@@ -279,7 +278,8 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
 }
 
 void DynaCoM::solveQP() {
-  H_.resize(j_, j_);
+  return;  
+  /*H_.resize(j_, j_);
   g_.resize(j_);
   C_.resize(uni_i_ + fri_i_, j_);
   u_.resize(uni_i_ + fri_i_);
@@ -317,6 +317,7 @@ void DynaCoM::solveQP() {
   // std::cout << "results.z: "<<qp.results.z <<std::endl;
   // Check results
   // std::cout << "solution:\n " << F_ << std::endl;
+  */
 }
 
 void DynaCoM::distribute() {
