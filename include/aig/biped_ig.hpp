@@ -28,24 +28,61 @@ namespace aig {
 
 struct BipedIGSettings {
  public:
-  std::string left_hip_joint_name = "";
-  std::string left_knee_joint_name = "";
-  std::string left_ankle_joint_name = "";
-  std::string left_foot_frame_name = "";
-  std::string right_hip_joint_name = "";
-  std::string right_knee_joint_name = "";
-  std::string right_ankle_joint_name = "";
-  std::string right_foot_frame_name = "";
+  std::string left_hip_joint_name;
+  std::string left_knee_joint_name;
+  std::string left_ankle_joint_name;
+  std::string left_foot_frame_name;
+  std::string right_hip_joint_name;
+  std::string right_knee_joint_name;
+  std::string right_ankle_joint_name;
+  std::string right_foot_frame_name;
   /**
    * @brief This must contain either a valid path to the urdf file or the
    * content of this file in a string.
    */
-  std::string urdf = "";
+  std::string urdf;
   /**
    * @brief This must contain either a valid path to the srdf file or the
    * content of this file in a string.
    */
-  std::string srdf = "";
+  std::string srdf;
+
+  BipedIGSettings()
+    : left_hip_joint_name("")
+    , left_knee_joint_name("")
+    , left_ankle_joint_name("")
+    , left_foot_frame_name("")
+    , right_hip_joint_name("")
+    , right_knee_joint_name("")
+    , right_ankle_joint_name("")
+    , right_foot_frame_name("")
+    , urdf("")
+    , srdf("")
+  {
+  }
+
+  BipedIGSettings(const std::string &_left_hip_joint_name, const std::string &_left_knee_joint_name,
+                  const std::string &_left_ankle_joint_name,
+                  const std::string &_left_foot_frame_name,
+                  const std::string &_right_hip_joint_name,
+                  const std::string &_right_knee_joint_name,
+                  const std::string &_right_ankle_joint_name,
+                  const std::string &_right_foot_frame_name,
+                  const std::string &_urdf,
+                  const std::string &_srdf)
+    : left_hip_joint_name(_left_hip_joint_name)
+    , left_knee_joint_name(_left_knee_joint_name)
+    , left_ankle_joint_name(_left_ankle_joint_name)
+    , left_foot_frame_name(_left_foot_frame_name)
+    , right_hip_joint_name(_right_hip_joint_name)
+    , right_knee_joint_name(_right_knee_joint_name)
+    , right_ankle_joint_name(_right_ankle_joint_name)
+    , right_foot_frame_name(_right_foot_frame_name)
+    , urdf(_urdf)
+    , srdf(_srdf)
+  {
+  }
+
 
   friend std::ostream &operator<<(std::ostream &out,
                                   const BipedIGSettings &obj) {
