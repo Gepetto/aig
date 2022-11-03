@@ -53,7 +53,9 @@ struct DynaCoMSettings {
   }
 };
 
-class DynaCoM {
+class DynaCoM{
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
   DynaCoMSettings settings_;
   Eigen::Matrix2d S_;
