@@ -28,7 +28,7 @@ void Contact6D::initialize(const Contact6DSettings &settings) {
   unilaterality_A_.block<5, 1>(0, 2) << -1, -hl, -hw, -hl, -hw;
   unilaterality_A_.block<2, 2>(1, 3) << 0, -1, 1, 0;
   unilaterality_A_.block<2, 2>(3, 3) << 0, 1, -1, 0;
-  unilaterality_b_ << Eigen::Matrix<double, 6, 1>::Zero();
+  unilaterality_b_ << Eigen::Matrix<double, 5, 1>::Zero();
 
   friction_A_ << Eigen::Matrix<double, 6, 6>::Zero();
   friction_A_.block<6, 1>(0, 2) << -mu, -mu, -mu, -mu, -gu, -gu;
