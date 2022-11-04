@@ -375,12 +375,21 @@ void DynaCoM::solveQP() {
 
 void DynaCoM::distribute() {
   Eigen::Index n, i = 0;
-  for (std::string name : active_contact6ds_) {
-    std::shared_ptr<Contact6D> &contact = known_contact6ds_[name];
-
-    n = contact->cols();
-    contact->applyForce(F_.segment(i, n));
-    i += n;
+  for (auto contact_pair : known_contact6ds_)
+  {
+    if (std::find(active_contact6ds_.begin(), active_contact6ds_.end(), contact_pair.first) ==
+        active_contact6ds_.end())
+    {
+      // Contact not active
+      contact_pair.second->applyForce(Eigen::Matrix<double, 6, 1>::Zero());
+    }
+    else
+    {
+      // contact is active
+      n = static_cast<int>(contact_pair.second->cols());
+      contact_pair.second->applyForce(F_.segment(i, n));
+      i += n;
+    }
   }
 }
 
