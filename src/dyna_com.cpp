@@ -13,7 +13,7 @@
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/parsers/urdf.hpp>
-
+#include <eiquadprog/eiquadprog.hpp>
 #include "aig/contact6d.hpp"
 
 namespace aig {
@@ -277,47 +277,100 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
   newton_euler_b_ << groundCoMForce, groundCoMTorque;
 }
 
+//void DynaCoM::solveQP() {
+//  H_.resize(j_, j_);
+//  g_.resize(j_);
+//  C_.resize(uni_i_ + fri_i_, j_);
+//  u_.resize(uni_i_ + fri_i_);
+//  l_.resize(uni_i_ + fri_i_);
+//  A_.resize(6, j_);
+
+//  H_.setZero();
+//  g_.setZero();
+//  H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
+//  C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
+//      friction_A_.block(0, 0, fri_i_, j_);
+
+//  u_.setZero();
+//  l_.setConstant(-inf_);
+//  A_ << newton_euler_A_.block(0, 0, 6, j_);
+//  b_ << newton_euler_b_;
+//  // Initialization of QP solver
+//  // std::cout << "matrix H:\n " << H_ << std::endl;
+//  // std::cout << "matrix A:\n " << A_ << std::endl;
+//  // std::cout << "matrix b:\n " << b_ << std::endl;
+//  // std::cout << "matrix C:\n " << C_ << std::endl;
+
+//  // std::cout<<"In solveQP, matrices made, starting proxQP"<<std::endl;
+//  proxsuite::proxqp::dense::isize dim = j_;
+//  proxsuite::proxqp::dense::isize n_eq(6);
+//  proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
+//  proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
+
+//  qp.init(H_, g_, A_, b_, C_, l_,
+//          u_);  //,std::nullopt,std::nullopt,std::nullopt
+//  qp.solve();
+
+//  F_.resize(j_);
+//  F_ << qp.results.x;
+//  // Check results
+//  // std::cout << "solution:\n " << F_ << std::endl;
+//}
+
+
+
 void DynaCoM::solveQP() {
-  return;  
-  /*H_.resize(j_, j_);
-  g_.resize(j_);
-  C_.resize(uni_i_ + fri_i_, j_);
-  u_.resize(uni_i_ + fri_i_);
-  l_.resize(uni_i_ + fri_i_);
-  A_.resize(6, j_);
-
-  H_.setZero();
-  g_.setZero();
-  H_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, j_);
-  C_ << unilaterality_A_.block(0, 0, uni_i_, j_),
-      friction_A_.block(0, 0, fri_i_, j_);
-
-  u_.setZero();
-  l_.setConstant(-inf_);
-  A_ << newton_euler_A_.block(0, 0, 6, j_);
-  b_ << newton_euler_b_;
-  // Initialization of QP solver
-  // std::cout << "matrix H:\n " << H_ << std::endl;
-  // std::cout << "matrix A:\n " << A_ << std::endl;
-  // std::cout << "matrix b:\n " << b_ << std::endl;
-  // std::cout << "matrix C:\n " << C_ << std::endl;
-
-  // std::cout<<"In solveQP, matrices made, starting proxQP"<<std::endl;
-  proxsuite::proxqp::dense::isize dim = j_;
-  proxsuite::proxqp::dense::isize n_eq(6);
-  proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
-  proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
-
-  qp.init(H_, g_, A_, b_, C_, l_, u_);
-  qp.solve();
-
-  F_.resize(j_);
-  F_ << qp.results.x;
-  // std::cout << "results.y: "<<qp.results.y <<std::endl;
-  // std::cout << "results.z: "<<qp.results.z <<std::endl;
-  // Check results
-  // std::cout << "solution:\n " << F_ << std::endl;
+  /* eiquadprog formulation :
+  min 0.5 * x G x + g0 x
+  s.t.
+  CE^T x + ce0 = 0
+  CI^T x + ci0 >= 0
   */
+
+  /* proxsuite formulation :
+  min 0.5 * x H x + g^T x
+  s.t.
+  A x = b
+  l <= C x <= u
+  */
+
+  int dim(static_cast<int>(j_)); // number of variables
+  int n_eq(6); // number of equality constraints
+  int n_ineq(static_cast<int>(fri_i_ + uni_i_)); // number of inequalities constraints
+
+  F_.resize(dim);
+  G_.resize(dim, dim);
+  g0_.resize(dim);
+  CE_.resize(dim, n_eq);
+  ce0_.resize(n_eq);
+  C_.resize(n_ineq, dim);
+  CI_.resize(dim, n_ineq);
+  ci0_.resize(n_ineq);
+
+  G_.setZero();
+  G_.diagonal() << (regularization_A_.cwiseAbs2()).segment(0, dim);
+  g0_.setZero();
+
+  CE_ << newton_euler_A_.block(0, 0, 6, dim).transpose();
+  ce0_ << -newton_euler_b_;
+
+  C_ << unilaterality_A_.block(0, 0, static_cast<int>(uni_i_), dim),
+        friction_A_.block(0, 0, static_cast<int>(fri_i_), dim);
+  CI_ = -C_.transpose();
+  ci0_.setZero();
+
+//  std::cout<<"G "<<std::endl<<G_<<std::endl;
+//  std::cout<<"g0 "<<std::endl<<g0_<<std::endl;
+//  std::cout<<"CE "<<std::endl<<CE_<<std::endl;
+//  std::cout<<"ce "<<std::endl<<ce0_<<std::endl;
+//  std::cout<<"CI "<<std::endl<<CI_<<std::endl;
+//  std::cout<<"ci "<<std::endl<<ci0_<<std::endl;
+
+
+  activeSetSize_ = 0;
+  //const double precision =
+  eiquadprog::solvers::solve_quadprog(G_, g0_, CE_, ce0_, CI_, ci0_, F_, activeSet_, activeSetSize_);
+  //std::cout<<"DynaCom::SolveQP, finished with precision = "<<precision<<std::endl;
 }
 
 void DynaCoM::distribute() {
