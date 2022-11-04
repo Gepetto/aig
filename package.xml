@@ -20,6 +20,7 @@
   <depend>eigen</depend>
   <depend>boost</depend>
   <depend>pinocchio</depend>
+  <depend>eiquadprog</depend>
   <test_depend>example-robot-data</test_depend>
 
   <buildtool_depend>cmake</buildtool_depend>

@@ -79,13 +79,21 @@ public:
   Eigen::Matrix<double, 6, -1> newton_euler_A_;
   Eigen::Matrix<double, 6, 1> newton_euler_b_;
 
-  Eigen::MatrixXd H_, C_, A_;
-  Eigen::VectorXd g_, u_, l_;
-  Eigen::Matrix<double, 6, 1> b_;
+  // variables for QP problem with proxsuite formulation
+//  Eigen::MatrixXd H_, , A_;
+//  Eigen::VectorXd g_, u_, l_;
+//  Eigen::Matrix<double, 6, 1> b_;
+
+  // variables for QP problem with eiquadprog formulation
+  Eigen::MatrixXd G_;     // matrix for quadratic cost
+  Eigen::VectorXd g0_;         // linear part of the cost function
+  Eigen::MatrixXd CE_, CI_, C_;    // constraints matrix
+  Eigen::VectorXd ce0_, ci0_;  // constraints vector
+
+  // variables for QP problem
   Eigen::VectorXd F_;
-  Eigen::VectorXi ActiveSet_;
-  int activeSetSize_;
-  // Eigen::QuadProgStatus status;
+  Eigen::VectorXi activeSet_;
+  size_t activeSetSize_;
 
   size_t cols_, uni_rows_, fri_rows_;
   // active sizes:
