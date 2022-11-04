@@ -414,7 +414,7 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
   // std::cout<<"it is actually solving the QP"<<std::endl;
   distribute();
   // std::cout<<"it even distribute the forces"<<std::endl;
-  std::cout << "Distributed" << std::endl;
+  //std::cout << "Distributed" << std::endl;
 }
 
 }  // namespace aig
