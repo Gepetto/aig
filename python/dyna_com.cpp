@@ -64,25 +64,18 @@ void exposeDynaCoM() {
            bp::return_value_policy<bp::copy_const_reference>(),
            bp::args("self"))
       .def("uni_A", &DynaCoM::uni_A,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("uni_b", &DynaCoM::uni_b,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("fri_A", &DynaCoM::fri_A,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("fri_b", &DynaCoM::fri_b,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("reg_A", &DynaCoM::reg_A,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("reg_b", &DynaCoM::reg_b,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("NE_A", &DynaCoM::NE_A,
-           bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
       .def("NE_b", &DynaCoM::NE_b,
            bp::return_value_policy<bp::reference_existing_object>(),
@@ -113,7 +106,10 @@ void exposeDynaCoM() {
            bp::args("self"))
       .def("getNL", &DynaCoM::getNL,
            bp::return_value_policy<bp::reference_existing_object>(),
-           bp::args("self"));
+           bp::args("self"))
+      .def("getGroundCoMForce", &DynaCoM::getGroundCoMForce, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      .def("getGroundCoMTorque", &DynaCoM::getGroundCoMTorque, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"))
+      ;
 }
 }  // namespace python
 }  // namespace aig
