@@ -92,8 +92,8 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
   /**
    * @brief The external wrench is supposed to be expressed
    * in the frame of the Center of mass.
-   * 
-   * @brief The option flatHorizontalGround assumes that supporting contacts 
+   *
+   * @brief The option flatHorizontalGround assumes that supporting contacts
    * where previously defined.
    *
    * TODO: In the case when flatHorizontalGround = True, still, we could
@@ -126,8 +126,8 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
     distributeForce(groundCoMForce_, groundCoMTorque_, data_.com[0]);
     // @TODO: IT could happen that the expected groundCoMwrench is not feasible,
     // in such case, we should get the clossest possible and recompute the
-    // centroidal motion accordingly. So, groundCoMForce_(2) in the following 
-    // should be updated. 
+    // centroidal motion accordingly. So, groundCoMForce_(2) in the following
+    // should be updated.
     // The case when no contact is active should also be managed.
 
     CoPTorque_ = Eigen::Vector3d::Zero();
@@ -308,7 +308,7 @@ void DynaCoM::solveQP() {
   proxsuite::proxqp::dense::isize n_in(fri_i_ + uni_i_);
   proxsuite::proxqp::dense::QP<double> qp(dim, n_eq, n_in);
 
-  qp.init(H_, g_, A_, b_, C_, l_, u_); 
+  qp.init(H_, g_, A_, b_, C_, l_, u_);
   qp.solve();
 
   F_.resize(j_);
@@ -339,10 +339,10 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
    * class has been updated to the correct robot
    * posture before executing this distribution.
    *
-   * //@TODO: if the list of active contacts is empty, no force or torque 
-   * can be applied. Manage such case. We change the arguments? we throw 
+   * //@TODO: if the list of active contacts is empty, no force or torque
+   * can be applied. Manage such case. We change the arguments? we throw
    * error? Check.
-   * 
+   *
    * */
 
   buildMatrices(groundCoMForce, groundCoMTorque, CoM);

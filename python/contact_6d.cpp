@@ -89,8 +89,9 @@ void exposeContact6D() {
       .def("appliedForce", &Contact6D::appliedForce,
            bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"))
-      .def("get_pose", &Contact6D::getPose, bp::return_value_policy<bp::reference_existing_object>(), bp::args("self"));
-
+      .def("get_pose", &Contact6D::getPose,
+           bp::return_value_policy<bp::reference_existing_object>(),
+           bp::args("self"));
 }
 }  // namespace python
 }  // namespace aig
