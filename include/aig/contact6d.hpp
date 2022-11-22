@@ -78,6 +78,7 @@ class Contact6D {
   Contact6D(const Contact6DSettings &settings);
   void initialize(const Contact6DSettings &settings);
 
+
   // ~Contact6D();
 
   // setters
@@ -93,6 +94,7 @@ class Contact6D {
     contactForce_ << force;
   }
   void setPose(pinocchio::SE3 &pose) { oMs_ = pose; }
+  void deactivate(){contactForce_.setZero();}
 
   // getters
   const Contact6DSettings &getSettings() { return settings_; }
