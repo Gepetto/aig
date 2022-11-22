@@ -167,13 +167,13 @@ class DynaCoM {
   const pinocchio::Model &getModel() { return model_; }
   const pinocchio::Data &getData() { return data_; }
 
-  const Eigen::MatrixXd &uni_A() { return unilaterality_A_; }
-  const Eigen::VectorXd &uni_b() { return unilaterality_b_; }
-  const Eigen::MatrixXd &fri_A() { return friction_A_; }
-  const Eigen::VectorXd &fri_b() { return friction_b_; }
-  const Eigen::VectorXd &reg_A() { return regularization_A_; }
-  const Eigen::VectorXd &reg_b() { return regularization_b_; }
-  const Eigen::Matrix<double, 6, -1> &NE_A() { return newton_euler_A_; }
+  const Eigen::MatrixXd uni_A() { return unilaterality_A_.block(0, 0, uni_i_, j_); }
+  const Eigen::VectorXd uni_b() { return unilaterality_b_.segment(0, j_); }
+  const Eigen::MatrixXd fri_A() { return friction_A_.block(0, 0, fri_i_, j_); }
+  const Eigen::VectorXd fri_b() { return friction_b_.segment(0, j_); }
+  const Eigen::VectorXd reg_A() { return regularization_A_.segment(0, j_); }
+  const Eigen::VectorXd reg_b() { return regularization_b_.segment(0, j_); }
+  const Eigen::Matrix<double, 6, -1> NE_A() { return newton_euler_A_.block(0, 0, 6, j_); }
   const Eigen::Matrix<double, 6, 1> &NE_b() { return newton_euler_b_; }
   const Eigen::VectorXd &allForces() { return F_; }
 };

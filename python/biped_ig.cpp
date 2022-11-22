@@ -111,14 +111,27 @@ bp::tuple solve(BipedIG &self, const std::array<Eigen::Vector3d, 3> &com,
              max_iterations);
   return bp::tuple(pos);
 }
-bp::tuple solve(BipedIG &self, const std::array<pinocchio::SE3, 3> &base,
-                const std::array<pinocchio::SE3, 3> &LF,
-                const std::array<pinocchio::SE3, 3> &RF,
+bp::tuple solve(BipedIG &self, const bp::list &base,
+                const bp::list &LF,
+                const bp::list &RF,
                 const Eigen::VectorXd &q0, const double &dt) {
   Eigen::VectorXd pos, vel, acc;
-  self.solve(base, LF, RF, q0, pos, vel, acc, dt);
-  return bp::tuple(pos);
+
+  std::array<pinocchio::SE3, 3> B {bp::extract<pinocchio::SE3>(base[0]),
+                                   bp::extract<pinocchio::SE3>(base[1]),
+                                   bp::extract<pinocchio::SE3>(base[2])};
+  std::array<pinocchio::SE3, 3> L {bp::extract<pinocchio::SE3>(LF[0]),
+                                   bp::extract<pinocchio::SE3>(LF[1]),
+                                   bp::extract<pinocchio::SE3>(LF[2])};
+  std::array<pinocchio::SE3, 3> R {bp::extract<pinocchio::SE3>(RF[0]),
+                                   bp::extract<pinocchio::SE3>(RF[1]),
+                                   bp::extract<pinocchio::SE3>(RF[2])};
+
+  self.solve(B, L, R, q0, pos, vel, acc, dt);
+
+  return bp::make_tuple(pos, vel, acc);
 }
+
 bp::tuple solve(BipedIG &self, const std::array<Eigen::Isometry3d, 3> &base,
                 const std::array<Eigen::Isometry3d, 3> &LF,
                 const std::array<Eigen::Isometry3d, 3> &RF,
@@ -245,9 +258,9 @@ void exposeBiped_IG() {
           (bp::args("self", "coms", "baseRotations", "leftFeet", "rightFeet",
                     "q0", "dt"),
            bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
-      .def<bp::tuple(BipedIG &, const std::array<pinocchio::SE3, 3> &,
-                     const std::array<pinocchio::SE3, 3> &,
-                     const std::array<pinocchio::SE3, 3> &,
+      .def<bp::tuple(BipedIG &, const bp::list &,
+                     const bp::list &,
+                     const bp::list &,
                      const Eigen::VectorXd &, const double &)>(
           "solve", &solve,
           (bp::args("self", "bases", "leftFeet", "rightFeet", "q0", "dt")))
