@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
     unittest.main()
 
-    if debug == True:
+    if debug:
         sleep(5)
         o = TestBipedIG()
         o.setUp()
