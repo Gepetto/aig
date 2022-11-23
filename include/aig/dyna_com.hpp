@@ -53,8 +53,8 @@ struct DynaCoMSettings {
   }
 };
 
-class DynaCoM{
-public:
+class DynaCoM {
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
   DynaCoMSettings settings_;
@@ -80,15 +80,15 @@ public:
   Eigen::Matrix<double, 6, 1> newton_euler_b_;
 
   // variables for QP problem with proxsuite formulation
-//  Eigen::MatrixXd H_, , A_;
-//  Eigen::VectorXd g_, u_, l_;
-//  Eigen::Matrix<double, 6, 1> b_;
+  //  Eigen::MatrixXd H_, , A_;
+  //  Eigen::VectorXd g_, u_, l_;
+  //  Eigen::Matrix<double, 6, 1> b_;
 
   // variables for QP problem with eiquadprog formulation
-  Eigen::MatrixXd G_;     // matrix for quadratic cost
-  Eigen::VectorXd g0_;         // linear part of the cost function
-  Eigen::MatrixXd CE_, CI_, C_;    // constraints matrix
-  Eigen::VectorXd ce0_, ci0_;  // constraints vector
+  Eigen::MatrixXd G_;            // matrix for quadratic cost
+  Eigen::VectorXd g0_;           // linear part of the cost function
+  Eigen::MatrixXd CE_, CI_, C_;  // constraints matrix
+  Eigen::VectorXd ce0_, ci0_;    // constraints vector
 
   // variables for QP problem
   Eigen::VectorXd F_;
