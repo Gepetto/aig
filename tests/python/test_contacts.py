@@ -69,7 +69,7 @@ class TestDynaCoM(unittest.TestCase):
         d.addContact6d(leftSole, "left_sole")
         d.addContact6d(rightSole, "right_sole")
 
-        ## BIPED IG to compute postures
+        # BIPED IG to compute postures
         settings = aig.BipedIGSettings.makeSettingsFor(
             EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data", "talos"
         )
