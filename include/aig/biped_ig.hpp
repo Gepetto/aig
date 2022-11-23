@@ -48,41 +48,36 @@ struct BipedIGSettings {
   std::string srdf;
 
   BipedIGSettings()
-    : left_hip_joint_name("")
-    , left_knee_joint_name("")
-    , left_ankle_joint_name("")
-    , left_foot_frame_name("")
-    , right_hip_joint_name("")
-    , right_knee_joint_name("")
-    , right_ankle_joint_name("")
-    , right_foot_frame_name("")
-    , urdf("")
-    , srdf("")
-  {
-  }
+      : left_hip_joint_name(""),
+        left_knee_joint_name(""),
+        left_ankle_joint_name(""),
+        left_foot_frame_name(""),
+        right_hip_joint_name(""),
+        right_knee_joint_name(""),
+        right_ankle_joint_name(""),
+        right_foot_frame_name(""),
+        urdf(""),
+        srdf("") {}
 
-  BipedIGSettings(const std::string &_left_hip_joint_name, const std::string &_left_knee_joint_name,
+  BipedIGSettings(const std::string &_left_hip_joint_name,
+                  const std::string &_left_knee_joint_name,
                   const std::string &_left_ankle_joint_name,
                   const std::string &_left_foot_frame_name,
                   const std::string &_right_hip_joint_name,
                   const std::string &_right_knee_joint_name,
                   const std::string &_right_ankle_joint_name,
                   const std::string &_right_foot_frame_name,
-                  const std::string &_urdf,
-                  const std::string &_srdf)
-    : left_hip_joint_name(_left_hip_joint_name)
-    , left_knee_joint_name(_left_knee_joint_name)
-    , left_ankle_joint_name(_left_ankle_joint_name)
-    , left_foot_frame_name(_left_foot_frame_name)
-    , right_hip_joint_name(_right_hip_joint_name)
-    , right_knee_joint_name(_right_knee_joint_name)
-    , right_ankle_joint_name(_right_ankle_joint_name)
-    , right_foot_frame_name(_right_foot_frame_name)
-    , urdf(_urdf)
-    , srdf(_srdf)
-  {
-  }
-
+                  const std::string &_urdf, const std::string &_srdf)
+      : left_hip_joint_name(_left_hip_joint_name),
+        left_knee_joint_name(_left_knee_joint_name),
+        left_ankle_joint_name(_left_ankle_joint_name),
+        left_foot_frame_name(_left_foot_frame_name),
+        right_hip_joint_name(_right_hip_joint_name),
+        right_knee_joint_name(_right_knee_joint_name),
+        right_ankle_joint_name(_right_ankle_joint_name),
+        right_foot_frame_name(_right_foot_frame_name),
+        urdf(_urdf),
+        srdf(_srdf) {}
 
   friend std::ostream &operator<<(std::ostream &out,
                                   const BipedIGSettings &obj) {

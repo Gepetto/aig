@@ -8,12 +8,13 @@
 
 #include <algorithm>
 #include <cctype>
+#include <eiquadprog/eiquadprog.hpp>
 #include <example-robot-data/path.hpp>
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/parsers/urdf.hpp>
-#include <eiquadprog/eiquadprog.hpp>
+
 #include "aig/contact6d.hpp"
 
 namespace aig {
@@ -277,13 +278,13 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
   newton_euler_b_ << groundCoMForce, groundCoMTorque;
 }
 
-//void DynaCoM::solveQP() {
-//  H_.resize(j_, j_);
-//  g_.resize(j_);
-//  C_.resize(uni_i_ + fri_i_, j_);
-//  u_.resize(uni_i_ + fri_i_);
-//  l_.resize(uni_i_ + fri_i_);
-//  A_.resize(6, j_);
+// void DynaCoM::solveQP() {
+//   H_.resize(j_, j_);
+//   g_.resize(j_);
+//   C_.resize(uni_i_ + fri_i_, j_);
+//   u_.resize(uni_i_ + fri_i_);
+//   l_.resize(uni_i_ + fri_i_);
+//   A_.resize(6, j_);
 
 //  H_.setZero();
 //  g_.setZero();
@@ -317,8 +318,6 @@ void DynaCoM::buildMatrices(const Eigen::Vector3d &groundCoMForce,
 //  // std::cout << "solution:\n " << F_ << std::endl;
 //}
 
-
-
 void DynaCoM::solveQP() {
   /* eiquadprog formulation :
   min 0.5 * x G x + g0 x
@@ -334,9 +333,10 @@ void DynaCoM::solveQP() {
   l <= C x <= u
   */
 
-  int dim(static_cast<int>(j_)); // number of variables
-  int n_eq(6); // number of equality constraints
-  int n_ineq(static_cast<int>(fri_i_ + uni_i_)); // number of inequalities constraints
+  int dim(static_cast<int>(j_));  // number of variables
+  int n_eq(6);                    // number of equality constraints
+  int n_ineq(
+      static_cast<int>(fri_i_ + uni_i_));  // number of inequalities constraints
 
   F_.resize(dim);
   G_.resize(dim, dim);
@@ -355,36 +355,33 @@ void DynaCoM::solveQP() {
   ce0_ << -newton_euler_b_;
 
   C_ << unilaterality_A_.block(0, 0, static_cast<int>(uni_i_), dim),
-        friction_A_.block(0, 0, static_cast<int>(fri_i_), dim);
+      friction_A_.block(0, 0, static_cast<int>(fri_i_), dim);
   CI_ = -C_.transpose();
   ci0_.setZero();
 
-//  std::cout<<"G "<<std::endl<<G_<<std::endl;
-//  std::cout<<"g0 "<<std::endl<<g0_<<std::endl;
-//  std::cout<<"CE "<<std::endl<<CE_<<std::endl;
-//  std::cout<<"ce "<<std::endl<<ce0_<<std::endl;
-//  std::cout<<"CI "<<std::endl<<CI_<<std::endl;
-//  std::cout<<"ci "<<std::endl<<ci0_<<std::endl;
-
+  //  std::cout<<"G "<<std::endl<<G_<<std::endl;
+  //  std::cout<<"g0 "<<std::endl<<g0_<<std::endl;
+  //  std::cout<<"CE "<<std::endl<<CE_<<std::endl;
+  //  std::cout<<"ce "<<std::endl<<ce0_<<std::endl;
+  //  std::cout<<"CI "<<std::endl<<CI_<<std::endl;
+  //  std::cout<<"ci "<<std::endl<<ci0_<<std::endl;
 
   activeSetSize_ = 0;
-  //const double precision =
-  eiquadprog::solvers::solve_quadprog(G_, g0_, CE_, ce0_, CI_, ci0_, F_, activeSet_, activeSetSize_);
-  //std::cout<<"DynaCom::SolveQP, finished with precision = "<<precision<<std::endl;
+  // const double precision =
+  eiquadprog::solvers::solve_quadprog(G_, g0_, CE_, ce0_, CI_, ci0_, F_,
+                                      activeSet_, activeSetSize_);
+  // std::cout<<"DynaCom::SolveQP, finished with precision =
+  // "<<precision<<std::endl;
 }
 
 void DynaCoM::distribute() {
   Eigen::Index n, i = 0;
-  for (auto contact_pair : known_contact6ds_)
-  {
-    if (std::find(active_contact6ds_.begin(), active_contact6ds_.end(), contact_pair.first) ==
-        active_contact6ds_.end())
-    {
+  for (auto contact_pair : known_contact6ds_) {
+    if (std::find(active_contact6ds_.begin(), active_contact6ds_.end(),
+                  contact_pair.first) == active_contact6ds_.end()) {
       // Contact not active
       contact_pair.second->applyForce(Eigen::Matrix<double, 6, 1>::Zero());
-    }
-    else
-    {
+    } else {
       // contact is active
       n = static_cast<int>(contact_pair.second->cols());
       contact_pair.second->applyForce(F_.segment(i, n));
@@ -414,7 +411,7 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
   // std::cout<<"it is actually solving the QP"<<std::endl;
   distribute();
   // std::cout<<"it even distribute the forces"<<std::endl;
-  //std::cout << "Distributed" << std::endl;
+  // std::cout << "Distributed" << std::endl;
 }
 
 }  // namespace aig
