@@ -169,7 +169,7 @@ if __name__ == "__main__":
         RF = pin.SE3(np.eye(3), np.array([0.0, -0.58, 0]))
         BS = pin.SE3(np.eye(3), np.array([0, 0, 0.7]))
 
-        #### From computation:
+        # From computation:
 
         posture = o.biped.solve(BS, LF, RF, o.q0)
         pin.forwardKinematics(o.model, o.data, posture)
@@ -191,10 +191,10 @@ if __name__ == "__main__":
         print("C5 gotten: ", C5)
         print("Q5_ gotten: ", Q5)
 
-        ### Repeating step by step
-        ## 1 The norm of hip_from_ankle are differnet
-        ## 2 The angles q7 are the same.
-        ### The error must be on q5, check the computation of c_.
+        # Repeating step by step
+        # 1 The norm of hip_from_ankle are differnet
+        # 2 The angles q7 are the same.
+        # The error must be on q5, check the computation of c_.
 
         ee = LF
         ll_settings = o.biped.get_left_leg_settings()
