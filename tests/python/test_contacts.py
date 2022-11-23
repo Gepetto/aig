@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 unittest.util._MAX_LENGTH = 2000
 
-debug = True
+debug = False
 visualize = True
 
 
@@ -750,7 +750,6 @@ class TestDynaCoM(unittest.TestCase):
             ]
         )
 
-        print(LF_wrench[:, 2] - Correct_left_z_force)
         self.assertTrue((LF_wrench[:, 2] - Correct_left_z_force < 1e-5).all())
 
         if visualize:
@@ -807,69 +806,3 @@ if __name__ == "__main__":
 
         h = TestDynaCoM()
         h.setUp()
-
-        d = h.dyn
-
-        # CONTACTS ##
-        settingsL = aig.Contact6DSettings()
-        settingsL.frame_name = "leg_left_sole_fix_joint"
-        settingsL.mu = 0.3
-        settingsL.gu = 0.4
-        settingsL.weights = np.array([1, 1, 1, 1, 1, 1])
-        settingsL.half_length = 0.1
-        settingsL.half_width = 0.05
-
-        leftSole = aig.Contact6D()
-        leftSole.initialize(settingsL)
-
-        settingsR = aig.Contact6DSettings()
-        settingsR.frame_name = "leg_right_sole_fix_joint"
-        settingsR.mu = 0.3
-        settingsR.gu = 0.4
-        settingsR.weights = np.array([1, 1, 1, 1, 1, 1])
-        settingsR.half_length = 0.1
-        settingsR.half_width = 0.05
-
-        rightSole = aig.Contact6D()
-        rightSole.initialize(settingsR)
-
-        # DYNAMICS ###
-        dynSettings = aig.DynaCoMSettings()
-        dynSettings.urdf = (
-            EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data/robots/talos_reduced.urdf"
-        )
-
-        d = aig.DynaCoM()
-        d.initialize(dynSettings)
-
-        pin.loadReferenceConfigurations(
-            d.model(),
-            EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data/srdf/talos.srdf",
-            False,
-        )
-
-        q0 = d.model().referenceConfigurations["half_sitting"]
-        v0 = np.zeros(d.model().nv)
-        d.computeDynamics(q0, v0, v0, np.zeros(6), True)
-        pin.computeAllTerms(d.model(), d.data(), q0, v0)
-        pin.updateFramePlacements(d.model(), d.data())
-
-        d.addContact6d(leftSole, "left_sole")
-        d.addContact6d(rightSole, "right_sole")
-
-        groundCoMwrench = np.array([0, 0, 1, 0, 0, 0])
-
-        CoM = pin.centerOfMass(d.model(), d.data(), q0)
-
-        d.distributeForce(groundCoMwrench[:3], groundCoMwrench[3:], CoM)
-
-        d.deactivateContact6d("right_sole")
-        d.computeDynamics(
-            q0,
-            np.zeros(d.model().nv),
-            np.zeros(d.model().nv),
-            np.zeros(6),
-            False,
-        )
-
-        print(d.getCoM()[:2], d.getCoP(), d.getCoM()[:2] - d.getCoP())
