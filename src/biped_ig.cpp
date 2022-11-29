@@ -87,14 +87,6 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   // Build pinocchio cache.
   data_ = pinocchio::Data(model_);
 
-  gravity_ = model_.gravity981;
-  mass_ = 0.0;
-  for (size_t k = 0; k < model_.inertias.size(); ++k) {
-    mass_ += model_.inertias[k].mass();
-  }
-  weight_ = mass_ * gravity_;
-  S_ << 0, -1, 1, 0;
-
   // Extract the CoM to Waist level arm.
   if (srdf_file_exists) {
     pinocchio::srdf::loadReferenceConfigurations(model_, settings_.srdf, false);
@@ -403,12 +395,6 @@ void BipedIG::computeDynamics(const Eigen::VectorXd &posture,
                               bool flatHorizontalGround) {
   dynamics_.computeDynamics(posture, velocity, acceleration, externalWrench,
                             flatHorizontalGround);
-  acom_ = dynamics_.getACoM();
-  dL_ = dynamics_.getAMVariation();
-  L_ = dynamics_.getAM();
-  groundForce_ = dynamics_.getGroundCoMForce();
-  groundCoMTorque_ = dynamics_.getGroundCoMTorque();
-  cop_ = dynamics_.getCoP();
 }
 
 void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
@@ -418,7 +404,6 @@ void BipedIG::computeNL(const double &w, const Eigen::VectorXd &posture,
                         bool flatHorizontalGround) {
   dynamics_.computeNL(w, posture, velocity, acceleration, externalWrench,
                       flatHorizontalGround);
-  n_ = dynamics_.getNL();
 }
 
 void BipedIG::computeNL(const double &w) {
@@ -427,7 +412,6 @@ void BipedIG::computeNL(const double &w) {
    * before.
    */
   dynamics_.computeNL(w);
-  n_ = dynamics_.getNL();
 }
 
 }  // namespace aig
