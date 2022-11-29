@@ -132,16 +132,6 @@ class BipedIG {
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
-  double mass_;
-  Eigen::Matrix2d S_;
-  Eigen::Vector3d gravity_;
-  // Eigen::Vector3d com_;
-  // Eigen::Vector3d vcom_;
-  Eigen::Vector3d acom_;
-  Eigen::Vector2d cop_;
-  Eigen::Vector3d dL_;
-  Eigen::Vector3d L_;
-  Eigen::Vector2d n_;
 
   // variables used in the waist-com vector correction:
   Eigen::Vector3d error_, com_temp_;
@@ -165,10 +155,6 @@ class BipedIG {
 
   void configureLegs();
 
-  // Internal computation variables
-  // on computeDynamics
-  Eigen::Vector3d groundForce_, groundCoMTorque_, nonCoPTorque_, weight_;
-
   // Public methods.
  public:
   BipedIG();
@@ -190,15 +176,20 @@ class BipedIG {
 
   /// @brief Get the Angular Momentum variation. Please call computeDynamics
   /// first. Deprecate it, AIG is not made for dynamics
-  const Eigen::Vector3d &getAMVariation() { return dL_; }
+  const Eigen::Vector3d &getAMVariation() { return dynamics_.getAMVariation(); }
 
-  /// @brief Get the Angular Momentum. Please call computeDynamics first.
-  const Eigen::Vector3d &getCoM() { return data_.com[0]; }
-  const Eigen::Vector3d &getVCoM() { return data_.vcom[0]; }
-  const Eigen::Vector3d &getACoM() { return acom_; }
-  const Eigen::Vector3d &getAM() { return L_; }
-  const Eigen::Vector2d &getCoP() { return cop_; }
-  const Eigen::Vector2d &getNL() { return n_; }
+  /// @brief Get the CoM position. Please call computeDynamics first.
+  const Eigen::Vector3d &getCoM() { return dynamics_.getCoM(); }
+  /// @brief Get the CoM velocity. Please call computeDynamics first.
+  const Eigen::Vector3d &getVCoM() { return dynamics_.getVCoM(); }
+  /// @brief Get the CoM acceleration. Please call computeDynamics first.
+  const Eigen::Vector3d &getACoM() { return dynamics_.getACoM(); }
+  /// @brief Get the angular momentum. Please call computeDynamics first.
+  const Eigen::Vector3d &getAM() { return dynamics_.getAM(); }
+  /// @brief Get the CoP Position. Please call computeDynamics first.
+  const Eigen::Vector2d &getCoP() { return dynamics_.getCoP(); }
+  /// @brief Get the nonlinear effect. Please call computeDynamics first.
+  const Eigen::Vector2d &getNL() { return dynamics_.getNL(); }
 
   void checkCompatibility();  // TODO
 

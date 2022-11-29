@@ -153,7 +153,7 @@ void DynaCoM::computeNL(const double &w, const Eigen::VectorXd &posture,
 
 void DynaCoM::computeNL(const double &w) {
   /**
-   * In this function form, computeDynamics is suposed to have been called
+   * In this function form, computeDynamics is supposed to have been called
    * before.
    */
   n_ = acom_.head<2>() / (w * w) - data_.com[0].head<2>() + cop_;

@@ -3,7 +3,7 @@
   <name>aig</name>
   <version>1.1.0</version>
   <description>
-    Analitcical inverse geometry for 6 links kinematic chains
+    Analytical inverse geometry for 6 links kinematic chains
   </description>
   <maintainer email="guilhem.saurel@laas.fr">Guilhem saurel</maintainer>
   <license>BSD</license>
