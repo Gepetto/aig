@@ -37,19 +37,19 @@ const std::string right_foot_frame_name = "leg_right_sole_fix_joint";
 // knee_from_hip
 // ankle_from_knee
 // ankle_from_foot
-const LegIGSettings llegs = {
-    (Eigen::Vector3d() << -0.02, 0.085, -0.27105)
-        .finished(),                                    /* hip_from_waist */
-    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),  /* knee_from_hip */
-    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(), /* ankle_from_knee */
-    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()   /* ankle_from_foot */
+const LegIGSettings llegs{
+    Eigen::Vector3d(-0.02, 0.085, -0.27105), /* hip_from_waist */
+    Eigen::Vector3d(0.0, 0.0, -0.38),        /* knee_from_hip */
+    Eigen::Vector3d(0.0, 0.0, -0.325),       /* ankle_from_knee */
+    Eigen::Vector3d(0.0, 0.0, 0.107)         /* ankle_from_foot */
 };
 
-const LegIGSettings rlegs = {
-    (Eigen::Vector3d() << -0.02, -0.085, -0.27105).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, -0.38).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, -0.325).finished(),
-    (Eigen::Vector3d() << 0.0, 0.0, 0.107).finished()};
+const LegIGSettings rlegs{
+    Eigen::Vector3d(-0.02, -0.085, -0.27105), /* hip_from_waist */
+    Eigen::Vector3d(0.0, 0.0, -0.38),         /* knee_from_hip */
+    Eigen::Vector3d(0.0, 0.0, -0.325),        /* ankle_from_knee */
+    Eigen::Vector3d(0.0, 0.0, 0.107)          /* ankle_from_foot */
+};
 
 aig::BipedIGSettings bipeds = {
     left_hip_joint_name,    /* left_hip_joint_name */

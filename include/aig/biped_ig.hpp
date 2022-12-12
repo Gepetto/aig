@@ -18,6 +18,7 @@
 #include "pinocchio/spatial/se3.hpp"
 #include "aig/arm_ig.hpp"
 #include "aig/leg_ig.hpp"
+#include "aig/dyna_com.hpp"
 // clang-format on
 
 namespace aig {
@@ -27,24 +28,56 @@ namespace aig {
 
 struct BipedIGSettings {
  public:
-  std::string left_hip_joint_name = "";
-  std::string left_knee_joint_name = "";
-  std::string left_ankle_joint_name = "";
-  std::string left_foot_frame_name = "";
-  std::string right_hip_joint_name = "";
-  std::string right_knee_joint_name = "";
-  std::string right_ankle_joint_name = "";
-  std::string right_foot_frame_name = "";
+  std::string left_hip_joint_name;
+  std::string left_knee_joint_name;
+  std::string left_ankle_joint_name;
+  std::string left_foot_frame_name;
+  std::string right_hip_joint_name;
+  std::string right_knee_joint_name;
+  std::string right_ankle_joint_name;
+  std::string right_foot_frame_name;
   /**
    * @brief This must contain either a valid path to the urdf file or the
    * content of this file in a string.
    */
-  std::string urdf = "";
+  std::string urdf;
   /**
    * @brief This must contain either a valid path to the srdf file or the
    * content of this file in a string.
    */
-  std::string srdf = "";
+  std::string srdf;
+
+  BipedIGSettings()
+      : left_hip_joint_name(""),
+        left_knee_joint_name(""),
+        left_ankle_joint_name(""),
+        left_foot_frame_name(""),
+        right_hip_joint_name(""),
+        right_knee_joint_name(""),
+        right_ankle_joint_name(""),
+        right_foot_frame_name(""),
+        urdf(""),
+        srdf("") {}
+
+  BipedIGSettings(const std::string &_left_hip_joint_name,
+                  const std::string &_left_knee_joint_name,
+                  const std::string &_left_ankle_joint_name,
+                  const std::string &_left_foot_frame_name,
+                  const std::string &_right_hip_joint_name,
+                  const std::string &_right_knee_joint_name,
+                  const std::string &_right_ankle_joint_name,
+                  const std::string &_right_foot_frame_name,
+                  const std::string &_urdf, const std::string &_srdf)
+      : left_hip_joint_name(_left_hip_joint_name),
+        left_knee_joint_name(_left_knee_joint_name),
+        left_ankle_joint_name(_left_ankle_joint_name),
+        left_foot_frame_name(_left_foot_frame_name),
+        right_hip_joint_name(_right_hip_joint_name),
+        right_knee_joint_name(_right_knee_joint_name),
+        right_ankle_joint_name(_right_ankle_joint_name),
+        right_foot_frame_name(_right_foot_frame_name),
+        urdf(_urdf),
+        srdf(_srdf) {}
 
   friend std::ostream &operator<<(std::ostream &out,
                                   const BipedIGSettings &obj) {
@@ -99,21 +132,13 @@ class BipedIG {
   Eigen::Vector3d com_from_waist_;
   int lleg_idx_qs_;  // Indexes in the configuration vector.
   int rleg_idx_qs_;  // Indexes in the configuration vector.
-  double mass_;
-  Eigen::Matrix2d S_;
-  Eigen::Vector3d gravity_;
-  // Eigen::Vector3d com_;
-  // Eigen::Vector3d vcom_;
-  Eigen::Vector3d acom_;
-  Eigen::Vector2d cop_;
-  Eigen::Vector3d dL_;
-  Eigen::Vector3d L_;
-  Eigen::Vector2d n_;
 
   // variables used in the waist-com vector correction:
   Eigen::Vector3d error_, com_temp_;
   Eigen::VectorXd posture_temp_;
   Eigen::Matrix3d baseRotation_temp_;
+
+  aig::DynaCoM dynamics_;
 
   // Private methods.
  private:
@@ -129,10 +154,6 @@ class BipedIG {
                              const Eigen::Matrix3d &baseRotation);
 
   void configureLegs();
-
-  // Internal computation variables
-  // on computeDynamics
-  Eigen::Vector3d groundForce_, groundCoMTorque_, nonCoPTorque_, weight_;
 
   // Public methods.
  public:
@@ -154,16 +175,21 @@ class BipedIG {
   void setQ0(const Eigen::VectorXd q0) { q0_ = q0; }
 
   /// @brief Get the Angular Momentum variation. Please call computeDynamics
-  /// first.
-  const Eigen::Vector3d &getAMVariation() { return dL_; }
+  /// first. Deprecate it, AIG is not made for dynamics
+  const Eigen::Vector3d &getAMVariation() { return dynamics_.getAMVariation(); }
 
-  /// @brief Get the Angular Momentum. Please call computeDynamics first.
-  const Eigen::Vector3d &getCoM() { return data_.com[0]; }
-  const Eigen::Vector3d &getVCoM() { return data_.vcom[0]; }
-  const Eigen::Vector3d &getACoM() { return acom_; }
-  const Eigen::Vector3d &getAM() { return L_; }
-  const Eigen::Vector2d &getCoP() { return cop_; }
-  const Eigen::Vector2d &getNL() { return n_; }
+  /// @brief Get the CoM position. Please call computeDynamics first.
+  const Eigen::Vector3d &getCoM() { return dynamics_.getCoM(); }
+  /// @brief Get the CoM velocity. Please call computeDynamics first.
+  const Eigen::Vector3d &getVCoM() { return dynamics_.getVCoM(); }
+  /// @brief Get the CoM acceleration. Please call computeDynamics first.
+  const Eigen::Vector3d &getACoM() { return dynamics_.getACoM(); }
+  /// @brief Get the angular momentum. Please call computeDynamics first.
+  const Eigen::Vector3d &getAM() { return dynamics_.getAM(); }
+  /// @brief Get the CoP Position. Please call computeDynamics first.
+  const Eigen::Vector2d &getCoP() { return dynamics_.getCoP(); }
+  /// @brief Get the nonlinear effect. Please call computeDynamics first.
+  const Eigen::Vector2d &getNL() { return dynamics_.getNL(); }
 
   void checkCompatibility();  // TODO
 
@@ -279,6 +305,8 @@ class BipedIG {
   void computeNL(const double &w);
 
   pinocchio::Model &get_model() { return model_; }
+  pinocchio::Data &get_data() { return data_; }
+  Eigen::Vector3d &get_com_from_waist() { return com_from_waist_; }
 };
 }  // namespace aig
 #endif  // AIG_BIPED_IG

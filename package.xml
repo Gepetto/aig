@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>aig</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <description>
-    Analitcical inverse geometry for 6 links kinematic chains
+    Analytical inverse geometry for 6 links kinematic chains
   </description>
   <maintainer email="guilhem.saurel@laas.fr">Guilhem saurel</maintainer>
   <license>BSD</license>
@@ -20,7 +20,7 @@
   <depend>eigen</depend>
   <depend>boost</depend>
   <depend>pinocchio</depend>
-
+  <depend>eiquadprog</depend>
   <test_depend>example-robot-data</test_depend>
 
   <buildtool_depend>cmake</buildtool_depend>

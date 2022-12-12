@@ -26,10 +26,25 @@ typedef Eigen::Matrix<double, 6, 1> LegJoints;
  */
 struct LegIGSettings {
  public:
-  Eigen::Vector3d hip_from_waist = Eigen::Vector3d::Zero();
-  Eigen::Vector3d knee_from_hip = Eigen::Vector3d::Zero();
-  Eigen::Vector3d ankle_from_knee = Eigen::Vector3d::Zero();
-  Eigen::Vector3d ankle_from_foot = Eigen::Vector3d::Zero();
+  Eigen::Vector3d hip_from_waist;
+  Eigen::Vector3d knee_from_hip;
+  Eigen::Vector3d ankle_from_knee;
+  Eigen::Vector3d ankle_from_foot;
+
+  LegIGSettings()
+      : hip_from_waist(Eigen::Vector3d::Zero()),
+        knee_from_hip(Eigen::Vector3d::Zero()),
+        ankle_from_knee(Eigen::Vector3d::Zero()),
+        ankle_from_foot(Eigen::Vector3d::Zero()) {}
+
+  LegIGSettings(const Eigen::Vector3d &_hip_from_waist,
+                const Eigen::Vector3d &_knee_from_hip,
+                const Eigen::Vector3d &_ankle_from_knee,
+                const Eigen::Vector3d &_ankle_from_foot)
+      : hip_from_waist(_hip_from_waist),
+        knee_from_hip(_knee_from_hip),
+        ankle_from_knee(_ankle_from_knee),
+        ankle_from_foot(_ankle_from_foot) {}
 
   friend std::ostream &operator<<(std::ostream &out, const LegIGSettings &obj) {
     out << "LegIGSettings:\n"
@@ -62,7 +77,7 @@ class LegIG {
   Eigen::Vector3d hip_, ankle_, hip_from_ankle_;
   double epsilon_, c5_;
   double q2_, q3_, q4_, q5_, q6_, q7_;
-  double opp_sign_hip_from_waist_y_, sign_hip_from_ankle_z;
+  double sign_hip_from_ankle_z;
   double a_, b_, c_;
   Eigen::Matrix3d Rint_, Rext_, R_;
   LegJoints output_;
