@@ -11,8 +11,6 @@ option(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
 option(INSTALL_PYTHON_INTERFACE_ONLY "Instal *ONLY* the python bindings" OFF)
 option(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
 
-add_compile_options(-std=c++11)
-
 # Project configuration
 if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
   set(PROJECT_USE_CMAKE_EXPORT TRUE)
