@@ -49,7 +49,6 @@ def get_visualizer():
 
 class TestBipedIG(unittest.TestCase):
     def setUp(self):
-
         settings = aig.BipedIGSettings.makeSettingsFor(
             EXAMPLE_ROBOT_DATA_MODEL_DIR + "/talos_data", "talos"
         )
@@ -157,7 +156,6 @@ class TestBipedIG(unittest.TestCase):
 
 
 if __name__ == "__main__":
-
     unittest.main()
 
     if debug:
