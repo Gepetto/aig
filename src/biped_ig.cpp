@@ -75,6 +75,7 @@ void BipedIG::initialize(const BipedIGSettings &settings) {
   }
 
   // Build the robot model.
+  model_ = pinocchio::Model();
   if (urdf_file_exists) {
     pinocchio::urdf::buildModel(settings_.urdf,
                                 pinocchio::JointModelFreeFlyer(), model_);
