@@ -3,7 +3,6 @@
 #include <Eigen/Dense>
 #include <iostream>
 
-#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/crba.hpp"
 #include "pinocchio/algorithm/frames.hpp"

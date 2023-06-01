@@ -2,7 +2,6 @@
 
 #include "aig/biped_ig.hpp"
 #include "aig/unittests/pyrene_settings.hpp"
-#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/algorithm/frames.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
