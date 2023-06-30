@@ -8,8 +8,9 @@
 
 #include <algorithm>
 #include <cctype>
+#ifdef WITH_EIQUADPROG
 #include <eiquadprog/eiquadprog.hpp>
-#include <example-robot-data/path.hpp>
+#endif
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/frames.hpp>
@@ -62,6 +63,7 @@ void DynaCoM::initialize(const DynaCoMSettings settings) {
   newton_euler_b_.resize(6);
 }
 
+#ifdef WITH_EIQUADPROG
 const Eigen::Matrix<double, 6, 6> DynaCoM::toWorldCoPWrench(
     pinocchio::SE3 pose) {
   /**
@@ -70,7 +72,7 @@ const Eigen::Matrix<double, 6, 6> DynaCoM::toWorldCoPWrench(
    * the vertical forces produce pressure on such surface.
    * This method generates the adjoint matrix needed to transform
    * local forces in some frame pose to a world wrench composed by
-   * the vertical force and the torque. Lateral forces are discarted
+   * the vertical force and the torque. Lateral forces are discarded
    * because they do not contribute on this CoP.
    * Still, notice that the lateral forces have an effect that is
    * accounted in the non-linear effects.
@@ -83,6 +85,7 @@ const Eigen::Matrix<double, 6, 6> DynaCoM::toWorldCoPWrench(
 
   return oXso_ * Sz_ * soXs_;
 }
+#endif
 
 void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
                               const Eigen::VectorXd &velocity,
@@ -116,12 +119,14 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
   groundCoMForce_ = data_.dhg.linear() - weight_ - externalWrench.head<3>();
   groundCoMTorque_ = dL_ - externalWrench.tail<3>();
 
+#ifdef WITH_EIQUADPROG
   if (flatHorizontalGround)
+#endif
     cop_ =
         data_.com[0].head<2>() + (S_ * groundCoMTorque_.head<2>() -
                                   groundCoMForce_.head<2>() * data_.com[0](2)) /
                                      (groundCoMForce_(2));
-
+#ifdef WITH_EIQUADPROG
   else {
     distributeForce(groundCoMForce_, groundCoMTorque_, data_.com[0]);
     // @TODO: IT could happen that the expected groundCoMwrench is not feasible,
@@ -139,6 +144,7 @@ void DynaCoM::computeDynamics(const Eigen::VectorXd &posture,
     }
     cop_ = S_ * CoPTorque_.head<2>() / groundCoMForce_(2);
   }
+#endif
 }
 
 void DynaCoM::computeNL(const double &w, const Eigen::VectorXd &posture,
@@ -162,6 +168,7 @@ void DynaCoM::computeNL(const double &w) {
 // Contact management
 // //////////////////////////////////////////////////////////////////
 
+#ifdef WITH_EIQUADPROG
 void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
                            const std::string &name, const bool active) {
   contact->setFrameID(model_.getFrameId(contact->getSettings().frame_name));
@@ -413,5 +420,5 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
   // std::cout<<"it even distribute the forces"<<std::endl;
   // std::cout << "Distributed" << std::endl;
 }
-
+#endif
 }  // namespace aig

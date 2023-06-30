@@ -45,11 +45,10 @@ include("${JRL_CMAKE_MODULES}/python.cmake")
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
-# check_minimal_cxx_standard(11 ENFORCE)
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
-add_project_dependency(eiquadprog REQUIRED)
+add_project_dependency(eiquadprog QUIET)
 
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -82,10 +81,17 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio eiquadprog::eiquadprog)
+target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio)
+if(${eiquadprog_FOUND})
+  target_link_libraries(${PROJECT_NAME} PUBLIC eiquadprog::eiquadprog)
+endif()
+
 
 if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+endif()
+if(${eiquadprog_FOUND})
+  target_compile_definitions(${PROJECT_NAME} PUBLIC WITH_EIQUADPROG)
 endif()
 
 # Python Bindings
