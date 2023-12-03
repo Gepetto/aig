@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10)
 
 # Project properties
 set(PROJECT_NAMESPACE gepetto)
@@ -15,7 +15,6 @@ option(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
 if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
   set(PROJECT_USE_CMAKE_EXPORT TRUE)
 endif()
-set(CUSTOM_HEADER_DIR ${PROJECT_NAME})
 
 # #################################################### Check if the submodule
 # cmake have been initialized
@@ -39,13 +38,11 @@ endif()
 # JRL-cmakemodule setup
 include("${JRL_CMAKE_MODULES}/base.cmake")
 include("${JRL_CMAKE_MODULES}/boost.cmake")
-include("${JRL_CMAKE_MODULES}/python.cmake")
 # ##############################################################################
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
-# check_minimal_cxx_standard(11 ENFORCE)
 
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
@@ -89,9 +86,6 @@ if(SUFFIX_SO_VERSION)
 endif()
 
 # Python Bindings
-# if(BUILD_PYTHON_INTERFACE)
-#   add_subdirectory(python)
-# endif()
 if(BUILD_PYTHON_INTERFACE)
   set(${PY_NAME}_SOURCES
     python/contact_6d.cpp
@@ -101,9 +95,9 @@ if(BUILD_PYTHON_INTERFACE)
   )
   add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
   target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
-  # target_include_directories(${PY_NAME}_py SYSTEM PRIVATE ${PYTHON_INCLUDE_DIR})
+  get_relative_rpath(${${PY_NAME}_INSTALL_DIR} ${PY_NAME}_INSTALL_RPATH)
   set_target_properties(${PY_NAME}_py PROPERTIES
-    INSTALL_RPATH "$ORIGIN/../../.."
+      INSTALL_RPATH "${${PY_NAME}_INSTALL_RPATH}"
     LIBRARY_OUTPUT_DIRECTORY ${PY_NAME}
     OUTPUT_NAME ${PY_NAME}
     PREFIX ""
