@@ -1,0 +1,33 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+- add CHANGELOG
+- require CMake >= 3.10
+- update CMake
+
+## [1.2.0] - 2022-12-12
+
+## [1.1.0] - 2022-09-12
+
+- require C++ >= 11
+- example-robot-data is optional
+- fix the computation of the dynamcis using Pioncchio and a unit-test on a static posture.
+- fix the check on the creation of settings using a robot name
+- rename the private method `void configurateLegs()` into `void configureLegs()`
+- add some getters on the CoM and its derivatives
+- update the `urdf_path` into `urdf`, and same for `srdf`
+
+## [1.0.0] - 2022-04-06
+
+Initial release
+
+[unreleased]: https://github.com/gepetto/aig/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/gepetto/aig/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/gepetto/aig/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/gepetto/aig/releases/tag/v1.0.0
