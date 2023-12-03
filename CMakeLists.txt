@@ -47,10 +47,10 @@ project(${PROJECT_NAME} ${PROJECT_ARGS})
 # Dependencies
 add_project_dependency(pinocchio REQUIRED)
 add_project_dependency(eiquadprog REQUIRED)
+add_project_dependency(example-robot-data 4.0.7 REQUIRED)
 
 if(BUILD_TESTING)
   find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-  find_package(example-robot-data REQUIRED)
 endif()
 
 if(BUILD_PYTHON_INTERFACE)

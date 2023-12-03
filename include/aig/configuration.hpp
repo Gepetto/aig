@@ -4,7 +4,6 @@
 
 // clang-format off
 #include "pinocchio/fwd.hpp"
-#include "example-robot-data/path.hpp"
 // clang-format on
 
 namespace conf {

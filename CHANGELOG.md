@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add CHANGELOG
 - require CMake >= 3.10
+- require example-robot-data >= 4.0.7
 - update CMake
 - update tooling (add isort, ruff, cmake-format, toml-sort, drop flake8)
 

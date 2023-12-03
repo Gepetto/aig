@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cctype>
 #include <eiquadprog/eiquadprog.hpp>
-#include <example-robot-data/path.hpp>
 #include <pinocchio/algorithm/center-of-mass.hpp>
 #include <pinocchio/algorithm/centroidal.hpp>
 #include <pinocchio/algorithm/frames.hpp>

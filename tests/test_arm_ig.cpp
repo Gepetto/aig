@@ -1,7 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "aig/unittests/pyrene_settings.hpp"
-#include "example-robot-data/path.hpp"
 #include "pinocchio/algorithm/center-of-mass.hpp"
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
