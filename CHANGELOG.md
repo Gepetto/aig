@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2023-12-03
+
 - add CHANGELOG
 - require CMake >= 3.10
 - require example-robot-data >= 4.0.7
@@ -29,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/gepetto/aig/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/gepetto/aig/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/gepetto/aig/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/gepetto/aig/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/gepetto/aig/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/gepetto/aig/releases/tag/v1.0.0
