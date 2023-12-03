@@ -1,10 +1,10 @@
 # flake8: noqa
 
-from .aig import (
+from .aig import (  # noqa: F401
+    BipedIG,
+    BipedIGSettings,
     Contact6D,
     Contact6DSettings,
-    DynaCoMSettings,
     DynaCoM,
-    BipedIGSettings,
-    BipedIG,
-)  # noqa: F401
+    DynaCoMSettings,
+)

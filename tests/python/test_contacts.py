@@ -5,13 +5,15 @@ Created on Thu Sep 22 16:28:36 2022
 
 @author: nvilla
 """
-import aig
-import numpy as np
-from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
 import unittest
-import pinocchio as pin
 from time import sleep
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pinocchio as pin
+from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
+
+import aig
 
 unittest.util._MAX_LENGTH = 2000
 

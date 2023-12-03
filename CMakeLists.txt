@@ -79,7 +79,8 @@ add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
                                    ${${PROJECT_NAME}_HEADERS})
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio eiquadprog::eiquadprog)
+target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio
+                                             eiquadprog::eiquadprog)
 
 if(SUFFIX_SO_VERSION)
   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
@@ -87,23 +88,19 @@ endif()
 
 # Python Bindings
 if(BUILD_PYTHON_INTERFACE)
-  set(${PY_NAME}_SOURCES
-    python/contact_6d.cpp
-    python/aig_modules.cpp
-    python/dyna_com.cpp
-    python/biped_ig.cpp
-  )
+  set(${PY_NAME}_SOURCES python/contact_6d.cpp python/aig_modules.cpp
+                         python/dyna_com.cpp python/biped_ig.cpp)
   add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
   target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
   get_relative_rpath(${${PY_NAME}_INSTALL_DIR} ${PY_NAME}_INSTALL_RPATH)
-  set_target_properties(${PY_NAME}_py PROPERTIES
-      INSTALL_RPATH "${${PY_NAME}_INSTALL_RPATH}"
-    LIBRARY_OUTPUT_DIRECTORY ${PY_NAME}
-    OUTPUT_NAME ${PY_NAME}
-    PREFIX ""
-    SUFFIX ${PYTHON_EXT_SUFFIX}
-  )
-  TARGET_LINK_BOOST_PYTHON(${PY_NAME}_py PRIVATE)
+  set_target_properties(
+    ${PY_NAME}_py
+    PROPERTIES INSTALL_RPATH "${${PY_NAME}_INSTALL_RPATH}"
+               LIBRARY_OUTPUT_DIRECTORY ${PY_NAME}
+               OUTPUT_NAME ${PY_NAME}
+               PREFIX ""
+               SUFFIX ${PYTHON_EXT_SUFFIX})
+  target_link_boost_python(${PY_NAME}_py PRIVATE)
   install(TARGETS ${PY_NAME}_py DESTINATION ${${PY_NAME}_INSTALL_DIR})
   install(DIRECTORY python/aig DESTINATION ${${PY_NAME}_INSTALL_DIR}/..)
 endif()
@@ -119,10 +116,11 @@ if(BUILD_TESTING)
 
   foreach(unittest_name ${${PROJECT_NAME}_CPP_TESTS})
     add_unit_test(${unittest_name} tests/${unittest_name}.cpp)
-    target_link_libraries(${unittest_name} ${PROJECT_NAME}
-      Boost::unit_test_framework example-robot-data::example-robot-data)
-    target_compile_definitions(${unittest_name} PUBLIC
-      "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN")
+    target_link_libraries(
+      ${unittest_name} ${PROJECT_NAME} Boost::unit_test_framework
+      example-robot-data::example-robot-data)
+    target_compile_definitions(${unittest_name}
+                               PUBLIC "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN")
   endforeach()
 endif()
 

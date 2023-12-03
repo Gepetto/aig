@@ -5,14 +5,14 @@ Created on Fri Oct  7 15:13:50 2022
 
 @author: nvilla
 """
-import aig
+import unittest
+from time import sleep, time
+
 import numpy as np
+import pinocchio as pin
 from example_robot_data.path import EXAMPLE_ROBOT_DATA_MODEL_DIR
 
-
-import unittest
-import pinocchio as pin
-from time import sleep, time
+import aig
 
 debug = False
 visualize = False
@@ -23,6 +23,7 @@ visualize = False
 def get_visualizer():
     import os
     import subprocess
+
     from example_robot_data.robots_loader import load
 
     robot = load("talos")
