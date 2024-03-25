@@ -27,8 +27,7 @@ struct Contact6DSettings {
 
   std::string to_string() {
     std::ostringstream out;
-    out << "Contact6D "
-        << ":\n";
+    out << "Contact6D " << ":\n";
     out << "    mu: " << this->mu << "\n";
     out << "    gu: " << this->gu << "\n";
     out << "    weights: " << this->weights.transpose() << "\n";
@@ -133,8 +132,7 @@ struct ContactPointSettings {
 
   std::string to_string() {
     std::ostringstream out;
-    out << "Contact6D "
-        << ":\n";
+    out << "Contact6D " << ":\n";
     out << "    mu: " << this->mu << "\n";
     out << "    weights: " << this->weights.transpose() << std::endl;
 
