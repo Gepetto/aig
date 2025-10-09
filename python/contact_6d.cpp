@@ -93,5 +93,5 @@ void exposeContact6D() {
            bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"));
 }
-}  // namespace python
-}  // namespace aig
+} // namespace python
+} // namespace aig

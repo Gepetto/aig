@@ -44,8 +44,8 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   // Compute the cos(q5)
   const Eigen::Vector3d &knee_from_hip = settings_.knee_from_hip;
   const Eigen::Vector3d &ankle_from_knee = settings_.ankle_from_knee;
-  a_ = abs(knee_from_hip(2));    // Femur Height.
-  b_ = abs(ankle_from_knee(2));  // Tibia Height.
+  a_ = abs(knee_from_hip(2));   // Femur Height.
+  b_ = abs(ankle_from_knee(2)); // Tibia Height.
   c_ = hip_from_ankle_.norm();
   c5_ = 0.5 * (c_ * c_ - a_ * a_ - b_ * b_) / (a_ * b_);
 
@@ -82,4 +82,4 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   return output_;
 }
 
-}  // namespace aig
+} // namespace aig

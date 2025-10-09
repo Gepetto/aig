@@ -27,8 +27,8 @@ std::shared_ptr<Contact6D> getContact(DynaCoM &self, std::string name) {
 }
 
 void exposeDynaCoM() {
-  bp::class_<std::vector<std::string> >("names_vector")
-      .def(bp::vector_indexing_suite<std::vector<std::string> >());
+  bp::class_<std::vector<std::string>>("names_vector")
+      .def(bp::vector_indexing_suite<std::vector<std::string>>());
 
   bp::class_<DynaCoMSettings>("DynaCoMSettings")
       .def_readwrite("urdf", &DynaCoMSettings::urdf);
@@ -107,5 +107,5 @@ void exposeDynaCoM() {
            bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"));
 }
-}  // namespace python
-}  // namespace aig
+} // namespace python
+} // namespace aig

@@ -61,8 +61,8 @@ void DynaCoM::initialize(const DynaCoMSettings settings) {
   newton_euler_b_.resize(6);
 }
 
-const Eigen::Matrix<double, 6, 6> DynaCoM::toWorldCoPWrench(
-    pinocchio::SE3 pose) {
+const Eigen::Matrix<double, 6, 6>
+DynaCoM::toWorldCoPWrench(pinocchio::SE3 pose) {
   /**
    * To compute any CoP, we need some surface. We compute the full
    * robot CoP considering always a horizontal surface. So, just
@@ -170,7 +170,8 @@ void DynaCoM::addContact6d(const std::shared_ptr<Contact6D> &contact,
       std::pair<std::string, std::shared_ptr<Contact6D>>(name, contact));
 
   addSizes(known_contact6ds_[name]);
-  if (active) activateContact6d(name);
+  if (active)
+    activateContact6d(name);
 }
 
 void DynaCoM::removeContact6d(const std::string &name) {
@@ -332,10 +333,10 @@ void DynaCoM::solveQP() {
   l <= C x <= u
   */
 
-  int dim(static_cast<int>(j_));  // number of variables
-  int n_eq(6);                    // number of equality constraints
+  int dim(static_cast<int>(j_)); // number of variables
+  int n_eq(6);                   // number of equality constraints
   int n_ineq(
-      static_cast<int>(fri_i_ + uni_i_));  // number of inequalities constraints
+      static_cast<int>(fri_i_ + uni_i_)); // number of inequalities constraints
 
   F_.resize(dim);
   G_.resize(dim, dim);
@@ -413,4 +414,4 @@ void DynaCoM::distributeForce(const Eigen::Vector3d &groundCoMForce,
   // std::cout << "Distributed" << std::endl;
 }
 
-}  // namespace aig
+} // namespace aig

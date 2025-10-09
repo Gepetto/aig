@@ -89,4 +89,4 @@ void Contact6D::updateNewtonEuler(const Eigen::Vector3d &CoM,
 
   newton_euler_A_ << (cMo_.act(oMs_)).toActionMatrixInverse().transpose();
 }
-}  // namespace aig
+} // namespace aig

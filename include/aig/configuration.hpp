@@ -21,6 +21,6 @@ const std::string rightAnkleJointName = "leg_right_5_joint";
 const std::string leftFootFrameName = "leg_left_sole_fix_joint";
 const std::string rightFootFrameName = "leg_right_sole_fix_joint";
 
-}  // namespace conf
+} // namespace conf
 
-#endif  // __PREVIEW_IK_CONFIGURATION
+#endif // __PREVIEW_IK_CONFIGURATION

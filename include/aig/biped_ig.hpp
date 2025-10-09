@@ -27,7 +27,7 @@ namespace aig {
  */
 
 struct BipedIGSettings {
- public:
+public:
   std::string left_hip_joint_name;
   std::string left_knee_joint_name;
   std::string left_ankle_joint_name;
@@ -48,15 +48,10 @@ struct BipedIGSettings {
   std::string srdf;
 
   BipedIGSettings()
-      : left_hip_joint_name(""),
-        left_knee_joint_name(""),
-        left_ankle_joint_name(""),
-        left_foot_frame_name(""),
-        right_hip_joint_name(""),
-        right_knee_joint_name(""),
-        right_ankle_joint_name(""),
-        right_foot_frame_name(""),
-        urdf(""),
+      : left_hip_joint_name(""), left_knee_joint_name(""),
+        left_ankle_joint_name(""), left_foot_frame_name(""),
+        right_hip_joint_name(""), right_knee_joint_name(""),
+        right_ankle_joint_name(""), right_foot_frame_name(""), urdf(""),
         srdf("") {}
 
   BipedIGSettings(const std::string &_left_hip_joint_name,
@@ -75,8 +70,7 @@ struct BipedIGSettings {
         right_hip_joint_name(_right_hip_joint_name),
         right_knee_joint_name(_right_knee_joint_name),
         right_ankle_joint_name(_right_ankle_joint_name),
-        right_foot_frame_name(_right_foot_frame_name),
-        urdf(_urdf),
+        right_foot_frame_name(_right_foot_frame_name), urdf(_urdf),
         srdf(_srdf) {}
 
   friend std::ostream &operator<<(std::ostream &out,
@@ -121,17 +115,17 @@ BipedIGSettings makeSettingsFor(const std::string &path_to_robots,
  */
 class BipedIG {
   // Private attributes.
- private:
+private:
   pinocchio::Model model_;
   pinocchio::Data data_;
   BipedIGSettings settings_;
   LegIG left_leg_, right_leg_;
   // ArmIG left_arm_, right_arm_;
-  Eigen::VectorXd q0_;  // q0_ is a reference configuration used to take all not
-                        // computed joints (such as head and arms)
+  Eigen::VectorXd q0_; // q0_ is a reference configuration used to take all not
+                       // computed joints (such as head and arms)
   Eigen::Vector3d com_from_waist_;
-  int lleg_idx_qs_;  // Indexes in the configuration vector.
-  int rleg_idx_qs_;  // Indexes in the configuration vector.
+  int lleg_idx_qs_; // Indexes in the configuration vector.
+  int rleg_idx_qs_; // Indexes in the configuration vector.
 
   // variables used in the waist-com vector correction:
   Eigen::Vector3d error_, com_temp_;
@@ -141,7 +135,7 @@ class BipedIG {
   aig::DynaCoM dynamics_;
 
   // Private methods.
- private:
+private:
   void derivatives(const Eigen::VectorXd &q1, const Eigen::VectorXd &q3,
                    Eigen::VectorXd &posture, Eigen::VectorXd &velocity,
                    Eigen::VectorXd &acceleration, const double &dt);
@@ -156,7 +150,7 @@ class BipedIG {
   void configureLegs();
 
   // Public methods.
- public:
+public:
   BipedIG();
 
   BipedIG(const BipedIGSettings &settings);
@@ -191,7 +185,7 @@ class BipedIG {
   /// @brief Get the nonlinear effect. Please call computeDynamics first.
   const Eigen::Vector2d &getNL() { return dynamics_.getNL(); }
 
-  void checkCompatibility();  // TODO
+  void checkCompatibility(); // TODO
 
   void solve(const Eigen::Vector3d &com, const pinocchio::SE3 &leftFoot,
              const pinocchio::SE3 &rightFoot, const Eigen::VectorXd &q0,
@@ -308,5 +302,5 @@ class BipedIG {
   pinocchio::Data &get_data() { return data_; }
   Eigen::Vector3d &get_com_from_waist() { return com_from_waist_; }
 };
-}  // namespace aig
-#endif  // AIG_BIPED_IG
+} // namespace aig
+#endif // AIG_BIPED_IG

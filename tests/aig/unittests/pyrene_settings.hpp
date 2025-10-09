@@ -63,7 +63,7 @@ aig::BipedIGSettings bipeds = {
     srdf                    /* srdf paths */
 };
 
-}  // namespace unittests
-}  // namespace aig
+} // namespace unittests
+} // namespace aig
 
-#endif  // AIG_PYRENE_SETTINGS
+#endif // AIG_PYRENE_SETTINGS
