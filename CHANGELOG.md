@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- ⚠️ Move the default branch on github to devel ⚠️
+- Add nix CI
+- Add mergify rules on devel
+- Update pre-commit rules and format.
+
+
 ## [1.2.1] - 2023-12-03
 
 - add CHANGELOG
