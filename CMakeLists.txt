@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22.1)
 
 # Project properties
 set(PROJECT_NAMESPACE gepetto)
@@ -7,25 +7,27 @@ set(PROJECT_DESCRIPTION "Analytical inverse geomery for MPC in bipeds")
 set(PROJECT_URL https://github.com/${PROJECT_NAMESPACE}/${PROJECT_NAME})
 
 # Project options
-option(BUILD_PYTHON_INTERFACE "Build the python binding" ON)
-option(INSTALL_PYTHON_INTERFACE_ONLY "Instal *ONLY* the python bindings" OFF)
 option(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
 
 # Project configuration
-if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(NOT BUILD_STANDALONE_PYTHON_INTERFACE)
   set(PROJECT_USE_CMAKE_EXPORT TRUE)
 endif()
 
-# #################################################### Check if the submodule
-# cmake have been initialized
-set(JRL_CMAKE_MODULES "${CMAKE_CURRENT_LIST_DIR}/cmake")
-if(NOT EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
-  if(${CMAKE_VERSION} VERSION_LESS "3.14.0")
-    message(
-      FATAL_ERROR
-        "\nPlease run the following command first:\ngit submodule update --init\n"
-    )
+# Check if the submodule cmake have been initialized
+if(EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
+  message(STATUS "JRL cmakemodules found in the source tree.")
+  set(JRL_CMAKE_MODULES "${CMAKE_SOURCE_DIR}/cmake")
+else()
+  find_package(jrl-cmakemodules QUIET CONFIG)
+  if(jrl-cmakemodules_FOUND)
+    get_property(
+      JRL_CMAKE_MODULES
+      TARGET jrl-cmakemodules::jrl-cmakemodules
+      PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+    message(STATUS "JRL cmakemodules found on system at ${JRL_CMAKE_MODULES}")
   else()
+    message(STATUS "JRL cmakemodules not found. Let's fetch it.")
     include(FetchContent)
     FetchContent_Declare(
       "jrl-cmakemodules"
@@ -38,25 +40,24 @@ endif()
 # JRL-cmakemodule setup
 include("${JRL_CMAKE_MODULES}/base.cmake")
 include("${JRL_CMAKE_MODULES}/boost.cmake")
-# ##############################################################################
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
 
 # Dependencies
-add_project_dependency(pinocchio REQUIRED)
-add_project_dependency(eiquadprog REQUIRED)
-add_project_dependency(example-robot-data 4.0.7 REQUIRED)
-
-if(BUILD_TESTING)
-  find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
-
 if(BUILD_PYTHON_INTERFACE)
-  find_package(eigenpy 2.7.10 REQUIRED)
+  add_project_dependency(eigenpy REQUIRED)
   string(REGEX REPLACE "-" "_" PY_NAME ${PROJECT_NAME})
   set(${PY_NAME}_INSTALL_DIR ${PYTHON_SITELIB}/${PY_NAME})
+endif()
+
+add_project_dependency(pinocchio REQUIRED)
+add_project_dependency(eiquadprog REQUIRED)
+add_project_dependency(example-robot-data REQUIRED)
+
+if(BUILD_TESTING)
+  add_project_dependency(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
 # Main library
@@ -100,7 +101,6 @@ if(BUILD_PYTHON_INTERFACE)
                OUTPUT_NAME ${PY_NAME}
                PREFIX ""
                SUFFIX ${PYTHON_EXT_SUFFIX})
-  target_link_boost_python(${PY_NAME}_py PRIVATE)
   install(TARGETS ${PY_NAME}_py DESTINATION ${${PY_NAME}_INSTALL_DIR})
   install(DIRECTORY python/aig DESTINATION ${${PY_NAME}_INSTALL_DIR}/..)
 endif()

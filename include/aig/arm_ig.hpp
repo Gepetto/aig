@@ -20,11 +20,11 @@ namespace aig {
  * @brief @todo Describe ArmIG
  */
 class ArmIG {
- public:
+public:
   ArmIG();
   Eigen::VectorXd solve(const pinocchio::SE3 &base,
                         const pinocchio::SE3 &endEffector);
 };
-}  // namespace aig
+} // namespace aig
 
-#endif  // AIG_ARM_IG
+#endif // AIG_ARM_IG

@@ -240,13 +240,13 @@ void exposeBiped_IG() {
                      const std::array<pinocchio::SE3, 3> &,
                      const std::array<pinocchio::SE3, 3> &,
                      const Eigen::VectorXd &, const double &, const double &,
-                     const int &)>(
-          "solve", &solve,
-          (bp::args("self", "coms",
-                    "baseRotations"
-                    "leftFeet",
-                    "rightFeet", "q0", "dt"),
-           bp::arg("tolerance") = 1e-10, bp::arg("max_iterations") = 0))
+                     const int &)>("solve", &solve,
+                                   (bp::args("self", "coms",
+                                             "baseRotations"
+                                             "leftFeet",
+                                             "rightFeet", "q0", "dt"),
+                                    bp::arg("tolerance") = 1e-10,
+                                    bp::arg("max_iterations") = 0))
       .def<bp::tuple(BipedIG &, const std::array<Eigen::Vector3d, 3> &,
                      const std::array<Eigen::Matrix3d, 3> &,
                      const std::array<Eigen::Isometry3d, 3> &,
@@ -302,5 +302,5 @@ void exposeBiped_IG() {
            bp::return_value_policy<bp::reference_existing_object>(),
            bp::args("self"));
 }
-}  // namespace python
-}  // namespace aig
+} // namespace python
+} // namespace aig

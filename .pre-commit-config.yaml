@@ -1,37 +1,24 @@
 ci:
   autoupdate_branch: devel
 repos:
-- repo: https://github.com/PyCQA/isort
-  rev: 6.1.0
-  hooks:
-  - id: isort
-    args:
-    - --profile
-    - black
-    - --project
-    - aig
-    - --filter-files
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.13.3
+  rev: v0.13.1
   hooks:
   - id: ruff
     args:
     - --fix
     - --exit-non-zero-on-fix
+    - --ignore
+    - UP036
+  - id: ruff-format
 - repo: https://github.com/cheshirekow/cmake-format-precommit
   rev: v0.6.13
   hooks:
   - id: cmake-format
-- repo: https://github.com/pappasam/toml-sort
-  rev: v0.24.3
-  hooks:
-  - id: toml-sort-fix
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v21.1.2
+  rev: v21.1.1
   hooks:
   - id: clang-format
-    args:
-    - --style=Google
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
   hooks:
@@ -50,7 +37,3 @@ repos:
   - id: fix-byte-order-marker
   - id: mixed-line-ending
   - id: trailing-whitespace
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 25.9.0
-  hooks:
-  - id: black

@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE(test_init_constructor) {
 
 enum Mode { ZERO, HALF_SITTING, RANDOM };
 
-void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
-                         pinocchio::SE3& rf, aig::LegJoints& ll_q,
-                         aig::LegJoints& rl_q, const Mode& mode) {
+void generate_references(pinocchio::SE3 &base, pinocchio::SE3 &lf,
+                         pinocchio::SE3 &rf, aig::LegJoints &ll_q,
+                         aig::LegJoints &rl_q, const Mode &mode) {
   // Get the model and data
   pinocchio::Model model;
   pinocchio::urdf::buildModel(aig::unittests::urdf,
@@ -47,23 +47,23 @@ void generate_references(pinocchio::SE3& base, pinocchio::SE3& lf,
   // Generate a robot configuration.
   Eigen::VectorXd q;
   switch (mode) {
-    case Mode::ZERO:
-      q = Eigen::VectorXd::Zero(model.nq);
-      q(6) = 1.0;
-      break;
-    case Mode::HALF_SITTING:
-      q = model.referenceConfigurations["half_sitting"];
-      break;
-    case Mode::RANDOM:
-      model.lowerPositionLimit.head<3>().fill(-0.1);
-      model.upperPositionLimit.head<3>().fill(0.1);
-      q = randomConfiguration(model);
-      break;
-    default:
-      throw std::runtime_error(
-          "tes_leg_ig: generate_references():Switch default ask, not "
-          "implemented.");
-      break;
+  case Mode::ZERO:
+    q = Eigen::VectorXd::Zero(model.nq);
+    q(6) = 1.0;
+    break;
+  case Mode::HALF_SITTING:
+    q = model.referenceConfigurations["half_sitting"];
+    break;
+  case Mode::RANDOM:
+    model.lowerPositionLimit.head<3>().fill(-0.1);
+    model.upperPositionLimit.head<3>().fill(0.1);
+    q = randomConfiguration(model);
+    break;
+  default:
+    throw std::runtime_error(
+        "tes_leg_ig: generate_references():Switch default ask, not "
+        "implemented.");
+    break;
   }
 
   // Forward Kinematics.

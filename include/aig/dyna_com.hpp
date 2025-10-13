@@ -31,7 +31,7 @@
 namespace aig {
 
 struct DynaCoMSettings {
- public:
+public:
   /**
    * @brief This must contain either a valid path to the urdf file or the
    * content of this file in a string.
@@ -54,9 +54,9 @@ struct DynaCoMSettings {
 };
 
 class DynaCoM {
- public:
+public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- private:
+private:
   DynaCoMSettings settings_;
   Eigen::Matrix2d S_;
   pinocchio::Model model_;
@@ -85,10 +85,10 @@ class DynaCoM {
   //  Eigen::Matrix<double, 6, 1> b_;
 
   // variables for QP problem with eiquadprog formulation
-  Eigen::MatrixXd G_;            // matrix for quadratic cost
-  Eigen::VectorXd g0_;           // linear part of the cost function
-  Eigen::MatrixXd CE_, CI_, C_;  // constraints matrix
-  Eigen::VectorXd ce0_, ci0_;    // constraints vector
+  Eigen::MatrixXd G_;           // matrix for quadratic cost
+  Eigen::VectorXd g0_;          // linear part of the cost function
+  Eigen::MatrixXd CE_, CI_, C_; // constraints matrix
+  Eigen::VectorXd ce0_, ci0_;   // constraints vector
 
   // variables for QP problem
   Eigen::VectorXd F_;
@@ -124,7 +124,7 @@ class DynaCoM {
 
   const Eigen::Matrix<double, 6, 6> toWorldCoPWrench(pinocchio::SE3 pose);
 
- public:
+public:
   DynaCoM();
   DynaCoM(const DynaCoMSettings settings);
   void initialize(const DynaCoMSettings settings);
@@ -192,6 +192,6 @@ class DynaCoM {
   const Eigen::VectorXd &allForces() { return F_; }
 };
 
-}  // namespace aig
+} // namespace aig
 
-#endif  // AIG_DYNACOM
+#endif // AIG_DYNACOM

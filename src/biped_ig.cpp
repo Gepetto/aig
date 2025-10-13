@@ -301,8 +301,8 @@ void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
   solve(coms[2], leftFeet[2], rightFeet[2], q0, q3, tolerance, max_iterations);
 
   derivatives(q1, q3, posture, velocity, acceleration, dt);
-}  // @TODO: Include the parameter tolerance in each method solve. and
-   // incorporate the correctCoMfromWaist in the methods solve.
+} // @TODO: Include the parameter tolerance in each method solve. and
+  // incorporate the correctCoMfromWaist in the methods solve.
 
 void BipedIG::solve(const std::array<Eigen::Vector3d, 3> &coms,
                     const std::array<Eigen::Matrix3d, 3> &baseRotations,
@@ -414,4 +414,4 @@ void BipedIG::computeNL(const double &w) {
   dynamics_.computeNL(w);
 }
 
-}  // namespace aig
+} // namespace aig

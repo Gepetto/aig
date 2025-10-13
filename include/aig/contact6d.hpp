@@ -19,7 +19,7 @@
 namespace aig {
 
 struct Contact6DSettings {
- public:
+public:
   double mu, gu;
   double half_length, half_width;
   Eigen::Matrix<double, 6, 1> weights;
@@ -58,7 +58,7 @@ struct Contact6DSettings {
 };
 
 class Contact6D {
- private:
+private:
   Contact6DSettings settings_;
   pinocchio::SE3 oMs_, cMo_;
 
@@ -73,7 +73,7 @@ class Contact6D {
   Eigen::Matrix<double, 6, 1> contactForce_;
   size_t frameID_;
 
- public:
+public:
   Contact6D();
   Contact6D(const Contact6DSettings &settings);
   void initialize(const Contact6DSettings &settings);
@@ -126,7 +126,7 @@ class Contact6D {
  * the ansester of ContactPoint and Contact6D. Similar for the settings.
  */
 struct ContactPointSettings {
- public:
+public:
   double mu;
   Eigen::Matrix<double, 3, 1> weights;
   std::string frame_name;
@@ -158,7 +158,7 @@ struct ContactPointSettings {
 };
 
 class ContactPoint {
- private:
+private:
   ContactPointSettings settings_;
   pinocchio::SE3 oMs_, cMo_;
 
@@ -173,7 +173,7 @@ class ContactPoint {
   size_t frameID_;
   Eigen::Matrix<double, 3, 1> contactForce_;
 
- public:
+public:
   ContactPoint();
   ContactPoint(const ContactPointSettings &settings);
   void initialize(const ContactPointSettings &settings);
@@ -213,6 +213,6 @@ class ContactPoint {
   const Eigen::Matrix<double, 3, 1> &appliedForce() { return contactForce_; }
 };
 
-}  // namespace aig
+} // namespace aig
 
-#endif  // AIG_CONTACT_6D
+#endif // AIG_CONTACT_6D

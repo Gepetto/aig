@@ -6,7 +6,7 @@ namespace python {
 void exposeContact6D();
 void exposeDynaCoM();
 void exposeBiped_IG();
-}  // namespace python
-}  // namespace aig
+} // namespace python
+} // namespace aig
 
-#endif  // AIG_PYTHON
+#endif // AIG_PYTHON
