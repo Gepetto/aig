@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- CMake: fix BUILD_STANDALONE_PYTHON_INTERFACE
+
 ## [1.3.0] - 2025-10-23
 
 - ⚠️ Move the default branch on github to devel ⚠️
