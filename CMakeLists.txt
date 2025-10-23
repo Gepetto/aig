@@ -61,30 +61,37 @@ if(BUILD_TESTING)
 endif()
 
 # Main library
-set(${PROJECT_NAME}_HEADERS
-    include/${PROJECT_NAME}/arm_ig.hpp #
-    include/${PROJECT_NAME}/leg_ig.hpp #
-    include/${PROJECT_NAME}/biped_ig.hpp #
-    include/${PROJECT_NAME}/dyna_com.hpp #
-    include/${PROJECT_NAME}/python.hpp #
-    include/${PROJECT_NAME}/contact6d.hpp #
-)
-set(${PROJECT_NAME}_SOURCES
-    src/arm_ig.cpp #
-    src/leg_ig.cpp #
-    src/biped_ig.cpp #
-    src/dyna_com.cpp #
-    src/contac6d.cpp #
-)
-add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
-                                   ${${PROJECT_NAME}_HEADERS})
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
-target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
-target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio
-                                             eiquadprog::eiquadprog)
+if(BUILD_STANDALONE_PYTHON_INTERFACE)
+  add_project_dependency(${PROJECT_NAME} REQUIRED CONFIG)
+else()
+  set(${PROJECT_NAME}_HEADERS
+      include/${PROJECT_NAME}/arm_ig.hpp #
+      include/${PROJECT_NAME}/leg_ig.hpp #
+      include/${PROJECT_NAME}/biped_ig.hpp #
+      include/${PROJECT_NAME}/dyna_com.hpp #
+      include/${PROJECT_NAME}/python.hpp #
+      include/${PROJECT_NAME}/contact6d.hpp #
+  )
+  set(${PROJECT_NAME}_SOURCES
+      src/arm_ig.cpp #
+      src/leg_ig.cpp #
+      src/biped_ig.cpp #
+      src/dyna_com.cpp #
+      src/contac6d.cpp #
+  )
+  add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES}
+                                     ${${PROJECT_NAME}_HEADERS})
+  add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+  target_include_directories(${PROJECT_NAME}
+                             PUBLIC $<INSTALL_INTERFACE:include>)
+  target_link_libraries(${PROJECT_NAME} PUBLIC pinocchio::pinocchio
+                                               eiquadprog::eiquadprog)
 
-if(SUFFIX_SO_VERSION)
-  set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+  if(SUFFIX_SO_VERSION)
+    set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION
+                                                     ${PROJECT_VERSION})
+  endif()
 endif()
 
 # Python Bindings
@@ -92,7 +99,8 @@ if(BUILD_PYTHON_INTERFACE)
   set(${PY_NAME}_SOURCES python/contact_6d.cpp python/aig_modules.cpp
                          python/dyna_com.cpp python/biped_ig.cpp)
   add_library(${PY_NAME}_py SHARED ${${PY_NAME}_SOURCES})
-  target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME} eigenpy::eigenpy)
+  target_link_libraries(${PY_NAME}_py PUBLIC ${PROJECT_NAME}::${PROJECT_NAME}
+                                             eigenpy::eigenpy)
   get_relative_rpath(${${PY_NAME}_INSTALL_DIR} ${PY_NAME}_INSTALL_RPATH)
   set_target_properties(
     ${PY_NAME}_py
@@ -105,7 +113,7 @@ if(BUILD_PYTHON_INTERFACE)
   install(DIRECTORY python/aig DESTINATION ${${PY_NAME}_INSTALL_DIR}/..)
 endif()
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND NOT BUILD_STANDALONE_PYTHON_INTERFACE)
   # Unit-Tests dependencies
   set(${PROJECT_NAME}_CPP_TESTS
       test_dependencies_usage #
@@ -125,7 +133,7 @@ if(BUILD_TESTING)
 endif()
 
 # Installation
-if(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+if(NOT BUILD_STANDALONE_PYTHON_INTERFACE)
   install(
     TARGETS ${PROJECT_NAME}
     EXPORT ${TARGETS_EXPORT_NAME}
