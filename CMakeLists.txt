@@ -54,9 +54,9 @@ endif()
 
 add_project_dependency(pinocchio REQUIRED)
 add_project_dependency(eiquadprog REQUIRED)
-add_project_dependency(example-robot-data REQUIRED)
 
 if(BUILD_TESTING)
+  add_project_dependency(example-robot-data REQUIRED)
   add_project_dependency(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 

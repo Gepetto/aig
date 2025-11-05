@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Make example-robot-data a pure test dependency. Hence we had to:
+    - Remove the include/aig/configuration.hpp file which was not used anywhere
+    - Update the CMake to find example-robot-data only if BUILD_TESTING is ON.
+
 ## [1.3.1] - 2025-10-23
 
 - CMake: fix BUILD_STANDALONE_PYTHON_INTERFACE
