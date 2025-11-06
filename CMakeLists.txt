@@ -19,7 +19,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/cmake/base.cmake")
   message(STATUS "JRL cmakemodules found in the source tree.")
   set(JRL_CMAKE_MODULES "${CMAKE_SOURCE_DIR}/cmake")
 else()
-  find_package(jrl-cmakemodules QUIET CONFIG)
+  message(WARNING "CMAKE_PREFIX_PATH=$ENV{CMAKE_PREFIX_PATH}")
+  find_package(jrl-cmakemodules QUIET CONFIG PATH_SUFFIXES
+               lib/x86_64-linux-gnu/cmake/jrl-cmakemodules)
   if(jrl-cmakemodules_FOUND)
     get_property(
       JRL_CMAKE_MODULES
