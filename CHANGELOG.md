@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- CMake: The jrl-cmakemodules is installed in a non standard folder in
+  ros-humble so we give CMake an hint on the prefix to look for the Config.cmake
+  file.  
+
 ## [2.0.0] - 2025-11-05
 
 - Make example-robot-data a pure test dependency. Hence we had to:
