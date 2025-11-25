@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add `jrl_cmakemodules` as `depend` in `package.xml`
+
 ## [2.0.0] - 2025-11-05
 
 - Make example-robot-data a pure test dependency. Hence we had to:
