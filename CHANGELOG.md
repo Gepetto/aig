@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2025-11-28
+
 - Add `jrl_cmakemodules` as `depend` in `package.xml`
 
 ## [2.0.0] - 2025-11-05
@@ -51,7 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release
 
-[Unreleased]: https://github.com/gepetto/aig/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/gepetto/aig/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/gepetto/aig/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/gepetto/aig/compare/v1.3.1...v2.0.0
 [1.3.1]: https://github.com/gepetto/aig/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/gepetto/aig/compare/v1.2.1...v1.3.0
