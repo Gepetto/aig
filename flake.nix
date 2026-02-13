@@ -40,7 +40,7 @@
           {
             packages = {
               default = self'.packages.aig;
-              aig = pkgs.python3Packages.aig.override { standalone = false; };
+              aig = pkgs.python3Packages.aig.override { buildStandalone = false; };
             };
           };
       }
