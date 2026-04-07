@@ -12,9 +12,9 @@ namespace aig {
 
 LegIG::LegIG() { reset_internals(); }
 
-LegIG::LegIG(const LegIGSettings &settings) { initialize(settings); }
+LegIG::LegIG(const LegIGSettings& settings) { initialize(settings); }
 
-void LegIG::initialize(const LegIGSettings &settings) {
+void LegIG::initialize(const LegIGSettings& settings) {
   settings_ = settings;
   reset_internals();
 }
@@ -31,8 +31,8 @@ void LegIG::reset_internals() {
   output_ = LegJoints::Zero();
 }
 
-LegJoints LegIG::solve(const pinocchio::SE3 &base,
-                       const pinocchio::SE3 &endEffector) {
+LegJoints LegIG::solve(const pinocchio::SE3& base,
+                       const pinocchio::SE3& endEffector) {
   reset_internals();
 
   // First we compute the position of the hip with respect to the ankle.
@@ -42,10 +42,10 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   hip_from_ankle_ = endEffector.rotation().transpose() * (hip_ - ankle_);
 
   // Compute the cos(q5)
-  const Eigen::Vector3d &knee_from_hip = settings_.knee_from_hip;
-  const Eigen::Vector3d &ankle_from_knee = settings_.ankle_from_knee;
-  a_ = abs(knee_from_hip(2));   // Femur Height.
-  b_ = abs(ankle_from_knee(2)); // Tibia Height.
+  const Eigen::Vector3d& knee_from_hip = settings_.knee_from_hip;
+  const Eigen::Vector3d& ankle_from_knee = settings_.ankle_from_knee;
+  a_ = abs(knee_from_hip(2));    // Femur Height.
+  b_ = abs(ankle_from_knee(2));  // Tibia Height.
   c_ = hip_from_ankle_.norm();
   c5_ = 0.5 * (c_ * c_ - a_ * a_ - b_ * b_) / (a_ * b_);
 
@@ -82,4 +82,4 @@ LegJoints LegIG::solve(const pinocchio::SE3 &base,
   return output_;
 }
 
-} // namespace aig
+}  // namespace aig
