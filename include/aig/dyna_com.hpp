@@ -31,22 +31,22 @@
 namespace aig {
 
 struct DynaCoMSettings {
-public:
+ public:
   /**
    * @brief This must contain either a valid path to the urdf file or the
    * content of this file in a string.
    */
   std::string urdf = "";
 
-  friend std::ostream &operator<<(std::ostream &out,
-                                  const DynaCoMSettings &obj) {
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const DynaCoMSettings& obj) {
     out << "DynaCoMSettings:\n";
     out << "    urdf: " << obj.urdf << std::endl;
     return out;
   }
 
-  friend bool operator==(const DynaCoMSettings &lhs,
-                         const DynaCoMSettings &rhs) {
+  friend bool operator==(const DynaCoMSettings& lhs,
+                         const DynaCoMSettings& rhs) {
     bool test = true;
     test &= lhs.urdf == rhs.urdf;
     return test;
@@ -54,9 +54,9 @@ public:
 };
 
 class DynaCoM {
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-private:
+ private:
   DynaCoMSettings settings_;
   Eigen::Matrix2d S_;
   pinocchio::Model model_;
@@ -85,10 +85,10 @@ private:
   //  Eigen::Matrix<double, 6, 1> b_;
 
   // variables for QP problem with eiquadprog formulation
-  Eigen::MatrixXd G_;           // matrix for quadratic cost
-  Eigen::VectorXd g0_;          // linear part of the cost function
-  Eigen::MatrixXd CE_, CI_, C_; // constraints matrix
-  Eigen::VectorXd ce0_, ci0_;   // constraints vector
+  Eigen::MatrixXd G_;            // matrix for quadratic cost
+  Eigen::VectorXd g0_;           // linear part of the cost function
+  Eigen::MatrixXd CE_, CI_, C_;  // constraints matrix
+  Eigen::VectorXd ce0_, ci0_;    // constraints vector
 
   // variables for QP problem
   Eigen::VectorXd F_;
@@ -113,69 +113,69 @@ private:
   pinocchio::SE3 oMso_, soMs_;
   Eigen::Matrix<double, 6, 6> Sz_, oXso_, soXs_;
 
-  void addSizes(const std::shared_ptr<Contact6D> &contact);
-  void removeSizes(const std::shared_ptr<Contact6D> &contact);
+  void addSizes(const std::shared_ptr<Contact6D>& contact);
+  void removeSizes(const std::shared_ptr<Contact6D>& contact);
   void resizeMatrices();
-  void buildMatrices(const Eigen::Vector3d &groundCoMForce,
-                     const Eigen::Vector3d &groundCoMTorque,
-                     const Eigen::Vector3d &CoM);
+  void buildMatrices(const Eigen::Vector3d& groundCoMForce,
+                     const Eigen::Vector3d& groundCoMTorque,
+                     const Eigen::Vector3d& CoM);
   void solveQP();
   void distribute();
 
   const Eigen::Matrix<double, 6, 6> toWorldCoPWrench(pinocchio::SE3 pose);
 
-public:
+ public:
   DynaCoM();
   DynaCoM(const DynaCoMSettings settings);
   void initialize(const DynaCoMSettings settings);
 
-  void computeDynamics(const Eigen::VectorXd &posture,
-                       const Eigen::VectorXd &velocity,
-                       const Eigen::VectorXd &acceleration,
-                       const Eigen::Matrix<double, 6, 1> &externalWrench =
+  void computeDynamics(const Eigen::VectorXd& posture,
+                       const Eigen::VectorXd& velocity,
+                       const Eigen::VectorXd& acceleration,
+                       const Eigen::Matrix<double, 6, 1>& externalWrench =
                            Eigen::Matrix<double, 6, 1>::Zero(),
                        bool flatHorizontalGround = true);
 
-  void computeNL(const double &w, const Eigen::VectorXd &posture,
-                 const Eigen::VectorXd &velocity,
-                 const Eigen::VectorXd &acceleration,
-                 const Eigen::Matrix<double, 6, 1> &externalWrench =
+  void computeNL(const double& w, const Eigen::VectorXd& posture,
+                 const Eigen::VectorXd& velocity,
+                 const Eigen::VectorXd& acceleration,
+                 const Eigen::Matrix<double, 6, 1>& externalWrench =
                      Eigen::Matrix<double, 6, 1>::Zero(),
                  bool flatHorizontalGround = true);
 
-  void computeNL(const double &w);
+  void computeNL(const double& w);
 
-  void addContact6d(const std::shared_ptr<Contact6D> &contact,
-                    const std::string &name, const bool active = true);
-  void removeContact6d(const std::string &name);
+  void addContact6d(const std::shared_ptr<Contact6D>& contact,
+                    const std::string& name, const bool active = true);
+  void removeContact6d(const std::string& name);
 
-  void activateContact6d(const std::string &name);
-  void deactivateContact6d(const std::string &name);
+  void activateContact6d(const std::string& name);
+  void deactivateContact6d(const std::string& name);
 
-  void distributeForce(const Eigen::Vector3d &groundCoMForce,
-                       const Eigen::Vector3d &groundCoMTorque,
-                       const Eigen::Vector3d &CoM);
+  void distributeForce(const Eigen::Vector3d& groundCoMForce,
+                       const Eigen::Vector3d& groundCoMTorque,
+                       const Eigen::Vector3d& CoM);
 
   // GETTERS
   /// @brief Please call computeDynamics first.
-  const Eigen::Vector3d &getAMVariation() { return dL_; }
-  const Eigen::Vector3d &getCoM() { return data_.com[0]; }
-  const Eigen::Vector3d &getVCoM() { return data_.vcom[0]; }
-  const Eigen::Vector3d &getACoM() { return acom_; }
-  const Eigen::Vector3d &getAM() { return L_; }
-  const Eigen::Vector2d &getCoP() { return cop_; }
-  const Eigen::Vector2d &getNL() { return n_; }
-  const Eigen::Vector3d &getGroundCoMForce() { return groundCoMForce_; }
-  const Eigen::Vector3d &getGroundCoMTorque() { return groundCoMTorque_; }
-  const std::vector<std::string> &getActiveContacts() {
+  const Eigen::Vector3d& getAMVariation() { return dL_; }
+  const Eigen::Vector3d& getCoM() { return data_.com[0]; }
+  const Eigen::Vector3d& getVCoM() { return data_.vcom[0]; }
+  const Eigen::Vector3d& getACoM() { return acom_; }
+  const Eigen::Vector3d& getAM() { return L_; }
+  const Eigen::Vector2d& getCoP() { return cop_; }
+  const Eigen::Vector2d& getNL() { return n_; }
+  const Eigen::Vector3d& getGroundCoMForce() { return groundCoMForce_; }
+  const Eigen::Vector3d& getGroundCoMTorque() { return groundCoMTorque_; }
+  const std::vector<std::string>& getActiveContacts() {
     return active_contact6ds_;
   }
-  const std::shared_ptr<Contact6D> &getContact(std::string name) {
+  const std::shared_ptr<Contact6D>& getContact(std::string name) {
     return known_contact6ds_[name];
   }
-  const DynaCoMSettings &getSettings() { return settings_; }
-  const pinocchio::Model &getModel() { return model_; }
-  const pinocchio::Data &getData() { return data_; }
+  const DynaCoMSettings& getSettings() { return settings_; }
+  const pinocchio::Model& getModel() { return model_; }
+  const pinocchio::Data& getData() { return data_; }
 
   const Eigen::MatrixXd uni_A() {
     return unilaterality_A_.block(0, 0, uni_i_, j_);
@@ -188,10 +188,10 @@ public:
   const Eigen::Matrix<double, 6, -1> NE_A() {
     return newton_euler_A_.block(0, 0, 6, j_);
   }
-  const Eigen::Matrix<double, 6, 1> &NE_b() { return newton_euler_b_; }
-  const Eigen::VectorXd &allForces() { return F_; }
+  const Eigen::Matrix<double, 6, 1>& NE_b() { return newton_euler_b_; }
+  const Eigen::VectorXd& allForces() { return F_; }
 };
 
-} // namespace aig
+}  // namespace aig
 
-#endif // AIG_DYNACOM
+#endif  // AIG_DYNACOM

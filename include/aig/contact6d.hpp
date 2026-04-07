@@ -19,7 +19,7 @@
 namespace aig {
 
 struct Contact6DSettings {
-public:
+ public:
   double mu, gu;
   double half_length, half_width;
   Eigen::Matrix<double, 6, 1> weights;
@@ -38,14 +38,14 @@ public:
     return out.str();
   }
 
-  std::ostream &operator<<(std::ostream &out) {
+  std::ostream& operator<<(std::ostream& out) {
     out << this->to_string();
     return out;
   }
 
-  bool operator!=(const Contact6DSettings &rhs) { return !(*this == rhs); }
+  bool operator!=(const Contact6DSettings& rhs) { return !(*this == rhs); }
 
-  bool operator==(const Contact6DSettings &rhs) {
+  bool operator==(const Contact6DSettings& rhs) {
     bool test = true;
     test &= this->frame_name == rhs.frame_name;
     test &= this->mu == rhs.mu;
@@ -58,7 +58,7 @@ public:
 };
 
 class Contact6D {
-private:
+ private:
   Contact6DSettings settings_;
   pinocchio::SE3 oMs_, cMo_;
 
@@ -73,30 +73,30 @@ private:
   Eigen::Matrix<double, 6, 1> contactForce_;
   size_t frameID_;
 
-public:
+ public:
   Contact6D();
-  Contact6D(const Contact6DSettings &settings);
-  void initialize(const Contact6DSettings &settings);
+  Contact6D(const Contact6DSettings& settings);
+  void initialize(const Contact6DSettings& settings);
 
   // ~Contact6D();
 
   // setters
-  void setMu(const double &mu);
-  void setGu(const double &gu);
-  void setForceWeights(const Eigen::Vector3d &force_weights);
-  void setTorqueWeights(const Eigen::Vector3d &torque_weights);
-  void setSurfaceHalfWidth(const double &half_width);
-  void setSurfaceHalfLength(const double &half_length);
-  void updateNewtonEuler(const Eigen::Vector3d &CoM, const pinocchio::SE3 &oMf);
+  void setMu(const double& mu);
+  void setGu(const double& gu);
+  void setForceWeights(const Eigen::Vector3d& force_weights);
+  void setTorqueWeights(const Eigen::Vector3d& torque_weights);
+  void setSurfaceHalfWidth(const double& half_width);
+  void setSurfaceHalfLength(const double& half_length);
+  void updateNewtonEuler(const Eigen::Vector3d& CoM, const pinocchio::SE3& oMf);
   void setFrameID(const size_t frameID) { frameID_ = frameID; }
-  void applyForce(const Eigen::Matrix<double, 6, 1> &force) {
+  void applyForce(const Eigen::Matrix<double, 6, 1>& force) {
     contactForce_ << force;
   }
-  void setPose(pinocchio::SE3 &pose) { oMs_ = pose; }
+  void setPose(pinocchio::SE3& pose) { oMs_ = pose; }
   void deactivate() { contactForce_.setZero(); }
 
   // getters
-  const Contact6DSettings &getSettings() { return settings_; }
+  const Contact6DSettings& getSettings() { return settings_; }
   const Eigen::Matrix<double, 6, 6> toWorldForces() {
     return oMs_.toActionMatrixInverse().transpose();
   }
@@ -107,17 +107,17 @@ public:
   size_t fri_rows() const { return friction_A_.rows(); }
   size_t cols() const { return newton_euler_A_.cols(); }
   size_t getFrameID() const { return frameID_; }
-  const pinocchio::SE3 &getPose() const { return oMs_; }
+  const pinocchio::SE3& getPose() const { return oMs_; }
 
-  const Eigen::Matrix<double, 5, 6> &uni_A() { return unilaterality_A_; }
-  const Eigen::Matrix<double, 5, 1> &uni_b() { return unilaterality_b_; }
-  const Eigen::Matrix<double, 6, 6> &fri_A() { return friction_A_; }
-  const Eigen::Matrix<double, 6, 1> &fri_b() { return friction_b_; }
-  const Eigen::Matrix<double, 6, 1> &reg_A() { return regularization_A_; }
-  const Eigen::Matrix<double, 6, 1> &reg_b() { return regularization_b_; }
-  const Eigen::Matrix<double, 6, 6> &NE_A() { return newton_euler_A_; }
+  const Eigen::Matrix<double, 5, 6>& uni_A() { return unilaterality_A_; }
+  const Eigen::Matrix<double, 5, 1>& uni_b() { return unilaterality_b_; }
+  const Eigen::Matrix<double, 6, 6>& fri_A() { return friction_A_; }
+  const Eigen::Matrix<double, 6, 1>& fri_b() { return friction_b_; }
+  const Eigen::Matrix<double, 6, 1>& reg_A() { return regularization_A_; }
+  const Eigen::Matrix<double, 6, 1>& reg_b() { return regularization_b_; }
+  const Eigen::Matrix<double, 6, 6>& NE_A() { return newton_euler_A_; }
 
-  const Eigen::Matrix<double, 6, 1> &appliedForce() { return contactForce_; }
+  const Eigen::Matrix<double, 6, 1>& appliedForce() { return contactForce_; }
 };
 
 ///// Start of future contact point. ////////////
@@ -126,7 +126,7 @@ public:
  * the ansester of ContactPoint and Contact6D. Similar for the settings.
  */
 struct ContactPointSettings {
-public:
+ public:
   double mu;
   Eigen::Matrix<double, 3, 1> weights;
   std::string frame_name;
@@ -141,12 +141,12 @@ public:
     return out.str();
   }
 
-  std::ostream &operator<<(std::ostream &out) {
+  std::ostream& operator<<(std::ostream& out) {
     out << this->to_string();
     return out;
   }
 
-  bool operator==(const ContactPointSettings &rhs) {
+  bool operator==(const ContactPointSettings& rhs) {
     bool test = true;
     test &= this->frame_name == rhs.frame_name;
     test &= this->mu == rhs.mu;
@@ -154,11 +154,11 @@ public:
     return test;
   }
 
-  bool operator!=(const ContactPointSettings &rhs) { return !(*this == rhs); }
+  bool operator!=(const ContactPointSettings& rhs) { return !(*this == rhs); }
 };
 
 class ContactPoint {
-private:
+ private:
   ContactPointSettings settings_;
   pinocchio::SE3 oMs_, cMo_;
 
@@ -173,24 +173,24 @@ private:
   size_t frameID_;
   Eigen::Matrix<double, 3, 1> contactForce_;
 
-public:
+ public:
   ContactPoint();
-  ContactPoint(const ContactPointSettings &settings);
-  void initialize(const ContactPointSettings &settings);
+  ContactPoint(const ContactPointSettings& settings);
+  void initialize(const ContactPointSettings& settings);
 
   // ~ContactPoint();
 
   // setters
-  void setMu(const double &mu);
-  void setForceWeights(const Eigen::Vector3d &force_weights);
-  void updateNewtonEuler(const Eigen::Vector3d &CoM, const pinocchio::SE3 &oMf);
+  void setMu(const double& mu);
+  void setForceWeights(const Eigen::Vector3d& force_weights);
+  void updateNewtonEuler(const Eigen::Vector3d& CoM, const pinocchio::SE3& oMf);
   void setFrameID(const size_t frameID) { frameID_ = frameID; }
-  void applyForce(const Eigen::Matrix<double, 3, 1> &force) {
+  void applyForce(const Eigen::Matrix<double, 3, 1>& force) {
     contactForce_ << force;
   }
 
   // getters
-  const ContactPointSettings &getSettings() { return settings_; }
+  const ContactPointSettings& getSettings() { return settings_; }
   const Eigen::Matrix<double, 6, 3> toWorldForces() {
     return oMs_.toActionMatrixInverse().transpose().block<6, 3>(0, 0);
   }
@@ -202,17 +202,17 @@ public:
   size_t cols() const { return newton_euler_A_.cols(); }
   size_t getFrameID() const { return frameID_; }
 
-  const Eigen::Matrix<double, 1, 3> &uni_A() { return unilaterality_A_; }
-  const Eigen::Matrix<double, 1, 1> &uni_b() { return unilaterality_b_; }
-  const Eigen::Matrix<double, 4, 3> &fri_A() { return friction_A_; }
-  const Eigen::Matrix<double, 4, 1> &fri_b() { return friction_b_; }
-  const Eigen::Matrix<double, 3, 1> &reg_A() { return regularization_A_; }
-  const Eigen::Matrix<double, 3, 1> &reg_b() { return regularization_b_; }
-  const Eigen::Matrix<double, 6, 3> &NE_A() { return newton_euler_A_; }
+  const Eigen::Matrix<double, 1, 3>& uni_A() { return unilaterality_A_; }
+  const Eigen::Matrix<double, 1, 1>& uni_b() { return unilaterality_b_; }
+  const Eigen::Matrix<double, 4, 3>& fri_A() { return friction_A_; }
+  const Eigen::Matrix<double, 4, 1>& fri_b() { return friction_b_; }
+  const Eigen::Matrix<double, 3, 1>& reg_A() { return regularization_A_; }
+  const Eigen::Matrix<double, 3, 1>& reg_b() { return regularization_b_; }
+  const Eigen::Matrix<double, 6, 3>& NE_A() { return newton_euler_A_; }
 
-  const Eigen::Matrix<double, 3, 1> &appliedForce() { return contactForce_; }
+  const Eigen::Matrix<double, 3, 1>& appliedForce() { return contactForce_; }
 };
 
-} // namespace aig
+}  // namespace aig
 
-#endif // AIG_CONTACT_6D
+#endif  // AIG_CONTACT_6D

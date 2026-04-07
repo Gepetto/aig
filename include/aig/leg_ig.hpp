@@ -25,7 +25,7 @@ typedef Eigen::Matrix<double, 6, 1> LegJoints;
  * @brief
  */
 struct LegIGSettings {
-public:
+ public:
   Eigen::Vector3d hip_from_waist;
   Eigen::Vector3d knee_from_hip;
   Eigen::Vector3d ankle_from_knee;
@@ -37,14 +37,16 @@ public:
         ankle_from_knee(Eigen::Vector3d::Zero()),
         ankle_from_foot(Eigen::Vector3d::Zero()) {}
 
-  LegIGSettings(const Eigen::Vector3d &_hip_from_waist,
-                const Eigen::Vector3d &_knee_from_hip,
-                const Eigen::Vector3d &_ankle_from_knee,
-                const Eigen::Vector3d &_ankle_from_foot)
-      : hip_from_waist(_hip_from_waist), knee_from_hip(_knee_from_hip),
-        ankle_from_knee(_ankle_from_knee), ankle_from_foot(_ankle_from_foot) {}
+  LegIGSettings(const Eigen::Vector3d& _hip_from_waist,
+                const Eigen::Vector3d& _knee_from_hip,
+                const Eigen::Vector3d& _ankle_from_knee,
+                const Eigen::Vector3d& _ankle_from_foot)
+      : hip_from_waist(_hip_from_waist),
+        knee_from_hip(_knee_from_hip),
+        ankle_from_knee(_ankle_from_knee),
+        ankle_from_foot(_ankle_from_foot) {}
 
-  friend std::ostream &operator<<(std::ostream &out, const LegIGSettings &obj) {
+  friend std::ostream& operator<<(std::ostream& out, const LegIGSettings& obj) {
     out << "LegIGSettings:\n"
         << "    hip_from_waist: " << obj.hip_from_waist.transpose() << "\n"
         << "    knee_from_hip: " << obj.knee_from_hip.transpose() << "\n"
@@ -54,7 +56,7 @@ public:
     return out;
   }
 
-  friend bool operator==(const LegIGSettings &lhs, const LegIGSettings &rhs) {
+  friend bool operator==(const LegIGSettings& lhs, const LegIGSettings& rhs) {
     bool test = true;
     test &= lhs.hip_from_waist == rhs.hip_from_waist;
     test &= lhs.knee_from_hip == rhs.knee_from_hip;
@@ -68,7 +70,7 @@ public:
  * @brief @todo
  */
 class LegIG {
-private:
+ private:
   LegIGSettings settings_;
 
   // internals
@@ -80,15 +82,15 @@ private:
   Eigen::Matrix3d Rint_, Rext_, R_;
   LegJoints output_;
 
-public:
+ public:
   LegIG();
-  LegIG(const LegIGSettings &settings);
+  LegIG(const LegIGSettings& settings);
   void reset_internals();
-  const LegIGSettings &get_settings() { return settings_; }
-  void initialize(const LegIGSettings &settings);
-  LegJoints solve(const pinocchio::SE3 &base,
-                  const pinocchio::SE3 &endEffector);
+  const LegIGSettings& get_settings() { return settings_; }
+  void initialize(const LegIGSettings& settings);
+  LegJoints solve(const pinocchio::SE3& base,
+                  const pinocchio::SE3& endEffector);
 };
-} // namespace aig
+}  // namespace aig
 
-#endif // AIG_LEG_IG
+#endif  // AIG_LEG_IG
